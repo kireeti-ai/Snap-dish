@@ -1,4 +1,4 @@
-    /* src/pages/RestaurantDetail/RestaurantDetail.css */
+  
 
     .restaurant-detail-page {
         padding: 20px 5vw;
@@ -159,35 +159,31 @@
         padding-top: 20px;
     }
 
-    /* --- CORRECTED STYLES START HERE --- */
 
-    /* This targets the FoodItem component specifically on this page */
     .category-items .food-item {
         display: flex;
-        /* THIS IS THE KEY CHANGE: Align items to the start, not spread apart */
+    
         justify-content: flex-start; 
         align-items: flex-start;
         padding: 15px 0;
         border-bottom: 1px solid #f0f0f0;
-        gap: 15px; /* Add space between image and text */
+        gap: 15px; 
     }
 
-    /* This targets the main info block (name, price, description) */
+
     .category-items .food-item .food-item-info {
-        flex-grow: 1; /* Allows this section to take up available space */
+        flex-grow: 1; 
     }
 
-    /* This rule ensures the name and rating stars don't spread apart */
     .category-items .food-item .food-item-name-rating {
         display: flex;
-        justify-content: space-between; /* This is okay for name and stars */
+        justify-content: space-between; 
         align-items: center;
     }
 
-    /* This targets the image container */
     .category-items .food-item .food-item-img-container {
         position: relative;
-        flex-shrink: 0; /* Prevents the image from shrinking */
+        flex-shrink: 0; 
     }
 
     .category-items .food-item .food-item-image {
@@ -197,7 +193,6 @@
         border-radius: 8px;
     }
 
-    /* This correctly positions the add/remove buttons over the image */
     .category-items .food-item .add,
     .category-items .food-item .food-item-counter {
         position: absolute;
@@ -209,7 +204,7 @@
         border-radius: 20px;
     }
 
-    /* --- CORRECTED STYLES END HERE --- */
+
 
     .fixed-menu-button {
         position: fixed;
@@ -239,12 +234,12 @@
             font-size: 24px;
         }
         .category-items .food-item {
-            /* On smaller screens, you might want them to stack again */
+     
             flex-direction: column;
-            align-items: stretch; /* Stretch to full width */
+            align-items: stretch;
             gap: 10px;
         }
         .category-items .food-item .food-item-img-container {
-            align-self: center; /* Center the image when stacked */
+            align-self: center; 
         }
     }

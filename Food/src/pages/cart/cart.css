@@ -1,25 +1,22 @@
-/* src/pages/Cart/cart.css */
-
 .cart {
-    margin: 100px auto; /* Centers the entire cart container on the page */
-    max-width: 1200px; /* Increased max-width to give more space for two columns */
+    margin: 100px auto;
+    max-width: 1200px;
     padding: 20px;
-    display: flex; /* Make the main cart container a flex container */
-    justify-content: space-between; /* Pushes the left and right sections to opposite ends */
-    gap: 50px; /* Space between the cart items section and the total/promo section */
-    flex-wrap: wrap; /* Allows sections to wrap onto a new line on smaller screens */
-    align-items: flex-start; /* Aligns items to the top if they have different heights */
+    display: flex;
+    justify-content: space-between;
+    gap: 50px;
+    flex-wrap: wrap;
+    align-items: flex-start;
 }
 
-/* LEFT SIDE - Cart Items Table (List of individual food items) */
 .cart-items {
-    flex: 2; /* This section will take up more space (e.g., about 60-70% of available width) */
-    min-width: 450px; /* Ensures the items list doesn't get too narrow before wrapping */
+    flex: 2;
+    min-width: 450px;
 }
 
 .cart-items-title {
     display: grid;
-    grid-template-columns: 1fr 1.5fr 1fr 1fr 1fr 0.5fr; /* Adjust column widths as needed */
+    grid-template-columns: 1fr 1.5fr 1fr 1fr 1fr 0.5fr;
     align-items: center;
     gap: 10px;
     padding: 10px 0;
@@ -31,7 +28,7 @@
 .cart-items-item {
     margin: 10px 0;
     display: grid;
-    grid-template-columns: 1fr 1.5fr 1fr 1fr 1fr 0.5fr; /* Same column structure as title */
+    grid-template-columns: 1fr 1.5fr 1fr 1fr 1fr 0.5fr;
     align-items: center;
     gap: 10px;
     padding: 10px 0;
@@ -40,13 +37,13 @@
 }
 
 .cart-items-item img {
-    width: 60px; /* Adjust image size */
+    width: 60px;
     height: 60px;
     border-radius: 4px;
-    object-fit: cover; /* Ensures images fit without distortion */
+    object-fit: cover;
 }
 
-.cart-items-item .cro { /* Styling for the 'x' remove button with class 'cro' */
+.cart-items-item .cro {
     cursor: pointer;
     color: red;
     font-size: 20px;
@@ -58,25 +55,23 @@
     height: 1px;
     background-color: #e0e0e0;
     border: none;
-    margin: 5px 0; /* Adjust margin for hr inside the map */
+    margin: 5px 0;
 }
 
 .cart-items-empty {
-  text-align: center;
-  padding: 50px;
-  font-size: 18px;
-  color: #555;
+    text-align: center;
+    padding: 50px;
+    font-size: 18px;
+    color: #555;
 }
 
-
-/* RIGHT SIDE - Cart Total and Promo Code Sections */
 .cart-bottom {
-    flex: 1; /* This section will take up less space (e.g., about 30-40% of available width) */
-    min-width: 300px; /* Ensures the summary section doesn't get too narrow */
+    flex: 1;
+    min-width: 300px;
     display: flex;
-    flex-direction: column; /* Stacks cart total and promo vertically within this right column */
-    gap: 30px; /* Gap between cart total and promo code sections */
-    padding-top: 0px; /* Adjust if you need to vertically align with cart items header */
+    flex-direction: column;
+    gap: 30px;
+    padding-top: 0px;
 }
 
 .cart-total {
@@ -109,7 +104,7 @@
 }
 
 .cart-total button {
-    background-color: purple; /* Example color */
+    background-color: purple;
     color: white;
     padding: 12px 20px;
     border: none;
@@ -117,15 +112,13 @@
     cursor: pointer;
     font-size: 16px;
     font-weight: 500;
-    margin-top: 20px; /* Space above the button */
+    margin-top: 20px;
     transition: background-color 0.3s ease;
 }
 
 .cart-total button:hover {
-    background-color: purple; /* Darker shade on hover */
+    background-color: purple;
 }
-
-
 
 .cart-promocode p {
     font-size: 16px;
@@ -136,22 +129,22 @@
 
 .cart-promo-input {
     display: flex;
-    width: 100%; /* Take full width of its container */
+    width: 100%;
     border-radius: 4px;
-    overflow: hidden; /* Ensures border-radius applies to children */
-    border: 1px solid #ddd; /* Add a subtle border */
+    overflow: hidden;
+    border: 1px solid #ddd;
 }
 
 .cart-promo-input input {
-    flex: 1; /* Take all available space in the flex container */
+    flex: 1;
     padding: 10px 15px;
     border: none;
-    outline: none; /* Remove outline on focus */
+    outline: none;
     font-size: 14px;
 }
 
 .cart-promo-input button {
-    background-color: black; /* Example color */
+    background-color: black;
     color: white;
     padding: 10px 20px;
     border: none;
@@ -162,22 +155,21 @@
 }
 
 .cart-promo-input button:hover {
-    background-color: #333; /* Darker shade on hover */
+    background-color: #333;
 }
 
-/* Responsive adjustments */
-@media (max-width: 992px) { /* When screen width is less than 992px */
+@media (max-width: 992px) {
     .cart {
-        flex-direction: column; /* Stack the main sections vertically */
-        gap: 50px; /* Space between the stacked sections */
-        align-items: center; /* Center the stacked sections horizontally */
+        flex-direction: column;
+        gap: 50px;
+        align-items: center;
     }
 
     .cart-items,
     .cart-bottom {
-        width: 100%; /* Make them take full width when stacked */
-        flex: unset; /* Remove flex sizing when stacked */
-        min-width: unset; /* Remove min-width when stacked */
+        width: 100%;
+        flex: unset;
+        min-width: unset;
     }
 }
 
@@ -189,7 +181,7 @@
     .cart-items-title,
     .cart-items-item {
         font-size: 12px;
-        grid-template-columns: 0.8fr 1.2fr 0.8fr 0.8fr 0.8fr 0.5fr; /* Adjust columns for smaller screens */
+        grid-template-columns: 0.8fr 1.2fr 0.8fr 0.8fr 0.8fr 0.5fr;
     }
 
     .cart-items-item img {
@@ -213,11 +205,11 @@
     .cart-items-title,
     .cart-items-item {
         font-size: 10px;
-        grid-template-columns: 0.6fr 1fr 0.6fr 0.6fr 0.6fr 0.4fr; /* Further adjustment for very small screens */
+        grid-template-columns: 0.6fr 1fr 0.6fr 0.6fr 0.6fr 0.4fr;
     }
 
     .cart-items-item p {
-        white-space: nowrap; /* Prevent text wrapping for very small screens */
+        white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
     }

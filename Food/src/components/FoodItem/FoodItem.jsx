@@ -1,15 +1,11 @@
-// src/components/FoodItem/FoodItem.jsx
 import React, { useContext } from 'react';
 import './FoodItem.css';
 import { assets } from '../../assets/assets.js';
 import { StoreContext } from '../../Context/StoreContext';
 
-// Accept the new 'context' prop to allow for different styling
 const FoodItem = ({ id, name, price, description, image, context }) => {
     const { cartItems, addToCart, removeFromCart } = useContext(StoreContext);
 
-    // Create a dynamic class name based on the context prop
-    // This will result in "food-item food-item-main-page" or "food-item food-item-detail-page"
     const itemClassName = `food-item food-item-${context}`;
 
     return (

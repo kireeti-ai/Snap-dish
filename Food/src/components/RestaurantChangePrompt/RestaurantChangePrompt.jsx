@@ -1,19 +1,15 @@
-// src/components/RestaurantChangePrompt/RestaurantChangePrompt.jsx
 import React, { useContext } from 'react';
 import { StoreContext } from '../../Context/StoreContext';
 import './RestaurantChangePrompt.css';
 
 const RestaurantChangePrompt = () => {
-  // Get the required functions and state from the context
   const { setShowRestaurantPrompt, clearCartAndAddToCart } = useContext(StoreContext);
 
   const handleConfirm = () => {
-    // This function will clear the cart and add the new item
     clearCartAndAddToCart();
   };
 
   const handleCancel = () => {
-    // This simply closes the prompt
     setShowRestaurantPrompt(false);
   };
 

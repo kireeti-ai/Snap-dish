@@ -1,68 +1,62 @@
 .login-popup {
-    position: fixed; /* Fixed position to cover the entire viewport */
+    position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.6); /* Semi-transparent black overlay */
-    display: flex; /* Use flexbox to center the popup box */
-    justify-content: center; /* Center horizontally */
-    align-items: center; /* Center vertically */
-    z-index: 1000; /* Ensure it's above other content */
-    animation: fadeIn 0.3s ease-out; /* Simple fade-in animation */
+    background-color: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    animation: fadeIn 0.3s ease-out;
 }
 
 .login-popup-box {
-    background-color: #fff; /* White background for the form */
-    color: #333; /* Darker text color */
-    padding: 30px 40px; /* Ample padding inside the box */
-    border-radius: 8px; /* Slightly rounded corners */
-    width: min(90vw, 400px); /* Responsive width: 90% of viewport width, max 400px */
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); /* Soft shadow for depth */
-    display: flex; /* Flex container for content inside the box */
-    flex-direction: column; /* Stack elements vertically */
-    gap: 20px; /* Space between main sections */
-    animation: slideIn 0.4s ease-out forwards; /* Slide-in animation */
+    background-color: #fff;
+    color: #333;
+    padding: 30px 40px;
+    border-radius: 8px;
+    width: min(90vw, 400px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    animation: slideIn 0.4s ease-out forwards;
 }
 
-/* Ensure the form elements within the 'title' div are structured correctly
-   The JSX for 'inputs', 'button', 'login-popup-condition', and the last <p>
-   are directly inside the 'title' div, which might be a structural oversight.
-   If 'title' is strictly for h2 and img, then 'inputs' etc. should be siblings of 'title'.
-   Assuming the JSX you provided is as-is, we'll style based on that.
-*/
 .login-popup-box .title {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 20px; /* Space below the title group */
-    flex-wrap: wrap; /* Allow wrapping if content is too wide */
-    gap: 15px; /* Gap between title and img if they wrap */
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 15px;
 }
 
 .login-popup-box h2 {
     font-size: 28px;
     font-weight: 600;
     color: #333;
-    margin: 0; /* Remove default margin */
+    margin: 0;
 }
 
 .login-popup-box .title img {
-    width: 20px; /* Size for the close icon */
+    width: 20px;
     cursor: pointer;
     transition: transform 0.2s ease-in-out;
 }
 
 .login-popup-box .title img:hover {
-    transform: rotate(90deg); /* Slight rotation on hover for close icon */
+    transform: rotate(90deg);
 }
 
 .login-popup-box .inputs {
     display: flex;
     flex-direction: column;
-    gap: 15px; /* Space between input fields */
-    margin-bottom: 20px; /* Space below the input group */
-    width: 100%; /* Ensure inputs take full width */
+    gap: 15px;
+    margin-bottom: 20px;
+    width: 100%;
 }
 
 .login-popup-box .inputs input {
@@ -70,11 +64,11 @@
     border: 1px solid #ccc;
     border-radius: 4px;
     font-size: 16px;
-    outline: none; /* Remove outline on focus */
+    outline: none;
 }
 
 .login-popup-box .inputs input:focus {
-    border-color: purple; /* Highlight border on focus */
+    border-color: purple;
 }
 
 .login-popup-box button {
@@ -87,52 +81,50 @@
     font-weight: 500;
     cursor: pointer;
     transition: background-color 0.2s ease;
-    width: 100%; /* Make button full width */
+    width: 100%;
 }
 
 .login-popup-box button:hover {
-    background-color: purple; /* Slightly darker red on hover */
+    background-color: purple;
 }
 
 .login-popup-condition {
     display: flex;
     align-items: center;
-    gap: 8px; /* Space between checkbox and text */
-    margin-top: 15px; /* Space above the condition */
+    gap: 8px;
+    margin-top: 15px;
 }
 
 .login-popup-condition input[type="checkbox"] {
     width: 18px;
     height: 18px;
-    accent-color: purple; /* Style checkbox color */
+    accent-color: purple;
     cursor: pointer;
 }
 
 .login-popup-condition p {
     font-size: 14px;
     color: #555;
-    margin: 0; /* Remove default margin */
+    margin: 0;
 }
 
 .login-popup-box p {
     font-size: 15px;
     color: #666;
-    margin: 10px 0 0; /* Margin above the login/signup toggle text */
+    margin: 10px 0 0;
 }
 
 .login-popup-box p span {
     color: purple;
     font-weight: 500;
     cursor: pointer;
-    text-decoration: underline; /* Underline to indicate clickability */
+    text-decoration: underline;
 }
 
 .login-popup-box p span:hover {
-    color: purple; /* Darker red on hover */
+    color: purple;
 }
 
-
-/* Keyframe Animations */
 @keyframes fadeIn {
     from { opacity: 0; }
     to { opacity: 1; }
@@ -143,11 +135,10 @@
     to { transform: translateY(0) scale(1); opacity: 1; }
 }
 
-/* Responsive adjustments for smaller screens if needed */
 @media (max-width: 600px) {
     .login-popup-box {
         padding: 20px 25px;
-        width: 95vw; /* Take up more width on very small screens */
+        width: 95vw;
     }
 
     .login-popup-box h2 {

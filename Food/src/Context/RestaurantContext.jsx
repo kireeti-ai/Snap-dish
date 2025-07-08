@@ -1,4 +1,4 @@
-// src/Context/RestaurantContext.jsx - CORRECTED
+
 import { createContext } from 'react';
 import { restaurant_list } from '../assets/assets.js';
 

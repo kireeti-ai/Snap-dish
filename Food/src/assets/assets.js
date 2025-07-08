@@ -1,6 +1,4 @@
-// src/assets/assets.js
 
-// Asset Imports
 import basket_icon from './bag_icon.png'
 import logo from './logo-snapdish.png'
 import header_img from './header.jpeg'

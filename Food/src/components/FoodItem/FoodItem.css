@@ -1,6 +1,3 @@
-
-
-/* Main Food Item Container */
 .food-item {
   width: 100%;
   margin: auto;
@@ -14,14 +11,12 @@
   transform: translateY(-5px);
 }
 
-/* Food Image */
 .food-item-image {
   width: 100%;
   border-radius: 15px;
   display: block;
 }
 
-/* Name and Rating Row */
 .food-item-name-rating {
   display: flex;
   align-items: center;
@@ -29,20 +24,16 @@
   margin-bottom: 10px;
 }
 
-/* Price Styling */
 .food-item-price {
   margin-top: 10px;
-  font-size: 1.1rem;  /* Better scaling than vw */
-
+  font-size: 1.1rem;
   font-weight: bold;
 }
 
-/* Image Container (for positioning icons) */
 .food-item-img-container {
   position: relative;
 }
 
-/* Add Button (when count = 0) */
 .food-item-img-container .add {
   width: 35px;
   position: absolute;
@@ -57,7 +48,6 @@
   transform: scale(1.1);
 }
 
-/* Counter when count > 0 */
 .food-item-counter {
   position: absolute;
   bottom: 15px;
@@ -72,13 +62,11 @@
   font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
 }
 
-/* Description text */
 .food-item-disc {
   font-size: 0.95rem;
   color: #333;
 }
 
-/* Fade In Animation */
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -90,7 +78,6 @@
   }
 }
 
-/* Optional: Make sure images are responsive */
 .food-item img {
   max-width: 100%;
   height: auto;

@@ -12,11 +12,11 @@
 
 .restaurant-list {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); /* Responsive grid */
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: 25px;
     row-gap: 40px;
-    justify-content: center; /* Center items in the grid */
-    padding: 0 20px; /* Add some padding on the sides */
+    justify-content: center;
+    padding: 0 20px;
 }
 
 @media (max-width: 768px) {
@@ -27,7 +27,7 @@
 
 @media (max-width: 480px) {
     .restaurant-list {
-        grid-template-columns: 1fr; /* Single column on very small screens */
+        grid-template-columns: 1fr;
         padding: 0 10px;
     }
 }

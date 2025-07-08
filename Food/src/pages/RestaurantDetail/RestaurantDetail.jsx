@@ -1,4 +1,4 @@
-// src/pages/RestaurantDetail/RestaurantDetail.jsx
+
 import React, { useContext, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { RestaurantContext } from '../../Context/RestaurantContext';
@@ -12,12 +12,8 @@ const RestaurantDetail = () => {
     const { restaurant_list } = useContext(RestaurantContext);
     const [restaurant, setRestaurant] = useState(null);
     const [restaurantMenu, setRestaurantMenu] = useState({});
-
-    // --- NEW STATE FOR FILTERS ---
     const [searchTerm, setSearchTerm] = useState("");
     const [vegOnly, setVegOnly] = useState(false);
-    // -----------------------------
-
     useEffect(() => {
         const foundRestaurant = restaurant_list.find(r => r._id === id);
         if (foundRestaurant) {
@@ -74,7 +70,7 @@ const RestaurantDetail = () => {
                     <img src={assets.search_icon} alt="search" className="search-icon" />
                 </div>
                 <div className="filter-options">
-                    {/* Connect button to state and add dynamic class for styling */}
+
                     <button 
                         className={`filter-button ${vegOnly ? 'active' : ''}`}
                         onClick={() => setVegOnly(!vegOnly)}
