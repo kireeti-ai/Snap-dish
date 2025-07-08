@@ -1,0 +1,143 @@
+.footer {
+    background-color: #333; /* Dark background for a professional look */
+    color: #fff; /* White text for contrast */
+    padding: 50px 0; /* Vertical padding */
+    font-family: 'Arial', sans-serif; /* A common, readable font */
+}
+
+.footer-content {
+    display: flex;
+    justify-content: space-around; /* Distribute content evenly */
+    flex-wrap: wrap; /* Allow wrapping on smaller screens */
+    max-width: 1200px; /* Max width for the content */
+    margin: 0 auto; /* Center the content */
+    padding: 0 20px; /* Horizontal padding for smaller screens */
+}
+
+.footer-content-left,
+.footer-content-center,
+.footer-content-right {
+    flex: 1; /* Allow items to grow and shrink */
+    min-width: 280px; /* Minimum width before wrapping */
+    margin-bottom: 30px; /* Space between sections on smaller screens */
+}
+
+/* Left Section */
+.footer-content-left img {
+    width: 120px; /* Adjust logo size */
+    margin-bottom: 20px;
+}
+
+.footer-content-left p {
+    font-size: 14px;
+    line-height: 1.6;
+    margin-bottom: 20px;
+    color: #ccc; /* Lighter text for paragraphs */
+}
+
+.social-icon {
+    display: flex;
+    gap: 15px; /* Space between social icons */
+}
+
+.social-icon img {
+    width: 30px; /* Size of social icons */
+    height: 30px;
+    cursor: pointer;
+    transition: transform 0.3s ease; /* Smooth hover effect */
+}
+
+.social-icon img:hover {
+    transform: translateY(-5px); /* Lift effect on hover */
+}
+
+/* Center Section */
+.footer-content-center h2,
+.footer-content-right h3 {
+    font-size: 20px;
+    margin-bottom: 25px;
+    color: #eee; /* Slightly lighter heading color */
+}
+
+.footer-content-center ul,
+.footer-content-right ul {
+    list-style: none; /* Remove bullet points */
+    padding: 0;
+    margin: 0;
+}
+
+.footer-content-center li,
+.footer-content-right li {
+    margin-bottom: 10px;
+    font-size: 15px;
+    cursor: pointer;
+    transition: color 0.3s ease; /* Smooth hover for list items */
+    color: #ccc;
+}
+
+.footer-content-center li:hover,
+.footer-content-right li:hover {
+    color: #007bff; /* Highlight on hover (e.g., a blue color) */
+}
+
+/* Horizontal Rule */
+.footer hr {
+    border: none;
+    border-top: 1px solid #555; /* Lighter line */
+    margin: 40px auto 20px; /* Top, horizontal auto, bottom margin */
+    max-width: 1160px; /* Match content width */
+}
+
+/* Copyright */
+.footer-copyright {
+    text-align: center;
+    font-size: 14px;
+    color: #aaa; /* Muted color for copyright */
+    padding-top: 20px; /* Space above copyright text */
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .footer-content {
+        flex-direction: column; /* Stack content vertically */
+        align-items: center; /* Center items when stacked */
+        text-align: center; /* Center text within sections */
+    }
+
+    .footer-content-left,
+    .footer-content-center,
+    .footer-content-right {
+        min-width: unset; /* Remove min-width to allow full width */
+        width: 100%; /* Take full width */
+        margin-bottom: 40px; /* Increase space between sections */
+    }
+
+    .social-icon {
+        justify-content: center; /* Center social icons */
+    }
+
+    .footer-content-left p {
+        padding: 0 15px; /* Add horizontal padding to paragraph */
+    }
+}
+
+@media (max-width: 480px) {
+    .footer {
+        padding: 30px 0; /* Reduce padding on very small screens */
+    }
+
+    .footer-content-left img {
+        width: 100px; /* Smaller logo */
+    }
+
+    .footer-content-center h2,
+    .footer-content-right h3 {
+        font-size: 18px; /* Smaller headings */
+    }
+
+    .footer-content-center li,
+    .footer-content-right li,
+    .footer-copyright {
+        font-size: 13px; /* Smaller text */
+    }
+}

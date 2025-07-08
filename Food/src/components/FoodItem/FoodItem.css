@@ -1,0 +1,98 @@
+
+
+/* Main Food Item Container */
+.food-item {
+  width: 100%;
+  margin: auto;
+  border-radius: 15px;
+  box-shadow: 0px 0px 10px #00000015;
+  transition: transform 0.3s ease;
+  animation: fadeIn 1s;
+}
+
+.food-item:hover {
+  transform: translateY(-5px);
+}
+
+/* Food Image */
+.food-item-image {
+  width: 100%;
+  border-radius: 15px;
+  display: block;
+}
+
+/* Name and Rating Row */
+.food-item-name-rating {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+/* Price Styling */
+.food-item-price {
+  margin-top: 10px;
+  font-size: 1.1rem;  /* Better scaling than vw */
+
+  font-weight: bold;
+}
+
+/* Image Container (for positioning icons) */
+.food-item-img-container {
+  position: relative;
+}
+
+/* Add Button (when count = 0) */
+.food-item-img-container .add {
+  width: 35px;
+  position: absolute;
+  bottom: 15px;
+  right: 15px;
+  cursor: pointer;
+  border-radius: 50%;
+  transition: transform 0.2s ease;
+}
+
+.food-item-img-container .add:hover {
+  transform: scale(1.1);
+}
+
+/* Counter when count > 0 */
+.food-item-counter {
+  position: absolute;
+  bottom: 15px;
+  right: 15px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 10px;
+  border-radius: 50px;
+  background-color: white;
+  box-shadow: 0 0 5px #00000020;
+  font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+}
+
+/* Description text */
+.food-item-disc {
+  font-size: 0.95rem;
+  color: #333;
+}
+
+/* Fade In Animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Optional: Make sure images are responsive */
+.food-item img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
