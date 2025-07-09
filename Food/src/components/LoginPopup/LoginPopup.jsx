@@ -4,7 +4,7 @@ import './LoginPopup.css';
 import { assets } from '../../assets/assets';
 
 const LoginPopup = ({ setShowLogin }) => {
-    const [cur, setCur] = useState("Login"); // State to manage 'Login' or 'Sign Up' view
+    const [cur, setCur] = useState("Login"); 
 
     return (
         <div className='login-popup'>
