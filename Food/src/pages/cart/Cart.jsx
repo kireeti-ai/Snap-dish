@@ -3,14 +3,10 @@ import './cart.css'
 import { StoreContext } from '../../Context/StoreContext'
 
 const Cart = () => {
-
   const { cartItems, food_list, removeFromCart, getTotalCartAmount } = useContext(StoreContext);
-
   const subTotal = getTotalCartAmount();
-
-  const deliveryFee = subTotal > 0 ? 2 : 0;
+  const deliveryFee = subTotal > 0 ? 99 : 0;
   const totalAmount = subTotal + deliveryFee;
-
   return (
     <div className='cart'>
       <div className="cart-items">
