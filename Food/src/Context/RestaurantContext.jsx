@@ -10,9 +10,9 @@ const RestaurantContextProvider = (props) => {
     }
 
     return (
-        // Use the Provider from the Context, not the component itself
+      
         <RestaurantContext.Provider value={contextValue}>
-            {props.children} {/* Corrected typo: props.children */}
+            {props.children} 
         </RestaurantContext.Provider>
     )
 }

@@ -18,7 +18,6 @@ const RestaurantDetail = () => {
         const foundRestaurant = restaurant_list.find(r => r._id === id);
         if (foundRestaurant) {
             setRestaurant(foundRestaurant);
-
             const filteredFood = food_list.filter(food => food.restaurant === foundRestaurant.name);
             const categorizedMenu = filteredFood.reduce((acc, food) => {
                 if (!acc[food.category]) {
@@ -75,7 +74,7 @@ const RestaurantDetail = () => {
                         className={`filter-button ${vegOnly ? 'active' : ''}`}
                         onClick={() => setVegOnly(!vegOnly)}
                     >
-                        <img src={assets.checked} alt="veg icon"/> Pure Veg
+                         Pure Veg
                     </button>
                     <button className="filter-button">Bestseller</button>
                 </div>
@@ -120,9 +119,7 @@ const RestaurantDetail = () => {
                 })}
             </div>
 
-             <div className="fixed-menu-button">
-                <button>MENU</button>
-            </div>
+
         </div>
     );
 }

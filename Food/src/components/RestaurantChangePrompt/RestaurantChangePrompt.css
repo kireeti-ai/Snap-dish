@@ -64,12 +64,12 @@
 }
 
 .prompt-confirm-btn {
-  background-color: #e5383b;
+  background-color: purple;
   color: white;
 }
 
 .prompt-confirm-btn:hover {
-  background-color: #c02d2f;
+  background-color: rgb(237, 129, 237);
 }
 
 @keyframes fadeIn {
