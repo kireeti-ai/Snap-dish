@@ -10,7 +10,6 @@ import save from './save.png'
 import loading from './loading-bar.png'
 import trash from './trash-can.png'
 import user from './user.png'
-
 import menu_1 from './biryani.png.avif'
 import menu_2 from './fried rice.png.avif'
 import menu_3 from './paratha.png.avif'
@@ -19,7 +18,6 @@ import menu_5 from './pizza.png.avif'
 import menu_6 from './menu_6.png'
 import menu_7 from './menu_7.png'
 import menu_8 from './menu_8.png'
-
 import food_1 from './food_1.png'
 import food_2 from './food_2.png'
 import food_3 from './food_3.png'
@@ -42,7 +40,6 @@ import food_19 from './food_19.png'
 import food_20 from './food_20.png'
 import food_21 from './food_21.png'
 import food_22 from './food_22.png'
-
 import add_icon_white from './add_icon_white.png'
 import add_icon_green from './add_icon_green.png'
 import remove_icon_red from './remove_icon_red.png'
@@ -61,8 +58,7 @@ import parcel_icon from './parcel_icon.png'
 import checked from './checked.png'
 import un_checked from './un_checked.png'
 
-
-// Exported Assets Object
+// Exported Assets Object (no changes here)
 export const assets = {
     logo, save, loading, offer, trash, user, star, time,
     basket_icon, header_img, search_icon, rating_starts,
@@ -72,19 +68,18 @@ export const assets = {
     logout_icon, bag_icon, parcel_icon, checked, un_checked
 }
 
-// Menu List
 export const menu_list = [
-    { menu_name: "Biryani", menu_image: menu_1 },
-    { menu_name: "Fried Rice", menu_image: menu_2 },
-    { menu_name: "Parata", menu_image: menu_3 },
-    { menu_name: "Cakes", menu_image: menu_4 },
-    { menu_name: "Pizza", menu_image: menu_5 },
+    { menu_name: "Salad", menu_image: menu_1 },
+    { menu_name: "Rolls", menu_image: menu_2 },
+    { menu_name: "Desserts", menu_image: menu_3 },
+    { menu_name: "Sandwich", menu_image: menu_4 },
+    { menu_name: "Cake", menu_image: menu_5 },
     { menu_name: "Pure Veg", menu_image: menu_6 },
     { menu_name: "Pasta", menu_image: menu_7 },
     { menu_name: "Noodles", menu_image: menu_8 }
 ]
 
-// Restaurant List
+
 export const restaurant_list = [
   { _id: "1", name: "Tasty Bites", image: food_11, cuisine: "Indian, Chinese", rating: 4.5, time: "30-40 min", address: "123 Main Street, Downtown", people: 60, price_for_two: 600 },
   { _id: "2", name: "Pizza Planet", image: food_12, cuisine: "Italian", rating: 4.2, time: "20-30 min", address: "456 Elm Avenue, City Center", people: 45, price_for_two: 800 },
@@ -101,26 +96,25 @@ export const restaurant_list = [
 ];
 
 
-// Food List with restaurant_id added
 export const food_list = [
-  { _id: "1", name: "Greek Salad", image: food_1, price: 12, description: "A refreshing mix of fresh vegetables", category: "Salad", type: "Veg", restaurant: "The Green Bowl", restaurant_id: "8" },
+  { _id: "1", name: "Greek Salad", image: food_1, price: 12, description: "A refreshing mix of fresh vegetables", category: "Salad", type: "Veg", restaurant: "The Green Bowl", restaurant_id: "8", is_top_dish: true },
   { _id: "2", name: "Veg Salad", image: food_2, price: 18, description: "A healthy and delicious vegetable salad", category: "Salad", type: "Veg", restaurant: "The Green Bowl", restaurant_id: "8" },
   { _id: "3", name: "Clover Salad", image: food_3, price: 16, description: "A special salad with a unique dressing", category: "Salad", type: "Veg", restaurant: "Urban Diner", restaurant_id: "3" },
-  { _id: "4", name: "Chicken Salad", image: food_4, price: 24, description: "Grilled chicken strips on a bed of greens", category: "Salad", type: "NonVeg", restaurant: "Flame Grill", restaurant_id: "9" },
+  { _id: "4", name: "Chicken Salad", image: food_4, price: 24, description: "Grilled chicken strips on a bed of greens", category: "Salad", type: "NonVeg", restaurant: "Flame Grill", restaurant_id: "9", is_top_dish: true },
   { _id: "5", name: "Lasagna Rolls", image: food_5, price: 14, description: "Classic lasagna rolled into perfect bites", category: "Rolls", type: "Veg", restaurant: "Pasta Fiesta", restaurant_id: "7" },
   { _id: "6", name: "Peri Peri Rolls", image: food_6, price: 12, description: "Spicy peri-peri seasoned rolls", category: "Rolls", type: "Veg", restaurant: "Flame Grill", restaurant_id: "9" },
-  { _id: "7", name: "Chicken Rolls", image: food_7, price: 20, description: "Tender chicken wrapped in a soft roll", category: "Rolls", type: "NonVeg", restaurant: "Burger Hub", restaurant_id: "6" },
+  { _id: "7", name: "Chicken Rolls", image: food_7, price: 20, description: "Tender chicken wrapped in a soft roll", category: "Rolls", type: "NonVeg", restaurant: "Burger Hub", restaurant_id: "6", is_top_dish: true },
   { _id: "8", name: "Veg Rolls", image: food_8, price: 15, description: "Mixed vegetables in a crispy roll", category: "Rolls", type: "Veg", restaurant: "The Green Bowl", restaurant_id: "8" },
   { _id: "9", name: "Ripple Ice Cream", image: food_9, price: 14, description: "Creamy ice cream with chocolate ripples", category: "Desserts", type: "Veg", restaurant: "Desert Delights", restaurant_id: "10" },
-  { _id: "10", name: "Chocolate Lava Cake", image: food_10, price: 18, description: "Warm chocolate cake with a gooey center", category: "Desserts", type: "Veg", restaurant: "Desert Delights", restaurant_id: "10" },
+  { _id: "10", name: "Chocolate Lava Cake", image: food_10, price: 18, description: "Warm chocolate cake with a gooey center", category: "Desserts", type: "Veg", restaurant: "Desert Delights", restaurant_id: "10", is_top_dish: true },
   { _id: "11", name: "Fruit Salad", image: food_11, price: 15, description: "A mix of fresh seasonal fruits", category: "Desserts", type: "Veg", restaurant: "The Green Bowl", restaurant_id: "8" },
-  { _id: "12", name: "Margherita Pizza", image: food_12, price: 22, description: "Classic pizza with tomato, mozzarella, and basil", category: "Pizza", type: "Veg", restaurant: "Pizza Planet", restaurant_id: "2" },
+  { _id: "12", name: "Margherita Pizza", image: food_12, price: 22, description: "Classic pizza with tomato, mozzarella, and basil", category: "Pizza", type: "Veg", restaurant: "Pizza Planet", restaurant_id: "2", is_top_dish: true },
   { _id: "13", name: "Pepperoni Pizza", image: food_13, price: 26, description: "A meaty pizza with spicy pepperoni", category: "Pizza", type: "NonVeg", restaurant: "Pizza Planet", restaurant_id: "2" },
   { _id: "14", name: "Paneer Tikka Pizza", image: food_14, price: 24, description: "An Indian twist on the classic pizza", category: "Pizza", type: "Veg", restaurant: "Curry House", restaurant_id: "4" },
   { _id: "15", name: "Sushi Platter", image: food_15, price: 35, description: "An assortment of fresh sushi rolls", category: "Sushi", type: "NonVeg", restaurant: "Sushi World", restaurant_id: "5" },
   { _id: "16", name: "Veggie Burger", image: food_16, price: 10, description: "A delicious and hearty vegetable burger", category: "Burger", type: "Veg", restaurant: "Burger Hub", restaurant_id: "6" },
-  { _id: "17", name: "Spaghetti Carbonara", image: food_17, price: 28, description: "Creamy pasta with bacon and cheese", category: "Pasta", type: "NonVeg", restaurant: "Pasta Fiesta", restaurant_id: "7" },
-  { _id: "18", name: "Pad Thai", image: food_18, price: 25, description: "Stir-fried rice noodles with shrimp and peanuts", category: "Noodles", type: "NonVeg", restaurant: "Thai Spice", restaurant_id: "11" },
-  { _id: "19", name: "Butter Chicken", image: food_19, price: 30, description: "Creamy and rich butter chicken curry", category: "Curry", type: "NonVeg", restaurant: "Punjabi Rasoi", restaurant_id: "12" },
+  { _id: "17", name: "Spaghetti Carbonara", image: food_17, price: 28, description: "Creamy pasta with bacon and cheese", category: "Pasta", type: "NonVeg", restaurant: "Pasta Fiesta", restaurant_id: "7", is_top_dish: true },
+  { _id: "18", name: "Pad Thai", image: food_18, price: 25, description: "Stir-fried rice noodles with shrimp and peanuts", category: "Noodles", type: "NonVeg", restaurant: "Thai Spice", restaurant_id: "11", is_top_dish: true },
+  { _id: "19", name: "Butter Chicken", image: food_19, price: 30, description: "Creamy and rich butter chicken curry", category: "Curry", type: "NonVeg", restaurant: "Punjabi Rasoi", restaurant_id: "12", is_top_dish: true },
   { _id: "20", name: "Dal Makhani", image: food_20, price: 20, description: "Slow-cooked black lentils in a creamy sauce", category: "Curry", type: "Veg", restaurant: "Punjabi Rasoi", restaurant_id: "12" }
 ];

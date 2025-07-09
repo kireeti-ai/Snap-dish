@@ -18,9 +18,11 @@ const StoreContextProvider = (props) => {
     if (Object.keys(cartItems).length === 0) {
       setCartItems({ [itemId]: 1 });
       setCartRestaurant(itemRestaurantId);
-    } else if (itemRestaurantId === cartRestaurant) {
+    } 
+    else if (itemRestaurantId === cartRestaurant) {
       setCartItems((prev) => ({ ...prev, [itemId]: (prev[itemId] || 0) + 1 }));
-    } else {
+    } 
+    else {
       setPendingItem(itemId);
       setShowRestaurantPrompt(true);
     }

@@ -1,10 +1,11 @@
 
-import React, { useState, useContext } from 'react'; 
+import React, { useState, useContext } from 'react';
 import Navbar from './components/navbar/navbar.jsx';
 import { Route, Routes } from 'react-router-dom';
 import Home from './pages/home/Home';
 import Cart from './pages/cart/Cart';
-import PlaceOrder from './pages/placeOrder/PlaceOrder';
+
+import PlaceOrder from './pages/PlaceOrder/PlaceOrder.jsx' 
 import RestaurantDetail from './pages/RestaurantDetail/RestaurantDetail.jsx';
 import LoginPopup from './components/LoginPopup/LoginPopup.jsx';
 import { StoreContext } from './Context/StoreContext.jsx';
