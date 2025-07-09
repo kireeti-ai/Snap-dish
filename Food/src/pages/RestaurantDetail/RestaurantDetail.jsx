@@ -31,7 +31,7 @@ const RestaurantDetail = () => {
     }, [id, restaurant_list]);
 
     if (!restaurant) {
-        return <div className="loading-state"><img src={assets.loading} alt="Loading"/>Loading restaurant details...</div>;
+        return <div className="loading-state"><img src={assets.loading} alt="Loading"/>Loading restaurant details... </div>;
     }
 
     return (
@@ -42,7 +42,7 @@ const RestaurantDetail = () => {
                     <p className="rating-info">
                         <img src={assets.star} alt="star" className="icon" /> {restaurant.rating} ({restaurant.people}k+ ratings)
                     </p>
-                    <p className="price-for-two">{restaurant.price_for_two}</p>
+                    <p className="price-for-two">Price For Two :  ₹{restaurant.price_for_two}</p>
                 </div>
                 <p className="cuisine">{restaurant.cuisine}</p>
                 <div className="location-time">
@@ -57,9 +57,9 @@ const RestaurantDetail = () => {
             <hr className="separator" />
 
             <div className="menu-search-filter">
-                <h3 className="menu-heading">-- MENU --</h3>
+                <h3 className="menu-heading"> MENU</h3>
                 <div className="search-bar">
-                    {/* Connect input to state */}
+                   
                     <input 
                         type="text" 
                         placeholder="Search for dishes" 
@@ -76,7 +76,7 @@ const RestaurantDetail = () => {
                     >
                          Pure Veg
                     </button>
-                    <button className="filter-button">Bestseller</button>
+                    <button className="filter-button" >Bestseller</button>
                 </div>
             </div>
 
@@ -84,14 +84,12 @@ const RestaurantDetail = () => {
 
             <div className="full-menu-section">
                 {Object.keys(restaurantMenu).map(category => {
-                    // Apply filters before rendering
+                
                     const filteredItems = restaurantMenu[category].filter(food => {
                         const matchesSearch = food.name.toLowerCase().includes(searchTerm.toLowerCase());
                         const matchesVeg = !vegOnly || food.type === 'Veg';
                         return matchesSearch && matchesVeg;
                     });
-
-                    // Only render the category if it has items after filtering
                     if (filteredItems.length === 0) {
                         return null;
                     }

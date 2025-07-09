@@ -1,9 +1,7 @@
-
 import React, { useContext } from 'react'
-
 import './RestaurantDisplay.css' 
 import {RestaurantContext} from  '../../Context/RestaurantContext.jsx'
-import RestaurantItem from '../RestaurantItem/RestaurantItem';
+import RestaurantItem from '../RestaurantItem/RestaurantItem'
 
 const RestaurantDisplay = () => {
     const {restaurant_list} = useContext(RestaurantContext);
