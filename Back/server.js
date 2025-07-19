@@ -11,6 +11,7 @@ app.use(cors());
 
 connectDb();
 //api endponits
+app.use('/images', express.static('uploads'))
 app.use("/api/food",foodRouter)
 app.get("/", (req, res) => {
     res.send("API working");
