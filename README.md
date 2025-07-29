@@ -3,7 +3,7 @@
 # SnapDish - A Full-Stack AI-Powered Food Delivery Platform
 
 <p align="center">
-  <img src="https://i.imgur.com/your-logo-url.png" width="200px" alt="SnapDish Logo">
+  <img src="/logo-snapdish.png" width="200px" alt="SnapDish Logo">
   <br>
   <i>Snap it. Eat it. Love it.</i>
 </p>
