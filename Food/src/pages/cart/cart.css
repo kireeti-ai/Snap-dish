@@ -1,0 +1,159 @@
+.cart {
+    margin: 100px auto;
+    max-width: 1200px;
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    gap: 50px;
+    flex-wrap: wrap;
+    align-items: flex-start;
+}
+
+.cart-items {
+    flex: 2;
+    min-width: 450px;
+}
+
+.cart-items-title {
+    display: grid;
+    grid-template-columns: 1fr 1.5fr 1fr 1fr 1fr 0.5fr;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 0;
+    color: grey;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.cart-items-item {
+    margin: 10px 0;
+    display: grid;
+    grid-template-columns: 1fr 1.5fr 1fr 1fr 1fr 0.5fr;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 0;
+    font-size: 16px;
+    font-weight: 500;
+}
+
+.cart-items-item img {
+    width: 60px;
+    height: 60px;
+    border-radius: 4px;
+    object-fit: cover;
+}
+
+.cart-items-item .cro {
+    cursor: pointer;
+    color: red;
+    font-size: 20px;
+    font-weight: bold;
+    text-align: center;
+}
+
+.cart hr {
+    height: 1px;
+    background-color: #e0e0e0;
+    border: none;
+    margin: 5px 0;
+}
+
+.cart-items-empty {
+    text-align: center;
+    padding: 50px;
+    font-size: 18px;
+    color: #555;
+}
+
+.cart-bottom {
+    flex: 1;
+    min-width: 300px;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    padding-top: 0px;
+}
+
+.cart-total {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.cart-total h2 {
+    font-size: 24px;
+    color: #333;
+}
+
+.cart-total .total-detail {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: #555;
+    margin-bottom: 10px;
+    font-size: 16px;
+}
+
+.cart-total .total-detail p {
+    margin: 0;
+}
+
+.cart-total .total-detail b {
+    font-size: 18px;
+    color: #000;
+}
+
+.cart-total button {
+    background-color: purple;
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 500;
+    margin-top: 20px;
+    transition: background-color 0.3s ease;
+}
+
+.cart-total button:hover {
+    background-color: purple;
+}
+
+.cart-promocode p {
+    font-size: 16px;
+    font-weight: 500;
+    color: #555;
+    margin-bottom: 15px;
+}
+
+.cart-promo-input {
+    display: flex;
+    width: 100%;
+    border-radius: 4px;
+    overflow: hidden;
+    border: 1px solid #ddd;
+}
+
+.cart-promo-input input {
+    flex: 1;
+    padding: 10px 15px;
+    border: none;
+    outline: none;
+    font-size: 14px;
+}
+
+.cart-promo-input button {
+    background-color: black;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: background-color 0.3s ease;
+}
+
+.cart-promo-input button:hover {
+    background-color: #333;
+}

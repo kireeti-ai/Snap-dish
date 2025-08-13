@@ -1,0 +1,262 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
+
+body {
+  font-family: 'Poppins', sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+.navbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 20px;
+  padding: 15px 30px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.logo {
+  width: 100px;
+  height: auto;
+  border-radius: 50%;
+}
+
+.navbar-left {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.navbar-location {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: #333;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.location-text {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  overflow: hidden;
+}
+
+.location-home {
+  font-weight: bold;
+  border-bottom: 2px solid black;
+}
+
+.location-address {
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.location-arrow {
+  color: orange;
+  font-size: 14px;
+}
+
+.nav-bar_menu {
+  display: flex;
+  align-items: center;
+  gap: 30px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.nav-bar_menu a {
+  font-size: 18px;
+  cursor: pointer;
+  text-decoration: none;
+  color: #333;
+  padding-bottom: 2px;
+}
+
+.nav-bar_menu a.active {
+  border-bottom: 2px solid lightcoral;
+}
+
+.navbar-right {
+  display: flex;
+  align-items: center;
+  gap: 35px;
+}
+
+.navbar-search {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background-color: #f0f0f0;
+  padding: 10px 15px;
+  border-radius: 50px;
+  border: 1px solid transparent;
+  transition: all 0.3s ease;
+}
+
+.navbar-search:hover {
+  border-color: #e0e0e0;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.navbar-search input {
+  border: none;
+  outline: none;
+  background-color: transparent;
+  width: 20vw;
+  min-width: 200px;
+  font-family: 'Poppins', sans-serif;
+  font-size: 14px;
+}
+
+.navbar-search img {
+  width: 20px;
+}
+
+.navbar-cart-icon,
+.favorites {
+  position: relative;
+  cursor: pointer;
+}
+
+.navbar-cart-icon img,
+.favorites img {
+  width: 22px;
+  height: 22px;
+}
+
+.navbar-cart-icon .dot {
+  position: absolute;
+  top: -4px;
+  right: -6px;
+  min-width: 8px;
+  min-height: 8px;
+  background-color: purple;
+  border-radius: 50%;
+}
+
+.navbar button {
+  background: transparent;
+  border: 1px solid lightcoral;
+  color: lightcoral;
+  padding: 8px 20px;
+  border-radius: 20px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.navbar button:hover {
+    background-color: lightcoral;
+    color: white;
+}
+
+.navbar-profile {
+  position: relative;
+  cursor: pointer;
+  padding-bottom: 10px; 
+  margin-bottom: -10px;
+}
+
+.navbar-profile .user-icon {
+    width: 22px;
+    height: 22px;
+}
+
+.navbar-profile-dropdown {
+  position: absolute;
+  display: none;
+  top: 100%; 
+  right: 0;
+  width: max-content; 
+  background-color: white;
+  padding: 15px 20px;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  z-index: 10;
+  list-style: none;
+}
+
+.navbar-profile:hover .navbar-profile-dropdown {
+  display: block;
+}
+
+.navbar-profile-dropdown li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0;
+  cursor: pointer;
+}
+
+.navbar-profile-dropdown li img {
+  width: 20px;
+}
+
+.navbar-profile-dropdown li p {
+  margin: 0;
+  color: #333;
+}
+
+.navbar-profile-dropdown li:hover p {
+  color: lightcoral;
+}
+
+.navbar-profile-dropdown hr {
+  border: none;
+  height: 1px;
+  background-color: #e0e0e0;
+  margin: 8px 0;
+}
+
+.dropdown-user-info p {
+    font-weight: 500;
+}
+
+@media (max-width: 1050px) {
+  .nav-bar_menu {
+    display: none;
+  }
+}
+
+@media (max-width: 750px) {
+  .navbar {
+    padding: 15px 20px;
+    justify-content: space-between;
+  }
+
+  .logo {
+    width: 80px;
+  }
+  
+  .navbar-search {
+    display: none;
+  }
+
+  .location-address {
+    max-width: 120px; 
+  }
+
+  .navbar-right {
+    gap: 20px;
+  }
+  
+  .favorites {
+    display: none;
+  }
+  
+  .navbar button {
+    padding: 6px 15px;
+    font-size: 14px;
+  }
+
+  .navbar-profile-dropdown {
+    right: 0;
+  }
+}

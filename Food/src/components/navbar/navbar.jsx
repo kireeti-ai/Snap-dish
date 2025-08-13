@@ -1,0 +1,111 @@
+import React, { useContext, useState } from "react";
+import "./navbar.css";
+import { assets } from "../../assets/assets";
+import { Link, useNavigate } from "react-router-dom";
+import { StoreContext } from "../../Context/StoreContext";
+import LocationModal from "../LocationModel/LocationModel";
+
+const Navbar = ({ setShowLogin }) => {
+  const [menu, setMenu] = useState("Home");
+  const [showLocationModal, setShowLocationModal] = useState(false);
+
+  const { token, userName, logout, location, setSearchQuery } = useContext(StoreContext);
+
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate("/");
+  };
+
+  return (
+    <>
+      {showLocationModal && <LocationModal setShowLocationModal={setShowLocationModal} />}
+
+      <div className="navbar">
+        <div className="navbar-left">
+          <Link to='/'>
+            <img src={assets.logo} alt="Logo" className="logo" />
+          </Link>
+          <div className="navbar-location" onClick={() => setShowLocationModal(true)}>
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="purple" viewBox="0 0 24 24">
+              <path d="M12 2C8.1 2 5 5.1 5 9c0 5.2 7 13 7 13s7-7.8 7-13c0-3.9-3.1-7-7-7zm0 9.5c-1.4 0-2.5-1.1-2.5-2.5S10.6 6.5 12 6.5s2.5 1.1 2.5 2.5S13.4 11.5 12 11.5z" />
+            </svg>
+            <div className="location-text">
+              <span className="location-home">DELIVERING TO</span>
+              <span className="location-address">
+                {location.address.length > 30 
+                    ? location.address.substring(0, 27) + "..." 
+                    : location.address
+                }
+              </span>
+            </div>
+            <span className="location-arrow">⌄</span>
+          </div>
+        </div>
+
+        <ul className="nav-bar_menu">
+          <li>
+            <a href="/" onClick={() => setMenu("Home")} className={menu === "Home" ? "active" : ""}>
+              Home
+            </a>
+          </li>
+          <li>
+            <a href="#food-display" onClick={() => setMenu("Menu")} className={menu === "Menu" ? "active" : ""}>
+              Restaurants
+            </a>
+          </li>
+        </ul>
+
+        <div className="navbar-right">
+          <div className="navbar-search">
+            <img src={assets.search_icon} alt="Search" />
+            <input 
+              onChange={(e) => setSearchQuery(e.target.value)} 
+              type="text" 
+              placeholder="Search dishes or restaurants..." 
+            />
+          </div>
+          <div className="navbar-cart-icon">
+            <Link to='/cart'>
+              <img src={assets.basket_icon} alt="Cart" />
+              <div className="dot"></div>
+            </Link>
+          </div>
+          <div className="favorites">
+            <img src={assets.save} alt="Wish List" />
+          </div>
+
+          {!token ? (
+            <button onClick={() => setShowLogin(true)}>Sign In</button>
+          ) : (
+            <div className="navbar-profile">
+              <img src={assets.user} alt="User" className="user-icon"/>
+              <ul className="navbar-profile-dropdown">
+                <li className="dropdown-user-info">
+                  <p>Hi, {userName}</p>
+                </li>
+                <hr />
+                <li>
+                  <img src={assets.bag_icon || ''} alt="Orders" />
+                  <p>Orders</p>
+                </li>
+                <li>
+                  <img src={assets.restaurant || ''} alt="Manage Restaurants" />
+                  <p>Manage Restaurants</p>
+                </li>
+                <hr />
+                <li onClick={handleLogout}>
+                  <img src={assets.logout_icon || ''} alt="Logout" />
+                  <p>Logout</p>
+                </li>
+              </ul>
+            </div>
+          )}
+        </div>
+      </div>
+    </>
+  );
+};
+
+export default Navbar;
