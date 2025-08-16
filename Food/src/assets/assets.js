@@ -9,6 +9,7 @@ import save from './save.png'
 import loading from './loading-bar.png'
 import trash from './trash-can.png'
 import user from './user.png'
+import hamburger_icon from './burger.png'
 import menu_1 from './biryani.png.avif'
 import menu_2 from './fried rice.png.avif'
 import menu_3 from './paratha.png.avif'
@@ -65,7 +66,7 @@ export const assets = {
     add_icon_green, add_icon_white, remove_icon_red,
     app_store, play_store, linkedin_icon, facebook_icon,
     twitter_icon, cross_icon, selector_icon, profile_icon,
-    logout_icon, bag_icon, parcel_icon, checked, un_checked,restaurant
+    logout_icon, bag_icon, parcel_icon, checked, un_checked,restaurant,hamburger_icon
 }
 
 // Menu List

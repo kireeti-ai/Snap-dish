@@ -10,7 +10,7 @@ import RestaurantDetail from './pages/RestaurantDetail/RestaurantDetail.jsx';
 import LoginPopup from './components/LoginPopup/LoginPopup.jsx';
 import { StoreContext } from './Context/StoreContext.jsx';
 import RestaurantChangePrompt from './components/RestaurantChangePrompt/RestaurantChangePrompt.jsx';
-
+import Footer from './components/Footer/Footer.jsx';
 const App = () => {
   const [showLogin, setShowLogin] = useState(false);
   const { showRestaurantPrompt } = useContext(StoreContext);
@@ -28,7 +28,9 @@ const App = () => {
           <Route path='/order' element={<PlaceOrder />} />
           <Route path='/restaurant/:id' element={<RestaurantDetail />} />
         </Routes>
+        
       </div>
+      <Footer/>
     </>
   );
 };

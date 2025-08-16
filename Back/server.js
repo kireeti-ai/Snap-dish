@@ -15,7 +15,7 @@ const port = process.env.PORT || 4000;
 
 // --- Middleware ---
 app.use(express.json()); // To parse JSON bodies
-app.use(cors({ origin: "*" })); // To allow cross-origin requests
+app.use(cors({ origin: "*" })); 
 
 // --- DB Connection ---
 connectDB();

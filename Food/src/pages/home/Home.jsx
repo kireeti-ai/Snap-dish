@@ -15,7 +15,7 @@ const Home = () => {
       <ExploreMenu category={category} setcategory={setCategory} />
       <FoodDisplay category={category} />
       <RestaurantDisplay />
-      <Footer/>
+      
     </div>
   );
 };
