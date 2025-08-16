@@ -17,7 +17,9 @@ const port = process.env.PORT || 4000;
 
 // --- Middleware ---
 app.use(express.json()); // To parse JSON bodies
-app.use(cors()); // To allow cross-origin requests
+app.use(cors({  origin: "https://snap-dish-xi.vercel.app",  // your deployed frontend
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  credentials: true})); // To allow cross-origin requests
 
 // --- DB Connection ---
 connectDB();
@@ -35,5 +37,5 @@ app.get("/", (req, res) => {
 });
 
 app.listen(port, () => {
-  console.log(`🚀 Server started on http://localhost:${port}`);
+  console.log(`🚀 Server started on`);
 });

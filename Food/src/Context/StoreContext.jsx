@@ -7,7 +7,7 @@ const StoreContextProvider = (props) => {
 
   const [cartItems, setCartItems] = useState({});
   const [searchQuery, setSearchQuery] = useState("");
-  const url = "https://snap-dish-vcqv.vercel.app"
+  const url = import.meta.env.VITE_API_BASE_URL;
   const [token, setToken] = useState();
   const [userName, setUserName] = useState("");
   const [cartRestaurant, setCartRestaurant] = useState(null);
