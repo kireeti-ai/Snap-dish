@@ -7,7 +7,7 @@ const StoreContextProvider = (props) => {
 
   const [cartItems, setCartItems] = useState({});
   const [searchQuery, setSearchQuery] = useState("");
-  const url = "http://localhost:4000"
+  const url = "https://snap-dish-vcqv.vercel.app"
   const [token, setToken] = useState();
   const [userName, setUserName] = useState("");
   const [cartRestaurant, setCartRestaurant] = useState(null);
@@ -20,7 +20,7 @@ const StoreContextProvider = (props) => {
   });
   const logout = () => {
     localStorage.removeItem("token");
-    localStorage.removeItem("userName"); // Also remove name from storage
+    localStorage.removeItem("userName"); 
     setToken("");
     setUserName("");
   };
