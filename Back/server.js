@@ -17,9 +17,23 @@ const port = process.env.PORT || 4000;
 
 // --- Middleware ---
 app.use(express.json()); // To parse JSON bodies
-app.use(cors({  origin: "https://snap-dish-xi.vercel.app",  // your deployed frontend
-  methods: ["GET", "POST", "PUT", "DELETE"],
-  credentials: true})); // To allow cross-origin requests
+const allowedOrigins = [
+  "http://localhost:5173",          // for local dev
+  "https://snap-dish-xi.vercel.app" // your deployed frontend
+];
+
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    credentials: true, // if you’re using cookies/auth
+  })
+); // To allow cross-origin requests
 
 // --- DB Connection ---
 connectDB();
