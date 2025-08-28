@@ -23,6 +23,7 @@ const Navbar = ({ setShowLogin }) => {
       {showLocationModal && <LocationModal setShowLocationModal={setShowLocationModal} />}
 
       <div className="navbar">
+        {/* LEFT */}
         <div className="navbar-left">
           <Link to='/'>
             <img src={assets.logo} alt="Logo" className="logo" />
@@ -44,19 +45,21 @@ const Navbar = ({ setShowLogin }) => {
           </div>
         </div>
 
-        <ul className="nav-bar_menu">
+        {/* CENTER */}
+        <ul className="navbar-menu">
           <li>
-            <a href="/" onClick={() => setMenu("Home")} className={menu === "Home" ? "active" : ""}>
+            <Link to="/" onClick={() => setMenu("Home")} className={menu === "Home" ? "active" : ""}>
               Home
-            </a>
+            </Link>
           </li>
           <li>
-            <a href="#food-display" onClick={() => setMenu("Menu")} className={menu === "Menu" ? "active" : ""}>
+            <Link to="#food-display" onClick={() => setMenu("Menu")} className={menu === "Menu" ? "active" : ""}>
               Restaurants
-            </a>
+            </Link>
           </li>
         </ul>
 
+        {/* RIGHT */}
         <div className="navbar-right">
           <div className="navbar-search">
             <img src={assets.search_icon} alt="Search" />
@@ -69,6 +72,8 @@ const Navbar = ({ setShowLogin }) => {
           <div className="navbar-cart-icon">
             <Link to='/cart'>
               <img src={assets.basket_icon} alt="Cart" />
+              {/* Only show dot if cart has items */}
+              {/* {cart.length > 0 && <div className="dot"></div>} */}
               <div className="dot"></div>
             </Link>
           </div>
@@ -87,16 +92,16 @@ const Navbar = ({ setShowLogin }) => {
                 </li>
                 <hr />
                 <li>
-                  <img src={assets.bag_icon || ''} alt="Orders" />
+                  {assets.bag_icon && <img src={assets.bag_icon} alt="Orders" />}
                   <p>Orders</p>
                 </li>
                 <li>
-                  <img src={assets.restaurant || ''} alt="Manage Restaurants" />
+                  {assets.restaurant && <img src={assets.restaurant} alt="Manage Restaurants" />}
                   <p>Manage Restaurants</p>
                 </li>
                 <hr />
                 <li onClick={handleLogout}>
-                  <img src={assets.logout_icon || ''} alt="Logout" />
+                  {assets.logout_icon && <img src={assets.logout_icon} alt="Logout" />}
                   <p>Logout</p>
                 </li>
               </ul>
