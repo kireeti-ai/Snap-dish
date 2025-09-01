@@ -73,7 +73,7 @@ function MenuManagement() {
             {menuItems.map(item => (
               <tr key={item.id}>
                 <td>{item.name}</td>
-                <td>${item.price.toFixed(2)}</td>
+                <td>₹{item.price.toFixed(2)}</td>
                 <td>{item.available ? 'Available' : 'Unavailable'}</td>
                 <td className="actions">
                   <button onClick={() => toggleAvailability(item.id)}>

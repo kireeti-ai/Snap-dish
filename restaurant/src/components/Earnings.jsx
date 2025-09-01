@@ -21,15 +21,15 @@ function Earnings() {
       <div className="earnings-summary">
         <div className="summary-card">
           <h3>Today's Earnings</h3>
-          <p>${earningsData.today.toFixed(2)}</p>
+          <p>₹{earningsData.today.toFixed(2)}</p>
         </div>
         <div className="summary-card">
           <h3>This Week's Earnings</h3>
-          <p>${earningsData.thisWeek.toFixed(2)}</p>
+          <p>₹{earningsData.thisWeek.toFixed(2)}</p>
         </div>
         <div className="summary-card">
           <h3>This Month's Earnings</h3>
-          <p>${earningsData.thisMonth.toFixed(2)}</p>
+          <p>₹{earningsData.thisMonth.toFixed(2)}</p>
         </div>
       </div>
 
