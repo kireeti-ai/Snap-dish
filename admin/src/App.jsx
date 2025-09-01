@@ -1,29 +1,34 @@
 import React from 'react';
-import Navbar from './components/Navbar/Navbar';
-import Sidebar from './components/Sidebar/Sidebar';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Add from './pages/Add/Add';
-import List from './pages/List/List';
-import Orders from './pages/Orders/Orders';
-import Restaurants from './pages/Restaurants/Restaurants';
-const App = () => {
+import Sidebar from './components/Sidebar';
+import Dashboard from './components/Dashboard';
+import ManageRequests from './components/ManageRequests'; // Import the new component
+import ManageRestaurants from './components/ManageRestaurants';
+import ManageCustomers from './components/ManageCustomers';
+import ManageDeliveryPartners from './components/ManageDeliveryPartners';
+import ViewOrders from './components/ViewOrders';
+import Settings from './components/Settings';
+import './App.css';
+
+function App() {
   return (
-     <Router>
-    <div>
-      <Navbar />
-      <hr />
-      <div className="app-content">
+    <Router>
+      <div className="app-container">
         <Sidebar />
-        <Routes>
-          <Route path="/add" element={<Add />} />
-          <Route path="/list" element={<List />} />
-          <Route path="/orders" element={<Orders />} />
-          <Route path="/restaurants" element={<Restaurants />} /> 
-        </Routes>
+        <main className="main-content">
+          <Routes>
+            <Route path="/" element={<Dashboard />} />
+            <Route path="/requests" element={<ManageRequests />} /> {/* Add this route */}
+            <Route path="/restaurants" element={<ManageRestaurants />} />
+            <Route path="/customers" element={<ManageCustomers />} />
+            <Route path="/delivery-partners" element={<ManageDeliveryPartners />} />
+            <Route path="/orders" element={<ViewOrders />} />
+            <Route path="/settings" element={<Settings />} />
+          </Routes>
+        </main>
       </div>
-    </div>
     </Router>
   );
-};
+}
 
 export default App;

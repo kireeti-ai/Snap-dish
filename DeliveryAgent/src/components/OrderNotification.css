@@ -1,0 +1,9 @@
+.new-order-card {
+    border-top: 5px solid var(--primary-color);
+    animation: fadeIn 0.5s ease-in-out;
+}
+.new-order-card h3 { text-align: center; color: var(--primary-color); }
+.new-order-card p { margin: 0.5rem 0; }
+.earnings { text-align: center; font-size: 1.2rem; margin-top: 1rem; color: var(--primary-color); }
+.actions { margin-top: 1.5rem; display: flex; gap: 1rem; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }

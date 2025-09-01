@@ -1,29 +1,40 @@
-import React from 'react'
-import Navbar from './components/Navbar/Navbar'
-import Sidebar from './components/Sidebar/Sidebar'
-import { Route, Routes } from 'react-router-dom'
-import Add from './pages/Add/Add'
-import List from './pages/List/List'
-import Orders from './pages/Orders/Orders'
-import { ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import { Routes, Route, Navigate } from 'react-router-dom';
+import Login from './components/Login';
+import Dashboard from './components/Dashboard';
+import { authService } from './services/authService';
+import ErrorBoundary from './components/ErrorBoundary';
+import './App.css';
 
-const App = () => {
-  return (
-    <div className='app'>
-      <ToastContainer />
-      <Navbar />
-      <hr />
-      <div className="app-content">
-        <Sidebar />
-        <Routes>
-          <Route path="/add" element={<Add />} />
-          <Route path="/list" element={<List />} />
-          <Route path="/orders" element={<Orders />} />
-        </Routes>
-      </div>
-    </div>
-  )
+// Update PrivateRoute to redirect to '/login'
+function PrivateRoute({ children }) {
+  const user = authService.getCurrentUser();
+  return user ? children : <Navigate to="/login" />;
 }
 
-export default App
+function App() {
+  return (
+    <div className="app">
+      <ErrorBoundary>
+        <Routes>
+          {/* 1. Define the login route */}
+          <Route path="/login" element={<Login />} />
+
+          {/* 2. Make the root path redirect to the login page */}
+          <Route path="/" element={<Navigate to="/login" />} />
+
+          {/* 3. Your dashboard route remains the same */}
+          <Route
+            path="/dashboard"
+            element={
+              <PrivateRoute>
+                <Dashboard />
+              </PrivateRoute>
+            }
+          />
+        </Routes>
+      </ErrorBoundary>
+    </div>
+  );
+}
+
+export default App;

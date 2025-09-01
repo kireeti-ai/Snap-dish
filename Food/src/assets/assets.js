@@ -9,6 +9,7 @@ import save from './save.png'
 import loading from './loading-bar.png'
 import trash from './trash-can.png'
 import user from './user.png'
+import agent from'./agent-2.png'
 import hamburger_icon from './burger.png'
 import menu_1 from './biryani.png.avif'
 import menu_2 from './fried rice.png.avif'
@@ -58,6 +59,7 @@ import parcel_icon from './parcel_icon.png'
 import checked from './checked.png'
 import un_checked from './un_checked.png'
 import restaurant from './restaurant.png'
+import ping from './pin.png'
 
 // Exported Assets Object
 export const assets = {
@@ -66,7 +68,7 @@ export const assets = {
     add_icon_green, add_icon_white, remove_icon_red,
     app_store, play_store, linkedin_icon, facebook_icon,
     twitter_icon, cross_icon, selector_icon, profile_icon,
-    logout_icon, bag_icon, parcel_icon, checked, un_checked,restaurant,hamburger_icon
+    logout_icon, bag_icon, parcel_icon, checked, un_checked,restaurant,hamburger_icon,agent,ping
 }
 
 // Menu List

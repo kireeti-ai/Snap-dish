@@ -1,0 +1,6 @@
+.status-toggle-card { display: flex; justify-content: space-between; align-items: center; }
+.status-toggle-card span { font-weight: 600; color: var(--secondary-color); }
+.status-toggle-card button { border: none; padding: 10px 20px; border-radius: 20px; color: white; font-weight: 600; cursor: pointer; }
+.online-btn { background-color: var(--danger-color); }
+.offline-btn { background-color: var(--primary-color); }
+.info-card { text-align: center; color: var(--light-text); }

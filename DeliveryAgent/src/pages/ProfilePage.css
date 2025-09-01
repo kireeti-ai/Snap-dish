@@ -1,0 +1,3 @@
+.profile-details .detail-item { display: flex; justify-content: space-between; padding: 1rem 0; border-bottom: 1px solid #f0f0f0; }
+.profile-details .detail-item:last-child { border-bottom: none; }
+.profile-details span { color: var(--light-text); }

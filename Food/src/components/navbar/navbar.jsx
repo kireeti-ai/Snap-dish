@@ -95,9 +95,17 @@ const Navbar = ({ setShowLogin }) => {
                   {assets.bag_icon && <img src={assets.bag_icon} alt="Orders" />}
                   <p>Orders</p>
                 </li>
+                <Link to='/partner-with-us'>
+                                <li>
+                    {assets.agent && <img src={assets.agent} alt="agents" />}
+                  <p>Partner with us</p>
+                </li>
+                </Link>
+
+
                 <li>
-                  {assets.restaurant && <img src={assets.restaurant} alt="Manage Restaurants" />}
-                  <p>Manage Restaurants</p>
+                  {assets.ping && <img src={assets.ping} alt="address" />}
+                  <p>Saved Address</p>
                 </li>
                 <hr />
                 <li onClick={handleLogout}>

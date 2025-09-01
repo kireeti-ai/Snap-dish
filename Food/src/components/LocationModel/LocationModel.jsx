@@ -5,7 +5,7 @@ import './LocationModel.css';
 import { StoreContext } from '../../Context/StoreContext';
 import { useJsApiLoader, Autocomplete } from '@react-google-maps/api';
 
-// The Google Maps API requires a libraries array.
+
 const libraries = ['places'];
 
 const LocationModal = ({ setShowLocationModal }) => {

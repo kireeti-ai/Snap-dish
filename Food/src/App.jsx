@@ -11,6 +11,7 @@ import LoginPopup from './components/LoginPopup/LoginPopup.jsx';
 import { StoreContext } from './Context/StoreContext.jsx';
 import RestaurantChangePrompt from './components/RestaurantChangePrompt/RestaurantChangePrompt.jsx';
 import Footer from './components/Footer/Footer.jsx';
+import ManageRestaurant from './pages/ManageResturant/ManageResturant.jsx';
 const App = () => {
   const [showLogin, setShowLogin] = useState(false);
   const { showRestaurantPrompt } = useContext(StoreContext);
@@ -27,6 +28,7 @@ const App = () => {
           <Route path='/cart' element={<Cart />} />
           <Route path='/order' element={<PlaceOrder />} />
           <Route path='/restaurant/:id' element={<RestaurantDetail />} />
+          <Route path='/partner-with-us' element={<ManageRestaurant />} />
         </Routes>
         
       </div>

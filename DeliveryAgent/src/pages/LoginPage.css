@@ -1,0 +1,6 @@
+.login-page-container { display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 1rem; }
+.login-card { text-align: center; background: white; padding: 2rem; border-radius: 12px; box-shadow: var(--shadow); width: 100%; max-width: 400px; }
+.login-card h1 { color: var(--primary-color); }
+.login-card p { color: var(--light-text); margin-bottom: 2rem; }
+.login-form input { width: 100%; padding: 12px; margin-bottom: 1rem; border: 1px solid #ddd; border-radius: 8px; }
+.login-form button { margin-top: 1rem; }

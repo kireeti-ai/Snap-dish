@@ -5,13 +5,15 @@ import { StoreContext } from '../../Context/StoreContext';
 import axios from 'axios';
 
 const LoginPopup = ({ setShowLogin }) => {
+    // Note: You will need to add setRole to your StoreContext later for redirection
     const { url, setToken, setUserName } = useContext(StoreContext);
     const [currState, setCurrState] = useState("Login");
     const [data, setData] = useState({
         name: "",
         email: "",
         password: "",
-        phone_number: ""
+        phone_number: "",
+        role: "customer" // NEW: Default role is 'customer'
     });
     const [error, setError] = useState("");
 
@@ -25,28 +27,55 @@ const LoginPopup = ({ setShowLogin }) => {
         event.preventDefault();
         setError("");
 
-        let endpoint = currState === 'Login' ? '/api/users/login' : '/api/users/register';
+        let endpoint = '';
+        let payload = {};
+
+        // Prepare the correct endpoint and payload based on the state
+        if (currState === 'Login') {
+            endpoint = '/api/users/login';
+            payload = {
+                email: data.email,
+                password: data.password
+            };
+        } else {
+            endpoint = '/api/users/register';
+            payload = data; // Send all data for registration
+        }
+        
         const fullUrl = url + endpoint;
 
         try {
-            const response = await axios.post(fullUrl, data);
+            const response = await axios.post(fullUrl, payload);
 
-            // If the request succeeds, the code will get here.
-            // The data we need is directly in response.data
-            setToken(response.data.token);
-            localStorage.setItem("token", response.data.token);
+            if (response.data.token) {
+                setToken(response.data.token);
+                localStorage.setItem("token", response.data.token);
 
-            // Use the name from the response if available
-            if (response.data.name) {
-                setUserName(response.data.name);
-                localStorage.setItem("userName", response.data.name);
+                if (response.data.name) {
+                    setUserName(response.data.name);
+                    localStorage.setItem("userName", response.data.name);
+                }
+
+                // NEW: Handle redirection based on role after login
+                // For this to work, your /api/users/login endpoint MUST return the user's role.
+                const userRole = response.data.role;
+                if (userRole === 'restaurant_owner') {
+                    // Redirect to the restaurant dashboard
+                    window.location.href = 'https://partner.snap-dish.com'; // Example URL
+                } else if (userRole === 'delivery_agent') {
+                    // Redirect to the delivery agent portal/app download page
+                    window.location.href = 'https://rider.snap-dish.com'; // Example URL
+                } else {
+                    // For customers, just close the popup
+                    setShowLogin(false);
+                }
+
+            } else {
+                 setError(response.data.message || "An unexpected error occurred.");
             }
 
-            setShowLogin(false);
-
         } catch (error) {
-            // Axios places the server's error response in error.response.data
-            setError(error.response?.data?.message || "An unexpected error occurred.");
+            setError(error.response?.data?.message || "Login failed. Please check your credentials.");
         }
     };
 
@@ -61,8 +90,15 @@ const LoginPopup = ({ setShowLogin }) => {
                     {error && <p className="error-message">{error}</p>}
                     {currState === "Sign Up" && (
                         <>
+                            {/* NEW: Role Selection Dropdown */}
+                            <label htmlFor="role-select">I am a:</label>
+                            <select id="role-select" name="role" value={data.role} onChange={onChangeHandler} required>
+                                <option value="customer">Customer</option>
+                                <option value="restaurant_owner">Restaurant Partner</option>
+                                <option value="delivery_agent">Delivery Partner</option>
+                            </select>
+
                             <input name='name' onChange={onChangeHandler} value={data.name} type="text" placeholder='Your name' required />
-                
                             <input name='phone_number' onChange={onChangeHandler} value={data.phone_number} type="tel" placeholder='Phone number' required />
                         </>
                     )}

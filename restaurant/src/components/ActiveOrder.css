@@ -1,0 +1,18 @@
+.active-order-card h3 {
+    color:  rgb(249, 184, 62);
+    margin-bottom: 0.5rem;
+}
+
+.active-order-card .current-status {
+    text-align: center;
+    background-color: #eafaf1;
+    color: #28a745;
+    padding: 0.5rem;
+    border-radius: 6px;
+    margin-bottom: 1.5rem;
+    font-size: 0.9rem;
+}
+.active-order-card .order-info {
+    margin-bottom: 1.5rem;
+    line-height: 1.6;
+}

@@ -1,0 +1,5 @@
+.active-order-card { border-top: 5px solid var(--secondary-color); }
+.active-order-card h3 { color: var(--secondary-color); }
+.active-order-card p { margin: 0.5rem 0 1.5rem 0; }
+.status { text-align: center; background-color: #eafaf1; color: #28a745; padding: 0.5rem; border-radius: 6px; }
+.completed-message { text-align: center; font-weight: 600; color: var(--primary-color); }
