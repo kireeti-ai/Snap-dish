@@ -78,7 +78,10 @@ const Navbar = ({ setShowLogin }) => {
             </Link>
           </div>
           <div className="favorites">
+            <Link to='wishList'>
             <img src={assets.save} alt="Wish List" />
+            </Link>
+            
           </div>
 
           {!token ? (
@@ -91,10 +94,13 @@ const Navbar = ({ setShowLogin }) => {
                   <p>Hi, {userName}</p>
                 </li>
                 <hr />
-                <li>
+                <Link to="/myOrders">
+                                <li>
                   {assets.bag_icon && <img src={assets.bag_icon} alt="Orders" />}
                   <p>Orders</p>
                 </li>
+                </Link>
+
                 <Link to='/partner-with-us'>
                                 <li>
                     {assets.agent && <img src={assets.agent} alt="agents" />}
@@ -102,11 +108,13 @@ const Navbar = ({ setShowLogin }) => {
                 </li>
                 </Link>
 
-
-                <li>
+                <Link to='/address'>
+                                <li>
                   {assets.ping && <img src={assets.ping} alt="address" />}
                   <p>Saved Address</p>
                 </li>
+                </Link>
+
                 <hr />
                 <li onClick={handleLogout}>
                   {assets.logout_icon && <img src={assets.logout_icon} alt="Logout" />}

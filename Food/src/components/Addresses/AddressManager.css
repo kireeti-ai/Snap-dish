@@ -1,0 +1,331 @@
+/* --- Global Variables and Base Styles (ensure these are consistent across your app) --- */
+:root {
+  --primary-color: #ff5722; /* Dominant brand color (e.g., orange/red for food) */
+  --primary-hover: #e64a19; /* Slightly darker primary for hover states */
+  --secondary-color: #4CAF50; /* A secondary accent color, e.g., for success/default */
+  --text-dark: #333333; /* Dark text for headings */
+  --text-medium: #555555; /* Medium text for paragraphs */
+  --text-light: #777777; /* Light text for less emphasis */
+  --bg-light: #f8f8f8; /* Light background for the overall page */
+  --bg-card: #ffffff; /* White background for cards and forms */
+  --border-color: #e0e0e0; /* Subtle border color */
+  --shadow-light: rgba(0, 0, 0, 0.05); /* Light shadow for depth */
+  --shadow-medium: rgba(0, 0, 0, 0.1); /* Medium shadow for interactive elements */
+  --red-alert: #dc3545; 
+  --blue-info: #007bff;
+}
+
+body {
+  margin: 0;
+  font-family: 'Poppins', sans-serif; /* A modern, clean font */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: var(--bg-light); /* Apply light background to the body */
+  color: var(--text-dark);
+}
+
+/* --- Address Manager Page Layout --- */
+.address-manager-page {
+  width: 100%;
+  min-height: calc(100vh - 120px); /* Adjust based on navbar/footer height */
+  display: flex;
+  justify-content: center; /* Center the content */
+  padding: 2rem 0;
+  background-color: var(--bg-light); /* Ensure no background image here */
+}
+
+.address-manager-content {
+  max-width: 900px; /* Constrain content width */
+  width: 100%;
+  padding: 0 1.5rem; /* Inner padding for content */
+}
+
+/* --- Header Section (Title and Add Button) --- */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.header h1 {
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: var(--text-dark);
+  margin: 0;
+}
+
+.btn-add-new {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  padding: 0.8rem 1.6rem;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.btn-add-new:hover {
+  background-color: var(--primary-hover);
+  transform: translateY(-2px);
+}
+
+.btn-add-new:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* --- Address List (Grid Layout) --- */
+.address-list-professional {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); /* Responsive grid */
+  gap: 1.8rem;
+  margin-top: 2rem;
+}
+
+/* --- Individual Address Card --- */
+.address-card-professional {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 1.8rem;
+  position: relative;
+  box-shadow: 0 2px 8px var(--shadow-light);
+  transition: all 0.2s ease;
+}
+
+.address-card-professional:hover {
+  box-shadow: 0 6px 16px var(--shadow-medium);
+  transform: translateY(-3px);
+}
+
+.address-card-professional.default {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 2px var(--primary-color), 0 4px 15px rgba(255, 87, 34, 0.15);
+}
+
+.default-badge {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background-color: var(--secondary-color);
+  color: white;
+  padding: 0.3rem 0.9rem;
+  border-radius: 99px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  margin-bottom: 1.2rem;
+}
+
+.location-icon {
+  color: var(--primary-color);
+  font-size: 1.5rem;
+}
+
+.card-header h3 {
+  margin: 0;
+  font-size: 1.3rem;
+  color: var(--text-dark);
+  font-weight: 600;
+}
+
+.address-card-professional p {
+  color: var(--text-medium);
+  margin: 0.4rem 0;
+  line-height: 1.6;
+  font-size: 0.95rem;
+}
+
+/* --- Card Actions (Edit, Delete, Set Default) --- */
+.card-actions {
+  margin-top: 1.8rem;
+  padding-top: 1.2rem;
+  border-top: 1px solid var(--border-color);
+  display: flex;
+  flex-wrap: wrap; /* Allow wrapping on small screens */
+  gap: 0.8rem;
+}
+
+.btn-action {
+  background: none;
+  border: none;
+  color: var(--primary-color);
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0.6rem 0.8rem;
+  border-radius: 6px;
+  transition: background-color 0.2s ease, color 0.2s ease;
+  font-size: 0.9rem;
+}
+.btn-action:hover {
+  background-color: var(--bg-light);
+  color: var(--primary-hover);
+}
+.btn-action.btn-delete { color: var(--red-alert); }
+.btn-action.btn-delete:hover { background-color: rgba(220, 53, 69, 0.1); }
+.btn-action.btn-default { color: var(--blue-info); }
+.btn-action.btn-default:hover { background-color: rgba(0, 123, 255, 0.1); }
+
+
+/* --- Address Form Styles (re-using existing names but with professional look) --- */
+.form-overlay {
+  margin-bottom: 2.5rem; /* Space below the form */
+  background-color: var(--bg-card);
+  padding: 2rem;
+  border-radius: 12px;
+  border: 1px solid var(--border-color);
+  box-shadow: 0 4px 12px var(--shadow-light);
+}
+
+.address-form-professional h3 {
+  margin-top: 0;
+  margin-bottom: 1.8rem;
+  font-size: 1.8rem;
+  color: var(--text-dark);
+}
+
+.form-row {
+  display: flex;
+  gap: 1.2rem;
+  margin-bottom: 1.2rem; /* Add spacing between rows */
+}
+
+.form-row .form-group {
+  flex: 1;
+}
+
+.form-group {
+  margin-bottom: 1.2rem;
+}
+
+.form-group label {
+  display: block;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--text-medium);
+  margin-bottom: 0.6rem;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 0.9rem 1.2rem;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  font-size: 1rem;
+  box-sizing: border-box;
+  color: var(--text-dark);
+  background-color: var(--bg-light);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(255, 87, 34, 0.15);
+  background-color: white; /* White background on focus */
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.btn-cancel, .btn-save {
+  border: none;
+  padding: 0.9rem 1.8rem;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.btn-cancel {
+  background-color: var(--medium-gray);
+  color: var(--text-dark);
+}
+.btn-cancel:hover {
+  background-color: #c0c0c0;
+  transform: translateY(-2px);
+}
+
+.btn-save {
+  background-color: var(--primary-color);
+  color: white;
+}
+.btn-save:hover {
+  background-color: var(--primary-hover);
+  transform: translateY(-2px);
+}
+
+.btn-cancel:active, .btn-save:active {
+  transform: translateY(0);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* --- Responsive Adjustments --- */
+@media (max-width: 768px) {
+  .header h1 {
+    font-size: 1.8rem;
+  }
+  .btn-add-new {
+    padding: 0.6rem 1.2rem;
+    font-size: 0.9rem;
+  }
+  .address-manager-content {
+    padding: 0 1rem;
+  }
+  .form-row {
+    flex-direction: column;
+    gap: 0; /* Remove gap for vertical stacking */
+  }
+  .form-group {
+    margin-bottom: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+  .address-card-professional {
+    padding: 1.2rem;
+  }
+  .card-actions {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  .btn-action {
+    width: 100%;
+    text-align: center;
+  }
+  .address-form-professional {
+    padding: 1.5rem;
+  }
+  .btn-cancel, .btn-save {
+    width: 100%;
+  }
+  .form-actions {
+    flex-direction: column-reverse; /* Save button on top for mobile */
+  }
+}

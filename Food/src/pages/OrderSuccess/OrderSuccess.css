@@ -1,0 +1,180 @@
+.order-success-page {
+  display: flex;
+  justify-content: center;
+  padding: 3rem 1rem;
+  background-color: #f9f9f9;
+  min-height: 100vh;
+}
+
+.success-container {
+  max-width: 600px;
+  width: 100%;
+  text-align: center;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+}
+
+/* --- Section 1: Header & Checkmark --- */
+.success-header {
+  margin-bottom: 2rem;
+}
+
+.success-header h1 {
+  font-size: 2.5rem;
+  color: #2c3e50;
+  margin: 1rem 0 0.5rem;
+}
+
+.success-header p {
+  font-size: 1.1rem;
+  color: #7f8c8d;
+  margin: 0.25rem 0;
+}
+
+.email-info {
+  font-size: 0.9rem !important;
+  font-style: italic;
+}
+
+.checkmark-icon {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  display: block;
+  stroke-width: 2;
+  stroke: #fff;
+  stroke-miterlimit: 10;
+  box-shadow: inset 0px 0px 0px #4caf50;
+  animation: fill .4s ease-in-out .4s forwards, scale .3s ease-in-out .9s both;
+  margin: 0 auto;
+}
+.checkmark-circle {
+  stroke-dasharray: 166;
+  stroke-dashoffset: 166;
+  stroke-width: 2;
+  stroke-miterlimit: 10;
+  stroke: #4caf50;
+  fill: none;
+  animation: stroke 0.6s cubic-bezier(0.65, 0, 0.45, 1) forwards;
+}
+.checkmark-check {
+  transform-origin: 50% 50%;
+  stroke-dasharray: 48;
+  stroke-dashoffset: 48;
+  animation: stroke 0.3s cubic-bezier(0.65, 0, 0.45, 1) 0.8s forwards;
+}
+@keyframes stroke { 100% { stroke-dashoffset: 0; } }
+@keyframes scale { 0%, 100% { transform: none; } 50% { transform: scale3d(1.1, 1.1, 1); } }
+@keyframes fill { 100% { box-shadow: inset 0px 0px 0px 40px #4caf50; } }
+
+/* --- Section 2: Order Summary --- */
+.order-summary-card, .review-card {
+  background-color: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 1.5rem;
+  text-align: left;
+  margin-bottom: 2rem;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+.order-summary-card h2, .review-card h3 {
+  margin-top: 0;
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 1rem;
+  color: #34495e;
+}
+
+.summary-details p {
+  margin: 0.5rem 0;
+  color: #333;
+}
+
+.summary-items {
+  margin: 1.5rem 0;
+}
+.summary-items h4 {
+  margin-bottom: 0.5rem;
+  color: #555;
+}
+.summary-item {
+  display: flex;
+  justify-content: space-between;
+  color: #7f8c8d;
+  padding: 0.5rem 0;
+}
+.summary-total {
+  display: flex;
+  justify-content: space-between;
+  font-size: 1.2rem;
+  font-weight: bold;
+  padding-top: 1rem;
+  margin-top: 1rem;
+  border-top: 1px solid #eee;
+}
+
+/* --- Section 3: Action Buttons --- */
+.action-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+.btn-primary, .btn-secondary {
+  border: none;
+  padding: 0.8rem 1.6rem;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+.btn-primary {
+  background-color: tomato;
+  color: white;
+}
+.btn-primary:hover {
+  background-color: #e64a19;
+  transform: translateY(-2px);
+}
+.btn-secondary {
+  background-color: #ecf0f1;
+  color: #34495e;
+}
+.btn-secondary:hover {
+  background-color: #bdc3c7;
+}
+
+/* --- Section 4: Review Card --- */
+.review-card p {
+  color: #7f8c8d;
+  margin-top: -1rem;
+  margin-bottom: 1.5rem;
+}
+.star-rating {
+  margin-bottom: 1rem;
+}
+.star-rating button {
+  background-color: transparent;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  font-size: 2.5rem;
+  padding: 0 0.2rem;
+}
+.star-rating .on { color: #f1c40f; }
+.star-rating .off { color: #e0e0e0; }
+.review-card textarea {
+  width: 100%;
+  min-height: 80px;
+  padding: 0.8rem;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+  font-size: 1rem;
+  margin-bottom: 1rem;
+  box-sizing: border-box;
+}
+.review-card .btn-primary {
+  width: 100%;
+}

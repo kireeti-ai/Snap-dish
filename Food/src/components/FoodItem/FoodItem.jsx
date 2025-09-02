@@ -4,13 +4,25 @@ import { assets } from '../../assets/assets.js';
 import { StoreContext } from '../../Context/StoreContext';
 
 const FoodItem = ({ id, name, price, description, image, context }) => {
-    const { cartItems, addToCart, removeFromCart } = useContext(StoreContext);
+    // ++ GET WISHLIST ITEMS AND FUNCTIONS FROM CONTEXT ++
+    const { cartItems, addToCart, removeFromCart, wishlistItems, addToWishlist, removeFromWishlist } = useContext(StoreContext);
 
     const itemClassName = `food-item food-item-${context}`;
+    
+    // Check if the current item is in the wishlist
+    const isWishlisted = wishlistItems.includes(id);
 
     return (
         <div className={itemClassName}>
             <div className="food-item-img-container">
+                {/* ++ ADD WISHLIST ICON HERE ++ */}
+                <img 
+                    className='wishlist-icon'
+                    onClick={() => isWishlisted ? removeFromWishlist(id) : addToWishlist(id)}
+                    src={isWishlisted ? assets.heart_solid : assets.heart_outline} // Use different icons based on state
+                    alt="Add to wishlist"
+                />
+
                 <img alt="" className="food-item-image" src={image} />
                 {!cartItems[id] ?
                     <img

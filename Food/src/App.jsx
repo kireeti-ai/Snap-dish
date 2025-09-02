@@ -12,6 +12,11 @@ import { StoreContext } from './Context/StoreContext.jsx';
 import RestaurantChangePrompt from './components/RestaurantChangePrompt/RestaurantChangePrompt.jsx';
 import Footer from './components/Footer/Footer.jsx';
 import ManageRestaurant from './pages/ManageResturant/ManageResturant.jsx';
+
+import AddressManager from './components/Addresses/AddressManager.jsx';
+import MyOrders from './pages/MyOrders/MyOrders.jsx';
+import Wishlist from './pages/WishList/WishList.jsx';
+import OrderSuccess from './pages/OrderSuccess/OrderSuccess.jsx';
 const App = () => {
   const [showLogin, setShowLogin] = useState(false);
   const { showRestaurantPrompt } = useContext(StoreContext);
@@ -29,6 +34,11 @@ const App = () => {
           <Route path='/order' element={<PlaceOrder />} />
           <Route path='/restaurant/:id' element={<RestaurantDetail />} />
           <Route path='/partner-with-us' element={<ManageRestaurant />} />
+          
+          <Route path='/address' element={<AddressManager/>}/>
+          <Route path='/myOrders' element={<MyOrders/>} />
+          <Route path='/wishList' element={<Wishlist/>}/>
+          <Route path ='/orderSuccess' element={<OrderSuccess/>}/>
         </Routes>
         
       </div>

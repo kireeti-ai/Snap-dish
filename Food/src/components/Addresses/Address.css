@@ -1,0 +1,110 @@
+/* CSS for Professional Address Form */
+
+:root {
+  --primary-color: #ff5722; /* Your website's brand color */
+  --light-gray: #f4f4f5;
+  --medium-gray: #e4e4e7;
+  --text-color: #18181b;
+  --card-bg: #ffffff;
+}
+
+/* This container can be used to add a backdrop or spacing */
+.form-overlay {
+  margin-bottom: 2rem;
+}
+
+/* The main form container */
+.address-form-professional {
+  background-color: var(--card-bg);
+  padding: 2rem;
+  border-radius: 12px;
+  border: 1px solid var(--medium-gray);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.address-form-professional h3 {
+  margin-top: 0;
+  margin-bottom: 1.5rem;
+  font-size: 1.5rem;
+  color: var(--text-color);
+}
+
+/* Styles for laying out inputs side-by-side */
+.form-row {
+  display: flex;
+  gap: 1rem;
+}
+
+.form-row .form-group {
+  flex: 1; /* Allows inputs to share space equally */
+}
+
+/* Individual form field container */
+.form-group {
+  margin-bottom: 1.25rem;
+}
+
+.form-group label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-color);
+  margin-bottom: 0.5rem;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid var(--medium-gray);
+  border-radius: 8px;
+  font-size: 1rem;
+  box-sizing: border-box;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(255, 87, 34, 0.1);
+}
+
+/* Container for form buttons */
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+/* Shared styles for buttons */
+.btn-cancel, .btn-save {
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.1s;
+}
+
+.btn-cancel:active, .btn-save:active {
+  transform: scale(0.98);
+}
+
+/* Specific button styles */
+.btn-cancel {
+  background-color: var(--light-gray);
+  color: var(--text-color);
+  border: 1px solid var(--medium-gray);
+}
+.btn-cancel:hover {
+  background-color: var(--medium-gray);
+}
+
+.btn-save {
+  background-color: var(--primary-color);
+  color: white;
+}
+.btn-save:hover {
+  background-color: #e64a19; /* A slightly darker shade for hover */
+}

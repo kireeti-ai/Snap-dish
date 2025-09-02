@@ -1,0 +1,26 @@
+.wishlist {
+  margin: 80px auto;
+  max-width: 1200px;
+  padding: 0 2rem;
+}
+
+.wishlist-content h2 {
+  font-size: 2rem;
+  font-weight: 600;
+  margin-bottom: 2rem;
+  border-bottom: 2px solid #f0f0f0;
+  padding-bottom: 1rem;
+}
+
+.wishlist-items {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 30px;
+}
+
+.wishlist-empty {
+  font-size: 1.2rem;
+  color: #888;
+  text-align: center;
+  margin-top: 4rem;
+}
