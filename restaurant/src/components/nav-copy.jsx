@@ -2,12 +2,12 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { authService } from '../services/authService';
 
-function Navbar({ setActiveComponent }) {
+function nav({ setActiveComponent }) {
   const navigate = useNavigate();
 
 const handleLogout = () => {
   authService.logout();
-  navigate('/login'); // This correctly navigates to the login page
+  navigate('/login');
 };
 
   return (
@@ -24,4 +24,4 @@ const handleLogout = () => {
   );
 }
 
-export default Navbar;
+export default nav;

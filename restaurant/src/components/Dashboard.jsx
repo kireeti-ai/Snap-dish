@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import Navbar from './navbar.jsx';
+import nav from './nav-copy.jsx';
 import ProfileManagement from './ProfileManagement';
 import MenuManagement from './MenuManagement';
 import OrderManagement from './OrderManagement';

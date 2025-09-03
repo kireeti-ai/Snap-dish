@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-// Mock data for initial menu
+
 const initialMenuItems = [
   { id: 1, name: 'Pizza', price: 12.99, available: true },
   { id: 2, name: 'Burger', price: 8.99, available: true },
@@ -21,7 +21,7 @@ function MenuManagement() {
         available: true,
       };
       setMenuItems([...menuItems, newMenuItem]);
-      setNewItem({ name: '', price: '' }); // Reset form
+      setNewItem({ name: '', price: '' }); 
     }
   };
 
@@ -39,7 +39,7 @@ function MenuManagement() {
     <div className="management-container">
       <h2>Menu Management</h2>
       
-      {/* Add New Item Form */}
+
       <form onSubmit={handleAddItem} className="add-item-form">
         <h3>Add New Item</h3>
         <input
@@ -57,7 +57,6 @@ function MenuManagement() {
         <button type="submit" className="btn-primary">Add Item</button>
       </form>
 
-      {/* Menu Item List */}
       <div className="item-list">
         <h3>Current Menu</h3>
         <table>
