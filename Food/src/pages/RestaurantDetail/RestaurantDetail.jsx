@@ -1,4 +1,3 @@
-
 import React, { useContext, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { RestaurantContext } from '../../Context/RestaurantContext';
@@ -6,6 +5,7 @@ import { food_list } from '../../assets/assets';
 import './RestaurantDetail.css';
 import { assets } from '../../assets/assets';
 import FoodItem from '../../components/FoodItem/FoodItem';
+import Reviews from '../../components/Reviews/Reviews';
 
 const RestaurantDetail = () => {
     const { id } = useParams();
@@ -14,6 +14,9 @@ const RestaurantDetail = () => {
     const [restaurantMenu, setRestaurantMenu] = useState({});
     const [searchTerm, setSearchTerm] = useState("");
     const [vegOnly, setVegOnly] = useState(false);
+    const [reviews, setReviews] = useState([]);
+
+
     useEffect(() => {
         const foundRestaurant = restaurant_list.find(r => r._id === id);
         if (foundRestaurant) {
@@ -27,6 +30,19 @@ const RestaurantDetail = () => {
                 return acc;
             }, {});
             setRestaurantMenu(categorizedMenu);
+            // Mock reviews data for demonstration
+            setReviews([
+                {
+                    reviewerName: 'John Doe',
+                    rating: 4,
+                    comment: 'Great food, loved the ambiance!'
+                },
+                {
+                    reviewerName: 'Jane Smith',
+                    rating: 5,
+                    comment: 'Absolutely fantastic! Will visit again.'
+                }
+            ]);
         }
     }, [id, restaurant_list]);
 
@@ -116,7 +132,8 @@ const RestaurantDetail = () => {
                     );
                 })}
             </div>
-
+            <hr className="separator" />
+            <Reviews reviews={reviews} />
 
         </div>
     );

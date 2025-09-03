@@ -23,7 +23,6 @@ const Navbar = ({ setShowLogin }) => {
       {showLocationModal && <LocationModal setShowLocationModal={setShowLocationModal} />}
 
       <div className="navbar">
-        {/* LEFT */}
         <div className="navbar-left">
           <Link to='/'>
             <img src={assets.logo} alt="Logo" className="logo" />
@@ -45,7 +44,6 @@ const Navbar = ({ setShowLogin }) => {
           </div>
         </div>
 
-        {/* CENTER */}
         <ul className="navbar-menu">
           <li>
             <Link to="/" onClick={() => setMenu("Home")} className={menu === "Home" ? "active" : ""}>
@@ -59,21 +57,22 @@ const Navbar = ({ setShowLogin }) => {
           </li>
         </ul>
 
-        {/* RIGHT */}
+    
         <div className="navbar-right">
           <div className="navbar-search">
-            <img src={assets.search_icon} alt="Search" />
-            <input 
-              onChange={(e) => setSearchQuery(e.target.value)} 
-              type="text" 
-              placeholder="Search dishes or restaurants..." 
-            />
+            <Link to="/search">
+                        <img src={assets.search_icon} alt="Search" />
+                        <div className="in">
+                          
+                        </div>
+
+            </Link>
+
           </div>
           <div className="navbar-cart-icon">
             <Link to='/cart'>
               <img src={assets.basket_icon} alt="Cart" />
-              {/* Only show dot if cart has items */}
-              {/* {cart.length > 0 && <div className="dot"></div>} */}
+
               <div className="dot"></div>
             </Link>
           </div>
@@ -113,6 +112,7 @@ const Navbar = ({ setShowLogin }) => {
                   {assets.ping && <img src={assets.ping} alt="address" />}
                   <p>Saved Address</p>
                 </li>
+                
                 </Link>
 
                 <hr />

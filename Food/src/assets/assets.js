@@ -84,21 +84,7 @@ export const menu_list = [
     { menu_name: "Noodles", menu_image: menu_8 }
 ]
 
-// Restaurant List
-export const restaurant_list = [
-  { _id: "1", name: "Tasty Bites", image: food_11, cuisine: "Indian, Chinese", rating: 4.5, time: "30-40 min", address: "123 Main Street, Downtown", people: 60, price_for_two: 600 },
-  { _id: "2", name: "Pizza Planet", image: food_12, cuisine: "Italian", rating: 4.2, time: "20-30 min", address: "456 Elm Avenue, City Center", people: 45, price_for_two: 800 },
-  { _id: "3", name: "Urban Diner", image: food_13, cuisine: "American", rating: 4.0, time: "25-35 min", address: "789 Oak Road, Riverside", people: 70, price_for_two: 750 },
-  { _id: "4", name: "Curry House", image: food_14, cuisine: "North Indian", rating: 4.3, time: "30-40 min", address: "321 Pine Street, Midtown", people: 50, price_for_two: 550 },
-  { _id: "5", name: "Sushi World", image: food_15, cuisine: "Japanese", rating: 4.6, time: "20-30 min", address: "654 Maple Lane, Uptown", people: 40, price_for_two: 1200 },
-  { _id: "6", name: "Burger Hub", image: food_16, cuisine: "Fast Food", rating: 4.1, time: "15-25 min", address: "987 Cedar Boulevard, Market Square", people: 80, price_for_two: 400 },
-  { _id: "7", name: "Pasta Fiesta", image: food_17, cuisine: "Italian", rating: 4.4, time: "20-30 min", address: "246 Birch Avenue, Greenfield", people: 55, price_for_two: 900 },
-  { _id: "8", name: "The Green Bowl", image: food_18, cuisine: "Healthy Food", rating: 4.3, time: "25-35 min", address: "135 Willow Street, Lakeview", people: 35, price_for_two: 700 },
-  { _id: "9", name: "Flame Grill", image: food_19, cuisine: "Barbecue", rating: 4.5, time: "30-40 min", address: "579 Spruce Road, West End", people: 65, price_for_two: 950 },
-  { _id: "10", name: "Desert Delights", image: food_20, cuisine: "Bakery, Desserts", rating: 4.7, time: "15-20 min", address: "864 Poplar Street, Eastwood", people: 30, price_for_two: 500 },
-  { _id: "11", name: "Thai Spice", image: food_21, cuisine: "Thai", rating: 4.4, time: "25 - 35 min", address: "753 Walnut Avenue, Highland Park", people: 50, price_for_two: 850 },
-  { _id: "12", name: "Punjabi Rasoi", image: food_22, cuisine: "Punjabi", rating: 4.6, time: "30 - 40 min", address: "159 Chestnut Road, Old Town", people: 75, price_for_two: 650 }
-];
+
 
 // Canteen List
 export const canteen_list = [
@@ -108,29 +94,35 @@ export const canteen_list = [
 ]
 
 // Food List (UPDATED to include items from canteens)
-export const food_list = [
-  { _id: "1", name: "Greek Salad", image: food_1, price: 12, description: "A refreshing mix of fresh vegetables", category: "Salad", type: "Veg", restaurant: "The Green Bowl", restaurant_id: "8", is_top_dish: true },
-  // UPDATED: This item is now from "IT Canteen"
-  { _id: "2", name: "Veg Salad", image: food_2, price: 18, description: "A healthy and delicious vegetable salad", category: "Salad", type: "Veg", restaurant: "IT Canteen", restaurant_id: "c1" },
-  { _id: "3", name: "Clover Salad", image: food_3, price: 16, description: "A special salad with a unique dressing", category: "Salad", type: "Veg", restaurant: "Urban Diner", restaurant_id: "3" },
-  { _id: "4", name: "Chicken Salad", image: food_4, price: 24, description: "Grilled chicken strips on a bed of greens", category: "Salad", type: "NonVeg", restaurant: "Flame Grill", restaurant_id: "9", is_top_dish: true },
-  { _id: "5", name: "Lasagna Rolls", image: food_5, price: 14, description: "Classic lasagna rolled into perfect bites", category: "Rolls", type: "Veg", restaurant: "Pasta Fiesta", restaurant_id: "7" },
-  // UPDATED: This item is now from "Main Canteen"
-  { _id: "6", name: "Peri Peri Rolls", image: food_6, price: 12, description: "Spicy peri-peri seasoned rolls", category: "Rolls", type: "Veg", restaurant: "Main Canteen", restaurant_id: "c3" },
-  { _id: "7", name: "Chicken Rolls", image: food_7, price: 20, description: "Tender chicken wrapped in a soft roll", category: "Rolls", type: "NonVeg", restaurant: "Burger Hub", restaurant_id: "6", is_top_dish: true },
-  // UPDATED: This item is now from "MBA Canteen"
-  { _id: "8", name: "Veg Rolls", image: food_8, price: 15, description: "Mixed vegetables in a crispy roll", category: "Rolls", type: "Veg", restaurant: "MBA Canteen", restaurant_id: "c2" },
-  { _id: "9", name: "Ripple Ice Cream", image: food_9, price: 14, description: "Creamy ice cream with chocolate ripples", category: "Desserts", type: "Veg", restaurant: "Desert Delights", restaurant_id: "10" },
-  { _id: "10", name: "Chocolate Lava Cake", image: food_10, price: 18, description: "Warm chocolate cake with a gooey center", category: "Desserts", type: "Veg", restaurant: "Desert Delights", restaurant_id: "10", is_top_dish: true },
-  { _id: "11", name: "Fruit Salad", image: food_11, price: 15, description: "A mix of fresh seasonal fruits", category: "Desserts", type: "Veg", restaurant: "The Green Bowl", restaurant_id: "8" },
-  { _id: "12", name: "Margherita Pizza", image: food_12, price: 22, description: "Classic pizza with tomato, mozzarella, and basil", category: "Pizza", type: "Veg", restaurant: "Pizza Planet", restaurant_id: "2", is_top_dish: true },
-  { _id: "13", name: "Pepperoni Pizza", image: food_13, price: 26, description: "A meaty pizza with spicy pepperoni", category: "Pizza", type: "NonVeg", restaurant: "Pizza Planet", restaurant_id: "2" },
-  { _id: "14", name: "Paneer Tikka Pizza", image: food_14, price: 24, description: "An Indian twist on the classic pizza", category: "Pizza", type: "Veg", restaurant: "Curry House", restaurant_id: "4" },
-  { _id: "15", name: "Sushi Platter", image: food_15, price: 35, description: "An assortment of fresh sushi rolls", category: "Sushi", type: "NonVeg", restaurant: "Sushi World", restaurant_id: "5" },
-  // UPDATED: This item is now from "Main Canteen"
-  { _id: "16", name: "Veggie Burger", image: food_16, price: 10, description: "A delicious and hearty vegetable burger", category: "Burger", type: "Veg", restaurant: "Main Canteen", restaurant_id: "c3" },
-  { _id: "17", name: "Spaghetti Carbonara", image: food_17, price: 28, description: "Creamy pasta with bacon and cheese", category: "Pasta", type: "NonVeg", restaurant: "Pasta Fiesta", restaurant_id: "7", is_top_dish: true },
-  { _id: "18", name: "Pad Thai", image: food_18, price: 25, description: "Stir-fried rice noodles with shrimp and peanuts", category: "Noodles", type: "NonVeg", restaurant: "Thai Spice", restaurant_id: "11", is_top_dish: true },
-  { _id: "19", name: "Butter Chicken", image: food_19, price: 30, description: "Creamy and rich butter chicken curry", category: "Curry", type: "NonVeg", restaurant: "Punjabi Rasoi", restaurant_id: "12", is_top_dish: true },
-  { _id: "20", name: "Dal Makhani", image: food_20, price: 20, description: "Slow-cooked black lentils in a creamy sauce", category: "Curry", type: "Veg", restaurant: "Punjabi Rasoi", restaurant_id: "12" }
+export const restaurant_list = [
+    { _id: "1", name: "Paradise Biryani", image: food_1, cuisine: "Hyderabadi, Mughlai", rating: 4.7, time: "35-45 min", address: "Kondapur, Hyderabad", people: 120, price_for_two: 750 },
+    { _id: "2", name: "Saravana Bhavan", image: food_2, cuisine: "South Indian", rating: 4.5, time: "20-30 min", address: "T. Nagar, Chennai", people: 90, price_for_two: 500 },
+    { _id: "3", name: "Haldiram's", image: food_3, cuisine: "North Indian, Street Food", rating: 4.2, time: "25-35 min", address: "Chandni Chowk, Delhi", people: 150, price_for_two: 600 },
+    { _id: "4", name: "Karim's", image: food_4, cuisine: "Mughlai", rating: 4.6, time: "40-50 min", address: "Jama Masjid, Delhi", people: 80, price_for_two: 1200 },
+    { _id: "5", name: "Anand Stall", image: food_5, cuisine: "Mumbai Street Food", rating: 4.8, time: "15-25 min", address: "Vile Parle, Mumbai", people: 200, price_for_two: 300 },
+    { _id: "6", name: "Ohri's", image: food_6, cuisine: "Multi-Cuisine", rating: 4.3, time: "30-40 min", address: "Banjara Hills, Hyderabad", people: 75, price_for_two: 1500 },
+    { _id: "7", name: "Adyar Ananda Bhavan", image: food_7, cuisine: "South Indian, Sweets", rating: 4.4, time: "20-30 min", address: "Adyar, Chennai", people: 110, price_for_two: 450 },
+    { _id: "8", name: "KFC", image: food_8, cuisine: "Fast Food", rating: 4.1, time: "25-35 min", address: "Multiple Locations", people: 180, price_for_two: 550 },
+    { _id: "9", name: "Domino's Pizza", image: food_9, cuisine: "Italian, Pizza", rating: 4.0, time: "30-40 min", address: "Multiple Locations", people: 160, price_for_two: 800 },
+    { _id: "10", name: "Subway", image: food_10, cuisine: "Healthy, Sandwiches", rating: 4.2, time: "15-20 min", address: "Multiple Locations", people: 130, price_for_two: 400 },
+    { _id: "11", name: "Wow! Momo", image: food_11, cuisine: "Tibetan, Fast Food", rating: 4.3, time: "20-30 min", address: "Koramangala, Bengaluru", people: 95, price_for_two: 400 },
+    { _id: "12", name: "Punjabi by Nature", image: food_12, cuisine: "North Indian, Punjabi", rating: 4.5, time: "30-40 min", address: "Sector 29, Gurgaon", people: 110, price_for_two: 1800 },
+    { _id: "13", name: "Bikanervala", image: food_13, cuisine: "Sweets, North Indian", rating: 4.1, time: "20-25 min", address: "Lajpat Nagar, Delhi", people: 130, price_for_two: 500 },
+    { _id: "14", name: "Burger King", image: food_14, cuisine: "Fast Food, Burgers", rating: 4.0, time: "25-35 min", address: "Multiple Locations", people: 170, price_for_two: 500 },
+    { _id: "15", name: "Barbeque Nation", image: food_15, cuisine: "Barbecue, North Indian", rating: 4.9, time: "45-55 min", address: "Jubilee Hills, Hyderabad", people: 250, price_for_two: 2000 },
+    { _id: "16", name: "Faasos", image: food_16, cuisine: "Wraps, Rolls", rating: 4.2, time: "15-25 min", address: "Cloud Kitchen", people: 140, price_for_two: 350 }
 ];
+
+// Food List (Indian Dishes)
+export const food_list = [
+    { _id: "1", name: "Hyderabadi Chicken Biryani", image: food_1, price: 350, description: "Aromatic basmati rice cooked with succulent chicken and exotic spices.", category: "Biryani", type: "Non-Veg", restaurant: "Paradise Biryani", restaurant_id: "1", is_top_dish: true },
+    { _id: "2", name: "Masala Dosa", image: food_2, price: 120, description: "Crispy rice crepe filled with a savory potato filling, served with chutney and sambar.", category: "Dosa", type: "Veg", restaurant: "Saravana Bhavan", restaurant_id: "2", is_top_dish: true },
+    { _id: "3", name: "Chole Bhature", image: food_3, price: 180, description: "Spicy chickpea curry served with fluffy, deep-fried bread.", category: "North Indian", type: "Veg", restaurant: "Haldiram's", restaurant_id: "3", is_top_dish: true },
+    { _id: "4", name: "Mutton Korma", image: food_4, price: 450, description: "Tender mutton pieces cooked in a rich and creamy gravy.", category: "Mughlai", type: "Non-Veg", restaurant: "Karim's", restaurant_id: "4", is_top_dish: true },
+    { _id: "5", name: "Vada Pav", image: food_5, price: 50, description: "The iconic Mumbai street food, a spiced potato fritter in a soft bread roll.", category: "Street Food", type: "Veg", restaurant: "Anand Stall", restaurant_id: "5", is_top_dish: true },
+    { _id: "6", name: "Tandoori Platter", image: food_6, price: 650, description: "An assortment of delicious tandoori kebabs and tikkas.", category: "Tandoori", type: "Non-Veg", restaurant: "Ohri's", restaurant_id: "6" },
+    { _id: "7", name: "Ghee Podi Idli", image: food_7, price: 90, description: "Soft, steamed rice cakes tossed in ghee and spicy podi masala.", category: "South Indian", type: "Veg", restaurant: "Adyar Ananda Bhavan", restaurant_id: "7" },
+    { _id: "8", name: "Zinger Burger", image: food_8, price: 250, description: "Crispy fried chicken fillet in a soft bun with lettuce and mayo.", category: "Fast Food", type: "Non-Veg", restaurant: "KFC", restaurant_id: "8" },
+    { _id: "9", name: "Margherita Pizza", image: food_9, price: 300, description: "Classic pizza with fresh mozzarella, tomatoes, and basil.", category: "Pizza", type: "Veg", restaurant: "Domino's Pizza", restaurant_id: "9" },
+    { _id: "10", name: "Paneer Tikka Sandwich", image: food_10, price: 180, description: "A healthy and filling sandwich with grilled paneer tikka and fresh veggies.", category: "Sandwiches", type: "Veg", restaurant: "Subway", restaurant_id: "10" }
+]

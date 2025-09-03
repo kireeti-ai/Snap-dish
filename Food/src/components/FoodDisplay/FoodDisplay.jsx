@@ -3,7 +3,7 @@ import React, { useContext } from 'react';
 import './FoodDisplay.css';
 
 import { CanteenContext } from '../../Context/CanteenContext';
-import FoodItem from '../FoodItem/FoodItem';
+
 import RestaurantItem from '../RestaurantItem/RestaurantItem.jsx'
 const FoodDisplay = ({ category }) => {
     const { canteen_list } = useContext(CanteenContext);

@@ -1,0 +1,50 @@
+.reviews-section {
+    margin-top: 20px;
+}
+
+.reviews-heading {
+    font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 15px;
+}
+
+.review {
+    border-bottom: 1px solid #e0e0e0;
+    padding: 15px 0;
+}
+
+.review-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.review-profile-icon {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    margin-right: 10px;
+}
+
+.reviewer-name {
+    font-weight: bold;
+}
+
+.review-rating {
+    margin-bottom: 10px;
+}
+
+.star-icon {
+    width: 16px;
+    height: 16px;
+    opacity: 0.5; /* Default for empty star */
+}
+
+.star-icon.filled {
+    opacity: 1; /* Filled star */
+}
+
+
+.review-comment {
+    font-size: 14px;
+}

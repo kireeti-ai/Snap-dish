@@ -96,29 +96,16 @@ body {
 .navbar-search {
   display: flex;
   align-items: center;
-  gap: 10px;
-  background-color: #f0f0f0;
-  padding: 10px 15px;
+
+
   border-radius: 50px;
   border: 1px solid transparent;
   transition: all 0.3s ease;
   
 }
 
-.navbar-search:hover {
-  border-color: #e0e0e0;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-}
 
-.navbar-search input {
-  border: none;
-  outline: none;
-  background-color: transparent;
-  width: 20vw;
-  min-width: 200px;
-  font-family: 'Poppins', sans-serif;
-  font-size: 14px;
-}
+
 
 .navbar-search img {
   width: 20px;

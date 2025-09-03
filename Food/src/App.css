@@ -1,0 +1,36 @@
+/* This will style EVERY <select> tag on your website */
+select {
+    /* Sizing and Spacing */
+    padding: 8px 30px 8px 12px;
+    font-size: 16px;
+    
+    /* Borders and Background */
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    background-color: #f8f8f8;
+
+    /* Removes the default system appearance */
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+
+    /* Custom Arrow using an embedded SVG */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23555'%3E%3Cpath d='M8 11L2 5h12z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-size: 10px;
+    
+    /* User Interaction */
+    cursor: pointer;
+}
+
+/* Global hover and focus styles */
+select:hover {
+    border-color: #888;
+}
+
+select:focus {
+    border-color: #007bff;
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}

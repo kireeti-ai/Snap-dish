@@ -47,13 +47,29 @@ const MyOrders = () => {
           <p key={index} className="order-item">{item.quantity} x {item.name}</p>
         ))}
       </div>
-      <div className="order-card-footer">
+      
         <p className="order-total">Total Paid: ₹{order.total}</p>
         {(order.status === 'Preparing' || order.status === 'Out for Delivery') && (
             <button className="track-order-btn">Track Order</button>
         )}
+        <div className="order-card-footer">
+            <p className="order-total">Total Paid: ₹{order.total}</p>
+            
+            {/* 🌟 ADD REVIEW BUTTON FOR DELIVERED ORDERS */}
+            {order.status === 'Delivered' && (
+                <div className="order-actions">
+                    <button className="track-order-btn">Track Order</button>
+                    <button 
+                        className="review-order-btn"
+                        onClick={() => openReviewModal(order)}
+                    >
+                        Write Review
+                    </button>
+                </div>
+            )}
+        </div>
       </div>
-    </div>
+    
   );
 
   return (

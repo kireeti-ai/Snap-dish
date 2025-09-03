@@ -1,11 +1,9 @@
 import React, { useState } from 'react';
 import './ManageRestaurant.css';
-import { assets } from '../../assets/assets'; // Assuming you have an upload icon asset
+import { assets } from '../../assets/assets'; 
 
 const ManageRestaurant = () => {
-    const [view, setView] = useState('restaurant'); // Toggles between 'restaurant' and 'agent' forms
-
-    // State for the restaurant registration form
+    const [view, setView] = useState('restaurant'); 
     const [restaurantData, setRestaurantData] = useState({
         name: '',
         description: '',
@@ -17,14 +15,11 @@ const ManageRestaurant = () => {
     const [restaurantImage, setRestaurantImage] = useState(null);
     const [imagePreview, setImagePreview] = useState(null);
 
-    // State for the delivery agent registration form
     const [agentData, setAgentData] = useState({
         name: '',
         phone: '',
         vehicleType: 'Bike'
     });
-
-    // --- Restaurant Form Handlers ---
 
     const handleRestaurantChange = (e) => {
         const { name, value } = e.target;
@@ -41,7 +36,6 @@ const ManageRestaurant = () => {
 
     const handleRestaurantSubmit = (e) => {
         e.preventDefault();
-        // In a real app, you would use FormData to send this to the backend
         const formData = new FormData();
         formData.append('name', restaurantData.name);
         formData.append('description', restaurantData.description);
@@ -55,7 +49,6 @@ const ManageRestaurant = () => {
 
         console.log('Submitting Restaurant Data:', Object.fromEntries(formData.entries()));
         alert('Restaurant registration submitted successfully! (Check console for data)');
-        // Reset form
         setRestaurantData({
             name: '', description: '', address: '', cuisine: 'Italian', openingTime: '09:00', closingTime: '22:00'
         });
@@ -63,8 +56,6 @@ const ManageRestaurant = () => {
         setImagePreview(null);
     };
 
-
-    // --- Delivery Agent Form Handlers ---
 
     const handleAgentChange = (e) => {
         const { name, value } = e.target;

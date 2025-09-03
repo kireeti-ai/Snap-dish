@@ -5,7 +5,7 @@ import { StoreContext } from '../../Context/StoreContext';
 import axios from 'axios';
 
 const LoginPopup = ({ setShowLogin }) => {
-    // Note: You will need to add setRole to your StoreContext later for redirection
+    
     const { url, setToken, setUserName } = useContext(StoreContext);
     const [currState, setCurrState] = useState("Login");
     const [data, setData] = useState({
@@ -13,7 +13,7 @@ const LoginPopup = ({ setShowLogin }) => {
         email: "",
         password: "",
         phone_number: "",
-        role: "customer" // NEW: Default role is 'customer'
+        role: "customer"
     });
     const [error, setError] = useState("");
 
@@ -29,8 +29,6 @@ const LoginPopup = ({ setShowLogin }) => {
 
         let endpoint = '';
         let payload = {};
-
-        // Prepare the correct endpoint and payload based on the state
         if (currState === 'Login') {
             endpoint = '/api/users/login';
             payload = {
@@ -39,7 +37,7 @@ const LoginPopup = ({ setShowLogin }) => {
             };
         } else {
             endpoint = '/api/users/register';
-            payload = data; // Send all data for registration
+            payload = data; 
         }
         
         const fullUrl = url + endpoint;
@@ -56,17 +54,14 @@ const LoginPopup = ({ setShowLogin }) => {
                     localStorage.setItem("userName", response.data.name);
                 }
 
-                // NEW: Handle redirection based on role after login
-                // For this to work, your /api/users/login endpoint MUST return the user's role.
                 const userRole = response.data.role;
                 if (userRole === 'restaurant_owner') {
-                    // Redirect to the restaurant dashboard
-                    window.location.href = 'https://partner.snap-dish.com'; // Example URL
+                    window.location.href = 'https://partner.snap-dish.com'; 
                 } else if (userRole === 'delivery_agent') {
-                    // Redirect to the delivery agent portal/app download page
-                    window.location.href = 'https://rider.snap-dish.com'; // Example URL
+            
+                    window.location.href = 'https://snap-dish-2p9s.vercel.app/login'; 
                 } else {
-                    // For customers, just close the popup
+            
                     setShowLogin(false);
                 }
 
@@ -90,7 +85,7 @@ const LoginPopup = ({ setShowLogin }) => {
                     {error && <p className="error-message">{error}</p>}
                     {currState === "Sign Up" && (
                         <>
-                            {/* NEW: Role Selection Dropdown */}
+                          
                             <label htmlFor="role-select">I am a:</label>
                             <select id="role-select" name="role" value={data.role} onChange={onChangeHandler} required>
                                 <option value="customer">Customer</option>

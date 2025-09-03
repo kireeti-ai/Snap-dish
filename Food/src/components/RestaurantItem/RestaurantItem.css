@@ -1,6 +1,7 @@
 .restaurant-box {
-    width: 280px;
-    margin: 15px;
+
+    width: 100%; 
+    margin: 0; 
     border-radius: 10px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     transition: transform 0.3s ease-in-out;
@@ -11,6 +12,7 @@
 .restaurant-box:hover {
     transform: translateY(-5px);
 }
+
 
 .restaurant-img-box {
     width: 100%;
