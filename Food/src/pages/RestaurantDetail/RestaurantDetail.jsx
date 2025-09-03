@@ -17,34 +17,22 @@ const RestaurantDetail = () => {
     const [reviews, setReviews] = useState([]);
 
 
-    useEffect(() => {
-        const foundRestaurant = restaurant_list.find(r => r._id === id);
-        if (foundRestaurant) {
-            setRestaurant(foundRestaurant);
-            const filteredFood = food_list.filter(food => food.restaurant === foundRestaurant.name);
-            const categorizedMenu = filteredFood.reduce((acc, food) => {
-                if (!acc[food.category]) {
-                    acc[food.category] = [];
-                }
-                acc[food.category].push(food);
-                return acc;
-            }, {});
-            setRestaurantMenu(categorizedMenu);
-            // Mock reviews data for demonstration
-            setReviews([
-                {
-                    reviewerName: 'John Doe',
-                    rating: 4,
-                    comment: 'Great food, loved the ambiance!'
-                },
-                {
-                    reviewerName: 'Jane Smith',
-                    rating: 5,
-                    comment: 'Absolutely fantastic! Will visit again.'
-                }
-            ]);
-        }
-    }, [id, restaurant_list]);
+useEffect(() => {
+    const foundRestaurant = restaurant_list.find(r => r._id === id);
+    if (foundRestaurant) {
+        setRestaurant(foundRestaurant);
+        const filteredFood = food_list.filter(food => food.restaurant === foundRestaurant.name);
+        const categorizedMenu = filteredFood.reduce((acc, food) => {
+            if (!acc[food.category]) {
+                acc[food.category] = [];
+            }
+            acc[food.category].push(food);
+            return acc;
+        }, {});
+        setRestaurantMenu(categorizedMenu);
+        setReviews(foundRestaurant.reviews || []);
+    }
+}, [id, restaurant_list]);
 
     if (!restaurant) {
         return <div className="loading-state"><img src={assets.loading} alt="Loading"/>Loading restaurant details... </div>;

@@ -94,23 +94,248 @@ export const canteen_list = [
 ]
 
 // Food List (UPDATED to include items from canteens)
+// Restaurant List with Reviews
 export const restaurant_list = [
-    { _id: "1", name: "Paradise Biryani", image: food_1, cuisine: "Hyderabadi, Mughlai", rating: 4.7, time: "35-45 min", address: "Kondapur, Hyderabad", people: 120, price_for_two: 750 },
-    { _id: "2", name: "Saravana Bhavan", image: food_2, cuisine: "South Indian", rating: 4.5, time: "20-30 min", address: "T. Nagar, Chennai", people: 90, price_for_two: 500 },
-    { _id: "3", name: "Haldiram's", image: food_3, cuisine: "North Indian, Street Food", rating: 4.2, time: "25-35 min", address: "Chandni Chowk, Delhi", people: 150, price_for_two: 600 },
-    { _id: "4", name: "Karim's", image: food_4, cuisine: "Mughlai", rating: 4.6, time: "40-50 min", address: "Jama Masjid, Delhi", people: 80, price_for_two: 1200 },
-    { _id: "5", name: "Anand Stall", image: food_5, cuisine: "Mumbai Street Food", rating: 4.8, time: "15-25 min", address: "Vile Parle, Mumbai", people: 200, price_for_two: 300 },
-    { _id: "6", name: "Ohri's", image: food_6, cuisine: "Multi-Cuisine", rating: 4.3, time: "30-40 min", address: "Banjara Hills, Hyderabad", people: 75, price_for_two: 1500 },
-    { _id: "7", name: "Adyar Ananda Bhavan", image: food_7, cuisine: "South Indian, Sweets", rating: 4.4, time: "20-30 min", address: "Adyar, Chennai", people: 110, price_for_two: 450 },
-    { _id: "8", name: "KFC", image: food_8, cuisine: "Fast Food", rating: 4.1, time: "25-35 min", address: "Multiple Locations", people: 180, price_for_two: 550 },
-    { _id: "9", name: "Domino's Pizza", image: food_9, cuisine: "Italian, Pizza", rating: 4.0, time: "30-40 min", address: "Multiple Locations", people: 160, price_for_two: 800 },
-    { _id: "10", name: "Subway", image: food_10, cuisine: "Healthy, Sandwiches", rating: 4.2, time: "15-20 min", address: "Multiple Locations", people: 130, price_for_two: 400 },
-    { _id: "11", name: "Wow! Momo", image: food_11, cuisine: "Tibetan, Fast Food", rating: 4.3, time: "20-30 min", address: "Koramangala, Bengaluru", people: 95, price_for_two: 400 },
-    { _id: "12", name: "Punjabi by Nature", image: food_12, cuisine: "North Indian, Punjabi", rating: 4.5, time: "30-40 min", address: "Sector 29, Gurgaon", people: 110, price_for_two: 1800 },
-    { _id: "13", name: "Bikanervala", image: food_13, cuisine: "Sweets, North Indian", rating: 4.1, time: "20-25 min", address: "Lajpat Nagar, Delhi", people: 130, price_for_two: 500 },
-    { _id: "14", name: "Burger King", image: food_14, cuisine: "Fast Food, Burgers", rating: 4.0, time: "25-35 min", address: "Multiple Locations", people: 170, price_for_two: 500 },
-    { _id: "15", name: "Barbeque Nation", image: food_15, cuisine: "Barbecue, North Indian", rating: 4.9, time: "45-55 min", address: "Jubilee Hills, Hyderabad", people: 250, price_for_two: 2000 },
-    { _id: "16", name: "Faasos", image: food_16, cuisine: "Wraps, Rolls", rating: 4.2, time: "15-25 min", address: "Cloud Kitchen", people: 140, price_for_two: 350 }
+    { 
+        _id: "1", 
+        name: "Paradise Biryani", 
+        image: food_1, 
+        cuisine: "Hyderabadi, Mughlai", 
+        rating: 4.7, 
+        time: "35-45 min", 
+        address: "Kondapur, Hyderabad", 
+        people: 120, 
+        price_for_two: 750,
+        reviews: [
+            { reviewerName: "Arjun", rating: 5, comment: "Authentic Hyderabadi biryani, absolutely delicious!" },
+            { reviewerName: "Priya", rating: 4, comment: "Great food, but portion size could be better." }
+        ]
+    },
+    { 
+        _id: "2", 
+        name: "Saravana Bhavan", 
+        image: food_2, 
+        cuisine: "South Indian", 
+        rating: 4.5, 
+        time: "20-30 min", 
+        address: "T. Nagar, Chennai", 
+        people: 90, 
+        price_for_two: 500,
+        reviews: [
+            { reviewerName: "Ravi", rating: 5, comment: "Best dosa in Chennai, crisp and tasty!" },
+            { reviewerName: "Sneha", rating: 4, comment: "Idlis were soft, but chutney could be fresher." }
+        ]
+    },
+    { 
+        _id: "3", 
+        name: "Haldiram's", 
+        image: food_3, 
+        cuisine: "North Indian, Street Food", 
+        rating: 4.2, 
+        time: "25-35 min", 
+        address: "Chandni Chowk, Delhi", 
+        people: 150, 
+        price_for_two: 600,
+        reviews: [
+            { reviewerName: "Amit", rating: 5, comment: "Chole Bhature was amazing!" },
+            { reviewerName: "Neha", rating: 3, comment: "Good taste but too crowded." }
+        ]
+    },
+    { 
+        _id: "4", 
+        name: "Karim's", 
+        image: food_4, 
+        cuisine: "Mughlai", 
+        rating: 4.6, 
+        time: "40-50 min", 
+        address: "Jama Masjid, Delhi", 
+        people: 80, 
+        price_for_two: 1200,
+        reviews: [
+            { reviewerName: "Rahul", rating: 5, comment: "Authentic Mughlai flavors, rich gravies." },
+            { reviewerName: "Fatima", rating: 4, comment: "Loved the kebabs, but seating is tight." }
+        ]
+    },
+    { 
+        _id: "5", 
+        name: "Anand Stall", 
+        image: food_5, 
+        cuisine: "Mumbai Street Food", 
+        rating: 4.8, 
+        time: "15-25 min", 
+        address: "Vile Parle, Mumbai", 
+        people: 200, 
+        price_for_two: 300,
+        reviews: [
+            { reviewerName: "Karan", rating: 5, comment: "Best vada pav ever! So authentic." },
+            { reviewerName: "Meera", rating: 5, comment: "Affordable and tasty, must try." }
+        ]
+    },
+    { 
+        _id: "6", 
+        name: "Ohri's", 
+        image: food_6, 
+        cuisine: "Multi-Cuisine", 
+        rating: 4.3, 
+        time: "30-40 min", 
+        address: "Banjara Hills, Hyderabad", 
+        people: 75, 
+        price_for_two: 1500,
+        reviews: [
+            { reviewerName: "Sunil", rating: 4, comment: "Good ambience, desserts are fantastic." },
+            { reviewerName: "Ritika", rating: 5, comment: "Family-friendly and lots of options." }
+        ]
+    },
+    { 
+        _id: "7", 
+        name: "Adyar Ananda Bhavan", 
+        image: food_7, 
+        cuisine: "South Indian, Sweets", 
+        rating: 4.4, 
+        time: "20-30 min", 
+        address: "Adyar, Chennai", 
+        people: 110, 
+        price_for_two: 450,
+        reviews: [
+            { reviewerName: "Deepak", rating: 4, comment: "Great sweets, slightly expensive." },
+            { reviewerName: "Latha", rating: 5, comment: "Rava kesari is heavenly!" }
+        ]
+    },
+    { 
+        _id: "8", 
+        name: "KFC", 
+        image: food_8, 
+        cuisine: "Fast Food", 
+        rating: 2.8,  // ⭐ Low rating
+        time: "25-35 min", 
+        address: "Multiple Locations", 
+        people: 180, 
+        price_for_two: 550,
+        reviews: [
+            { reviewerName: "Vikram", rating: 2, comment: "Too oily and not fresh." },
+            { reviewerName: "Rohini", rating: 3, comment: "Okay for a quick snack, nothing special." }
+        ]
+    },
+    { 
+        _id: "9", 
+        name: "Domino's Pizza", 
+        image: food_9, 
+        cuisine: "Italian, Pizza", 
+        rating: 4.0, 
+        time: "30-40 min", 
+        address: "Multiple Locations", 
+        people: 160, 
+        price_for_two: 800,
+        reviews: [
+            { reviewerName: "Anjali", rating: 4, comment: "Cheese burst was amazing!" },
+            { reviewerName: "Ramesh", rating: 3, comment: "Delivery took too long." }
+        ]
+    },
+    { 
+        _id: "10", 
+        name: "Subway", 
+        image: food_10, 
+        cuisine: "Healthy, Sandwiches", 
+        rating: 3.9, 
+        time: "15-20 min", 
+        address: "Multiple Locations", 
+        people: 130, 
+        price_for_two: 400,
+        reviews: [
+            { reviewerName: "Snehal", rating: 4, comment: "Fresh veggies, liked the salad bar." },
+            { reviewerName: "Kishore", rating: 3, comment: "Good, but portions are small." }
+        ]
+    },
+    { 
+        _id: "11", 
+        name: "Wow! Momo", 
+        image: food_11, 
+        cuisine: "Tibetan, Fast Food", 
+        rating: 3.2, 
+        time: "20-30 min", 
+        address: "Koramangala, Bengaluru", 
+        people: 95, 
+        price_for_two: 400,
+        reviews: [
+            { reviewerName: "Anand", rating: 3, comment: "Average taste, not authentic momos." },
+            { reviewerName: "Divya", rating: 4, comment: "Cheese momos were nice though." }
+        ]
+    },
+    { 
+        _id: "12", 
+        name: "Punjabi by Nature", 
+        image: food_12, 
+        cuisine: "North Indian, Punjabi", 
+        rating: 4.5, 
+        time: "30-40 min", 
+        address: "Sector 29, Gurgaon", 
+        people: 110, 
+        price_for_two: 1800,
+        reviews: [
+            { reviewerName: "Harpreet", rating: 5, comment: "Dal makhani and butter naan were amazing!" },
+            { reviewerName: "Simran", rating: 4, comment: "Good food, pricey but worth it." }
+        ]
+    },
+    { 
+        _id: "13", 
+        name: "Bikanervala", 
+        image: food_13, 
+        cuisine: "Sweets, North Indian", 
+        rating: 4.1, 
+        time: "20-25 min", 
+        address: "Lajpat Nagar, Delhi", 
+        people: 130, 
+        price_for_two: 500,
+        reviews: [
+            { reviewerName: "Gaurav", rating: 4, comment: "Great sweets, fresh and tasty." },
+            { reviewerName: "Asha", rating: 4, comment: "Loved the kachoris!" }
+        ]
+    },
+    { 
+        _id: "14", 
+        name: "Burger King", 
+        image: food_14, 
+        cuisine: "Fast Food, Burgers", 
+        rating: 2.9,  // ⭐ Low rating
+        time: "25-35 min", 
+        address: "Multiple Locations", 
+        people: 170, 
+        price_for_two: 500,
+        reviews: [
+            { reviewerName: "Suresh", rating: 3, comment: "Burgers were okay, fries soggy." },
+            { reviewerName: "Madhuri", rating: 2, comment: "Not worth the price, McD is better." }
+        ]
+    },
+    { 
+        _id: "15", 
+        name: "Barbeque Nation", 
+        image: food_15, 
+        cuisine: "Barbecue, North Indian", 
+        rating: 4.9, 
+        time: "45-55 min", 
+        address: "Jubilee Hills, Hyderabad", 
+        people: 250, 
+        price_for_two: 2000,
+        reviews: [
+            { reviewerName: "Rohit", rating: 5, comment: "Unlimited buffet is worth it!" },
+            { reviewerName: "Shalini", rating: 5, comment: "Grill experience was amazing, loved it." }
+        ]
+    },
+    { 
+        _id: "16", 
+        name: "Faasos", 
+        image: food_16, 
+        cuisine: "Wraps, Rolls", 
+        rating: 3.0, 
+        time: "15-25 min", 
+        address: "Cloud Kitchen", 
+        people: 140, 
+        price_for_two: 350,
+        reviews: [
+            { reviewerName: "Ramesh", rating: 3, comment: "Wraps are okay, sometimes inconsistent." },
+            { reviewerName: "Kavya", rating: 3, comment: "Good for late-night cravings." }
+        ]
+    }
 ];
 
 // Food List (Indian Dishes)
