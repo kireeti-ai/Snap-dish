@@ -51,7 +51,7 @@ const Navbar = ({ setShowLogin }) => {
             </Link>
           </li>
           <li>
-            <Link to="#food-display" onClick={() => setMenu("Menu")} className={menu === "Menu" ? "active" : ""}>
+            <Link to="/restaurant" >
               Restaurants
             </Link>
           </li>

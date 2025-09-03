@@ -36,6 +36,8 @@
   padding: 1.5rem;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
   transition: box-shadow 0.2s ease, transform 0.2s ease;
+  display: flex;
+  flex-direction: column;
 }
 
 .order-card:hover {
@@ -73,15 +75,16 @@
 }
 
 /* Status-specific colors */
-.order-status.preparing { background-color: #007bff; } /* Blue */
-.order-status.out-for-delivery { background-color: #ff9800; } /* Orange */
-.order-status.delivered { background-color: #4CAF50; } /* Green */
-.order-status.cancelled { background-color: #f44336; } /* Red */
+.order-status.preparing { background-color: #007bff; }
+.order-status.out-for-delivery { background-color: #ff9800; }
+.order-status.delivered { background-color: #4CAF50; }
+.order-status.cancelled { background-color: #f44336; }
 
 .order-items-list {
   padding-bottom: 1rem;
   margin-bottom: 1rem;
   border-bottom: 1px solid #f0f0f0;
+  flex-grow: 1; /* Allows this section to grow */
 }
 
 .order-item {
@@ -93,6 +96,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  margin-top: auto; /* Pushes footer to the bottom */
 }
 
 .order-total {
@@ -102,19 +106,35 @@
   margin: 0;
 }
 
-.track-order-btn {
-  background-color: #333;
-  color: white;
+.order-actions {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.track-order-btn, .review-order-btn {
   border: none;
   padding: 0.6rem 1.2rem;
   border-radius: 8px;
   font-weight: 600;
   cursor: pointer;
-  transition: background-color 0.2s ease;
+  transition: all 0.2s ease;
 }
 
+.track-order-btn {
+  background-color: #f0f0f0;
+  color: #333;
+}
 .track-order-btn:hover {
-  background-color: #555;
+  background-color: #e0e0e0;
+}
+
+.review-order-btn {
+  background-color: tomato;
+  color: white;
+}
+.review-order-btn:hover {
+  background-color: #e65a41;
+  transform: scale(1.05);
 }
 
 .no-orders-message {
@@ -124,4 +144,83 @@
   text-align: center;
   background-color: #fafafa;
   border-radius: 8px;
+}
+
+/* --- ✨ New Modal Styles --- */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: white;
+  padding: 2rem;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 500px;
+  position: relative;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.modal-close-btn {
+  position: absolute;
+  top: 1rem;
+  right: 1.2rem;
+  background: none;
+  border: none;
+  font-size: 2rem;
+  color: #aaa;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.modal-content h2 {
+    margin-top: 0;
+    margin-bottom: 0.5rem;
+    color: #333;
+}
+.modal-content p {
+    margin-bottom: 1.5rem;
+    color: #666;
+}
+
+.review-form textarea {
+    width: 100%;
+    padding: 0.75rem;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    font-size: 1rem;
+    margin-top: 1rem;
+    resize: vertical;
+}
+
+.submit-review-btn {
+    width: 100%;
+    padding: 0.8rem;
+    margin-top: 1rem;
+    background-color: tomato;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+.submit-review-btn:hover {
+    background-color: #e65a41;
 }

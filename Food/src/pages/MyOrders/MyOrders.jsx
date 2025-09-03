@@ -1,35 +1,42 @@
-// 1. Import useContext and your StoreContext
 import React, { useState, useEffect, useContext } from 'react';
 import './MyOrders.css';
 import { StoreContext } from '../../Context/StoreContext';
 
-// 2. Remove the mockUserOrders constant from this file
-// const mockUserOrders = [ ... ];
-
 const MyOrders = () => {
-  // 3. Get the real 'orders' array from the context
   const { orders } = useContext(StoreContext);
-
   const [activeOrders, setActiveOrders] = useState([]);
   const [pastOrders, setPastOrders] = useState([]);
 
-  useEffect(() => {
-    // 4. Use the 'orders' from context here instead of mock data
-    const allOrders = orders; 
-    
-    if (allOrders) {
-      const active = allOrders.filter(order => 
-        order.status === 'Preparing' || order.status === 'Out for Delivery'
-      );
-      
-      const past = allOrders.filter(order => 
-        order.status === 'Delivered' || order.status === 'Cancelled'
-      );
+  // State to manage the review modal
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedOrder, setSelectedOrder] = useState(null);
 
-      setActiveOrders(active);
-      setPastOrders(past);
-    }
-  }, [orders]); // 5. Add 'orders' to the dependency array
+  useEffect(() => {
+    const allOrders = orders || []; // Ensure orders is always an array
+    
+    const active = allOrders.filter(order => 
+      order.status === 'Preparing' || order.status === 'Out for Delivery'
+    );
+    
+    const past = allOrders.filter(order => 
+      order.status === 'Delivered' || order.status === 'Cancelled'
+    );
+
+    setActiveOrders(active);
+    setPastOrders(past);
+  }, [orders]);
+
+  // Function to open the modal
+  const openReviewModal = (order) => {
+    setSelectedOrder(order);
+    setIsModalOpen(true);
+  };
+
+  // Function to close the modal
+  const closeReviewModal = () => {
+    setIsModalOpen(false);
+    setSelectedOrder(null);
+  };
 
   const renderOrderCard = (order) => (
     <div key={order.id} className="order-card">
@@ -47,57 +54,73 @@ const MyOrders = () => {
           <p key={index} className="order-item">{item.quantity} x {item.name}</p>
         ))}
       </div>
-      
+      <div className="order-card-footer">
         <p className="order-total">Total Paid: ₹{order.total}</p>
-        {(order.status === 'Preparing' || order.status === 'Out for Delivery') && (
+        <div className="order-actions">
+          {(order.status === 'Preparing' || order.status === 'Out for Delivery') && (
             <button className="track-order-btn">Track Order</button>
-        )}
-        <div className="order-card-footer">
-            <p className="order-total">Total Paid: ₹{order.total}</p>
-            
-            {/* 🌟 ADD REVIEW BUTTON FOR DELIVERED ORDERS */}
-            {order.status === 'Delivered' && (
-                <div className="order-actions">
-                    <button className="track-order-btn">Track Order</button>
-                    <button 
-                        className="review-order-btn"
-                        onClick={() => openReviewModal(order)}
-                    >
-                        Write Review
-                    </button>
-                </div>
-            )}
+          )}
+          {order.status === 'Delivered' && (
+            <>
+              <button className="track-order-btn">Reorder</button>
+              <button 
+                className="review-order-btn"
+                onClick={() => openReviewModal(order)}
+              >
+                Write Review
+              </button>
+            </>
+          )}
         </div>
       </div>
-    
+    </div>
   );
 
   return (
-    <div className="my-orders-page">
-      <h1>My Orders</h1>
+    <>
+      <div className="my-orders-page">
+        <h1>My Orders</h1>
+        <section className="orders-section">
+          <h2>Active Orders</h2>
+          <div className="orders-list">
+            {activeOrders.length > 0 ? (
+              activeOrders.map(order => renderOrderCard(order))
+            ) : (
+              <p className="no-orders-message">You have no active orders right now.</p>
+            )}
+          </div>
+        </section>
+        <section className="orders-section">
+          <h2>Order History</h2>
+          <div className="orders-list">
+            {pastOrders.length > 0 ? (
+              pastOrders.map(order => renderOrderCard(order))
+            ) : (
+              <p className="no-orders-message">You haven't placed any orders yet.</p>
+            )}
+          </div>
+        </section>
+      </div>
 
-      <section className="orders-section">
-        <h2>Active Orders</h2>
-        <div className="orders-list">
-          {activeOrders.length > 0 ? (
-            activeOrders.map(order => renderOrderCard(order))
-          ) : (
-            <p className="no-orders-message">You have no active orders right now.</p>
-          )}
+      {/* Review Modal */}
+      {isModalOpen && selectedOrder && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <button className="modal-close-btn" onClick={closeReviewModal}>&times;</button>
+            <h2>Review your order from {selectedOrder.restaurant}</h2>
+            <p>Your feedback helps other food lovers!</p>
+            <form className="review-form">
+                <div className="star-rating">
+                    {/* Simple star rating placeholder */}
+                    <span>★★★★★</span>
+                </div>
+                <textarea placeholder="Tell us about your experience..." rows="5"></textarea>
+                <button type="submit" className="submit-review-btn">Submit Review</button>
+            </form>
+          </div>
         </div>
-      </section>
-
-      <section className="orders-section">
-        <h2>Order History</h2>
-        <div className="orders-list">
-          {pastOrders.length > 0 ? (
-            pastOrders.map(order => renderOrderCard(order))
-          ) : (
-            <p className="no-orders-message">You haven't placed any orders yet.</p>
-          )}
-        </div>
-      </section>
-    </div>
+      )}
+    </>
   );
 };
 

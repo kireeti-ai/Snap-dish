@@ -18,6 +18,7 @@ import MyOrders from './pages/MyOrders/MyOrders.jsx';
 import Wishlist from './pages/WishList/WishList.jsx';
 import OrderSuccess from './pages/OrderSuccess/OrderSuccess.jsx';
 import SearchPage from './pages/SearchPage/SearchPage.jsx';
+import RestaurantDisplay from './components/RestaurantDisplay/RestaurantDisplay.jsx';
 
 const App = () => {
   const [showLogin, setShowLogin] = useState(false);
@@ -36,7 +37,7 @@ const App = () => {
           <Route path='/order' element={<PlaceOrder />} />
           <Route path='/restaurant/:id' element={<RestaurantDetail />} />
           <Route path='/partner-with-us' element={<ManageRestaurant />} />
-          
+          <Route path='/restaurant' element={ <RestaurantDisplay />}/>
           <Route path='/address' element={<AddressManager/>}/>
           <Route path='/myOrders' element={<MyOrders/>} />
           <Route path='/wishList' element={<Wishlist/>}/>
