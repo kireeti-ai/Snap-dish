@@ -19,7 +19,7 @@ import Wishlist from './pages/WishList/WishList.jsx';
 import OrderSuccess from './pages/OrderSuccess/OrderSuccess.jsx';
 import SearchPage from './pages/SearchPage/SearchPage.jsx';
 import RestaurantDisplay from './components/RestaurantDisplay/RestaurantDisplay.jsx';
-
+import MyReviews from './pages/MyReviews/MyReviews.jsx';
 const App = () => {
   const [showLogin, setShowLogin] = useState(false);
   const { showRestaurantPrompt } = useContext(StoreContext);
@@ -43,6 +43,7 @@ const App = () => {
           <Route path='/wishList' element={<Wishlist/>}/>
           <Route path ='/orderSuccess' element={<OrderSuccess/>}/>
           <Route path='/search' element={<SearchPage/>} />
+          <Route path='/reviews-user' element={<MyReviews/>}/>
         
         </Routes>
         

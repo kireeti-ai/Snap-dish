@@ -1,46 +1,43 @@
-/* --- Global Variables and Base Styles (ensure these are consistent across your app) --- */
 :root {
-  --primary-color: #ff5722; /* Dominant brand color (e.g., orange/red for food) */
-  --primary-hover: #e64a19; /* Slightly darker primary for hover states */
-  --secondary-color: #4CAF50; /* A secondary accent color, e.g., for success/default */
-  --text-dark: #333333; /* Dark text for headings */
-  --text-medium: #555555; /* Medium text for paragraphs */
-  --text-light: #777777; /* Light text for less emphasis */
-  --bg-light: #f8f8f8; /* Light background for the overall page */
-  --bg-card: #ffffff; /* White background for cards and forms */
-  --border-color: #e0e0e0; /* Subtle border color */
-  --shadow-light: rgba(0, 0, 0, 0.05); /* Light shadow for depth */
-  --shadow-medium: rgba(0, 0, 0, 0.1); /* Medium shadow for interactive elements */
-  --red-alert: #dc3545; 
+  --primary-color: #ff5722;
+  --primary-hover: #e64a19;
+  --secondary-color: #4CAF50;
+  --text-dark: #333333;
+  --text-medium: #555555;
+  --text-light: #777777;
+  --bg-light: #f8f8f8;
+  --bg-card: #ffffff;
+  --border-color: #e0e0e0;
+  --shadow-light: rgba(0, 0, 0, 0.05);
+  --shadow-medium: rgba(0, 0, 0, 0.1);
+  --red-alert: #dc3545;
   --blue-info: #007bff;
 }
 
 body {
   margin: 0;
-  font-family: 'Poppins', sans-serif; /* A modern, clean font */
+  font-family: 'Poppins', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: var(--bg-light); /* Apply light background to the body */
+  background-color: var(--bg-light);
   color: var(--text-dark);
 }
 
-/* --- Address Manager Page Layout --- */
 .address-manager-page {
   width: 100%;
-  min-height: calc(100vh - 120px); /* Adjust based on navbar/footer height */
+  min-height: calc(100vh - 120px);
   display: flex;
-  justify-content: center; /* Center the content */
+  justify-content: center;
   padding: 2rem 0;
-  background-color: var(--bg-light); /* Ensure no background image here */
+  background-color: var(--bg-light);
 }
 
 .address-manager-content {
-  max-width: 900px; /* Constrain content width */
+  max-width: 900px;
   width: 100%;
-  padding: 0 1.5rem; /* Inner padding for content */
+  padding: 0 1.5rem;
 }
 
-/* --- Header Section (Title and Add Button) --- */
 .header {
   display: flex;
   justify-content: space-between;
@@ -83,15 +80,13 @@ body {
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
-/* --- Address List (Grid Layout) --- */
 .address-list-professional {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); /* Responsive grid */
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
   gap: 1.8rem;
   margin-top: 2rem;
 }
 
-/* --- Individual Address Card --- */
 .address-card-professional {
   background-color: var(--bg-card);
   border: 1px solid var(--border-color);
@@ -151,13 +146,12 @@ body {
   font-size: 0.95rem;
 }
 
-/* --- Card Actions (Edit, Delete, Set Default) --- */
 .card-actions {
   margin-top: 1.8rem;
   padding-top: 1.2rem;
   border-top: 1px solid var(--border-color);
   display: flex;
-  flex-wrap: wrap; /* Allow wrapping on small screens */
+  flex-wrap: wrap;
   gap: 0.8rem;
 }
 
@@ -172,19 +166,30 @@ body {
   transition: background-color 0.2s ease, color 0.2s ease;
   font-size: 0.9rem;
 }
+
 .btn-action:hover {
   background-color: var(--bg-light);
   color: var(--primary-hover);
 }
-.btn-action.btn-delete { color: var(--red-alert); }
-.btn-action.btn-delete:hover { background-color: rgba(220, 53, 69, 0.1); }
-.btn-action.btn-default { color: var(--blue-info); }
-.btn-action.btn-default:hover { background-color: rgba(0, 123, 255, 0.1); }
 
+.btn-action.btn-delete {
+  color: var(--red-alert);
+}
 
-/* --- Address Form Styles (re-using existing names but with professional look) --- */
+.btn-action.btn-delete:hover {
+  background-color: rgba(220, 53, 69, 0.1);
+}
+
+.btn-action.btn-default {
+  color: var(--blue-info);
+}
+
+.btn-action.btn-default:hover {
+  background-color: rgba(0, 123, 255, 0.1);
+}
+
 .form-overlay {
-  margin-bottom: 2.5rem; /* Space below the form */
+  margin-bottom: 2.5rem;
   background-color: var(--bg-card);
   padding: 2rem;
   border-radius: 12px;
@@ -202,7 +207,7 @@ body {
 .form-row {
   display: flex;
   gap: 1.2rem;
-  margin-bottom: 1.2rem; /* Add spacing between rows */
+  margin-bottom: 1.2rem;
 }
 
 .form-row .form-group {
@@ -227,7 +232,6 @@ body {
   border: 1px solid var(--border-color);
   border-radius: 8px;
   font-size: 1rem;
-  box-sizing: border-box;
   color: var(--text-dark);
   background-color: var(--bg-light);
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
@@ -237,7 +241,7 @@ body {
   outline: none;
   border-color: var(--primary-color);
   box-shadow: 0 0 0 3px rgba(255, 87, 34, 0.15);
-  background-color: white; /* White background on focus */
+  background-color: white;
 }
 
 .form-actions {
@@ -259,11 +263,12 @@ body {
 }
 
 .btn-cancel {
-  background-color: var(--medium-gray);
+  background-color: #c0c0c0;
   color: var(--text-dark);
 }
+
 .btn-cancel:hover {
-  background-color: #c0c0c0;
+  background-color: #a0a0a0;
   transform: translateY(-2px);
 }
 
@@ -271,6 +276,7 @@ body {
   background-color: var(--primary-color);
   color: white;
 }
+
 .btn-save:hover {
   background-color: var(--primary-hover);
   transform: translateY(-2px);
@@ -281,51 +287,20 @@ body {
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
 }
 
-/* --- Responsive Adjustments --- */
 @media (max-width: 768px) {
-  .header h1 {
-    font-size: 1.8rem;
-  }
-  .btn-add-new {
-    padding: 0.6rem 1.2rem;
-    font-size: 0.9rem;
-  }
-  .address-manager-content {
-    padding: 0 1rem;
-  }
-  .form-row {
-    flex-direction: column;
-    gap: 0; /* Remove gap for vertical stacking */
-  }
-  .form-group {
-    margin-bottom: 1rem;
-  }
+  .header h1 { font-size: 1.8rem; }
+  .btn-add-new { padding: 0.6rem 1.2rem; font-size: 0.9rem; }
+  .address-manager-content { padding: 0 1rem; }
+  .form-row { flex-direction: column; gap: 0; }
+  .form-group { margin-bottom: 1rem; }
 }
 
 @media (max-width: 480px) {
-  .header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 1rem;
-  }
-  .address-card-professional {
-    padding: 1.2rem;
-  }
-  .card-actions {
-    flex-direction: column;
-    gap: 0.5rem;
-  }
-  .btn-action {
-    width: 100%;
-    text-align: center;
-  }
-  .address-form-professional {
-    padding: 1.5rem;
-  }
-  .btn-cancel, .btn-save {
-    width: 100%;
-  }
-  .form-actions {
-    flex-direction: column-reverse; /* Save button on top for mobile */
-  }
+  .header { flex-direction: column; align-items: flex-start; gap: 1rem; }
+  .address-card-professional { padding: 1.2rem; }
+  .card-actions { flex-direction: column; gap: 0.5rem; }
+  .btn-action { width: 100%; text-align: center; }
+  .address-form-professional { padding: 1.5rem; }
+  .btn-cancel, .btn-save { width: 100%; }
+  .form-actions { flex-direction: column-reverse; }
 }

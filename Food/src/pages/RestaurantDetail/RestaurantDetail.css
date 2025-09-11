@@ -188,3 +188,50 @@
         font-size: 24px;
     }
 }
+/* Animate arrow rotation */
+.dropdown-arrow {
+  display: inline-block;
+  font-size: 14px;
+  margin-left: 8px;
+  transition: transform 0.3s ease;
+}
+
+/* Add subtle hover on category headers */
+.category-header:hover {
+  background-color: #efefef;
+  transition: background-color 0.3s ease;
+}
+
+/* Smooth fade for menu items */
+.category-items {
+  transition: all 0.4s ease;
+}
+
+/* Empty state styling */
+.empty-state {
+  text-align: center;
+  color: #888;
+  font-size: 16px;
+  margin: 40px 0;
+}
+
+/* Skeleton loader for loading state */
+.loading-state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #555;
+  font-size: 16px;
+  gap: 10px;
+}
+
+.loading-state img {
+  width: 30px;
+  height: 30px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}

@@ -7,7 +7,7 @@ const LoginPage = () => {
 
     const handleLogin = (e) => {
         e.preventDefault();
-        // In a real app, you'd verify credentials here
+
         console.log("Simulating successful login...");
         login();
     };
@@ -19,8 +19,8 @@ const LoginPage = () => {
                 <p>Partner Portal</p>
                 <h2>Partner Login</h2>
                 <form onSubmit={handleLogin} className="login-form">
-                    <input type="email" placeholder="email@example.com" defaultValue="rider@snap-dish.com" required />
-                    <input type="password" placeholder="Password" defaultValue="password123" required />
+                    <input type="email" placeholder="email@example.com"  required />
+                    <input type="password" placeholder="Password" required />
                     <button type="submit" className="btn btn-primary">Login</button>
                 </form>
             </div>

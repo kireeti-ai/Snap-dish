@@ -1,10 +1,10 @@
 // src/components/LocationModal/LocationModal.js
 
-import React, { useContext, useState, useRef } from 'react';
+import React, { useContext, useRef } from 'react';
 import './LocationModel.css';
 import { StoreContext } from '../../Context/StoreContext';
 import { useJsApiLoader, Autocomplete } from '@react-google-maps/api';
-
+import { motion, AnimatePresence } from 'framer-motion';
 
 const libraries = ['places'];
 
@@ -12,11 +12,11 @@ const LocationModal = ({ setShowLocationModal }) => {
   const { setLocation } = useContext(StoreContext);
   const autocompleteRef = useRef(null);
 
-  // This hook loads the Google Maps script
   const { isLoaded, loadError } = useJsApiLoader({
-    googleMapsApiKey: 'AIzaSyDjJQOIclqe3ydi-GEaoVrDXa21wNjTc6E', // Use the same key
+    googleMapsApiKey: 'AIzaSyDjJQOIclqe3ydi-GEaoVrDXa21wNjTc6E',
     libraries,
   });
+
   const handleDetectLocation = () => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(async (position) => {
@@ -42,6 +42,7 @@ const LocationModal = ({ setShowLocationModal }) => {
       alert('Geolocation is not supported by your browser.');
     }
   };
+
   const onPlaceChanged = () => {
     if (autocompleteRef.current) {
       const place = autocompleteRef.current.getPlace();
@@ -51,7 +52,7 @@ const LocationModal = ({ setShowLocationModal }) => {
           latitude: place.geometry.location.lat(),
           longitude: place.geometry.location.lng(),
         });
-        setShowLocationModal(false); // Close modal
+        setShowLocationModal(false);
       }
     }
   };
@@ -60,29 +61,42 @@ const LocationModal = ({ setShowLocationModal }) => {
   if (!isLoaded) return <div>Loading...</div>;
 
   return (
-    <div className="location-modal-overlay">
-      <div className="location-modal">
-        <div className="modal-header">
-          <h2>Select Your Location</h2>
-          <button onClick={() => setShowLocationModal(false)} className="close-btn">×</button>
-        </div>
-        <div className="modal-body">
-          <Autocomplete
-            onLoad={(ref) => (autocompleteRef.current = ref)}
-            onPlaceChanged={onPlaceChanged}
-          >
-            <input
-              type="text"
-              placeholder="Search for area, street name..."
-              className="location-search-input"
-            />
-          </Autocomplete>
-          <button onClick={handleDetectLocation} className="detect-location-btn">
-             📍 Detect My Location
-          </button>
-        </div>
-      </div>
-    </div>
+    <AnimatePresence>
+      <motion.div
+        className="location-modal-overlay"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+      >
+        <motion.div
+          className="location-modal"
+          initial={{ y: -50, opacity: 0, scale: 0.95 }}
+          animate={{ y: 0, opacity: 1, scale: 1 }}
+          exit={{ y: 50, opacity: 0, scale: 0.95 }}
+          transition={{ duration: 0.3 }}
+        >
+          <div className="modal-header">
+            <h2>Select Your Location</h2>
+            <button onClick={() => setShowLocationModal(false)} className="close-btn">×</button>
+          </div>
+          <div className="modal-body">
+            <Autocomplete
+              onLoad={(ref) => (autocompleteRef.current = ref)}
+              onPlaceChanged={onPlaceChanged}
+            >
+              <input
+                type="text"
+                placeholder="Search for area, street name..."
+                className="location-search-input"
+              />
+            </Autocomplete>
+            <button onClick={handleDetectLocation} className="detect-location-btn">
+              📍 Detect My Location
+            </button>
+          </div>
+        </motion.div>
+      </motion.div>
+    </AnimatePresence>
   );
 };
 

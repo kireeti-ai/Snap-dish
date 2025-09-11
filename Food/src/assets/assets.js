@@ -62,6 +62,7 @@ import restaurant from './restaurant.png'
 import ping from './pin.png'
 import heart_solid from './heart_solid.png'
 import heart_outline from './heart_outline.png'
+import review from './review.png'
 // Exported Assets Object
 export const assets = {
     logo, save, loading, offer, trash, user, star, time,
@@ -69,7 +70,7 @@ export const assets = {
     add_icon_green, add_icon_white, remove_icon_red,
     app_store, play_store, linkedin_icon, facebook_icon,
     twitter_icon, cross_icon, selector_icon, profile_icon,
-    logout_icon, bag_icon, parcel_icon, checked, un_checked,restaurant,hamburger_icon,agent,ping,heart_solid,heart_outline
+    logout_icon, bag_icon, parcel_icon, checked, un_checked,restaurant,hamburger_icon,agent,ping,heart_solid,heart_outline,review
 }
 
 // Menu List

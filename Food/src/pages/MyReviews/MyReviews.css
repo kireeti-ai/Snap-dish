@@ -1,0 +1,65 @@
+.my-reviews-page {
+  max-width: 1200px;
+  margin: 40px auto;
+  padding: 0 20px;
+}
+
+.my-reviews-page h1 {
+  font-size: 2rem;
+  font-weight: 600;
+  margin-bottom: 2rem;
+}
+
+.no-reviews {
+  font-size: 1.2rem;
+  color: #888;
+}
+
+.reviews-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.review-card {
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  overflow: hidden;
+  padding: 15px;
+}
+
+.review-card-header {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 10px;
+}
+
+.review-restaurant-image {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 10px;
+}
+
+.review-card-header h3 {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.review-card-header p {
+  margin: 0;
+  color: #555;
+  font-size: 0.9rem;
+}
+
+.review-card-content .review-rating {
+  font-weight: 500;
+  margin-bottom: 8px;
+}
+
+.review-card-content .review-comment {
+  font-size: 0.95rem;
+  color: #333;
+}
