@@ -1,4 +1,3 @@
-
 import React, { useState, useContext } from 'react';
 import Navbar from './components/navbar/navbar.jsx';
 import { Route, Routes } from 'react-router-dom';
