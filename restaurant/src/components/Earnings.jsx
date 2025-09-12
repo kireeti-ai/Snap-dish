@@ -1,6 +1,5 @@
 import React from 'react';
 
-// Mock data
 const earningsData = {
   today: 450.75,
   thisWeek: 2890.50,
@@ -8,9 +7,9 @@ const earningsData = {
 };
 
 const orderHistory = [
-  { id: 103, date: '2025-09-01', total: 10.50, status: 'Completed' },
-  { id: 102, date: '2025-09-01', total: 12.48, status: 'Completed' },
-  { id: 101, date: '2025-08-31', total: 15.99, status: 'Completed' },
+  { id: 103, date: '2025-09-01', total: 850.50, status: 'Completed' },
+  { id: 102, date: '2025-09-01', total: 1248.00, status: 'Completed' },
+  { id: 101, date: '2025-08-31', total: 1599.00, status: 'Completed' },
 ];
 
 function Earnings() {
@@ -49,7 +48,7 @@ function Earnings() {
               <tr key={order.id}>
                 <td>#{order.id}</td>
                 <td>{order.date}</td>
-                <td>${order.total.toFixed(2)}</td>
+                <td>₹{order.total.toFixed(2)}</td>
                 <td>{order.status}</td>
               </tr>
             ))}

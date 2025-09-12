@@ -2,6 +2,7 @@ import React from 'react';
 import './RestaurantItem.css';
 import { assets } from '../../assets/assets';
 import { Link } from 'react-router-dom';
+import axios from "axios";
 
 const RestaurantItem = ({ id, name, cuisine, rating, time, image, address, price_for_two }) => {
   return (
@@ -12,10 +13,8 @@ const RestaurantItem = ({ id, name, cuisine, rating, time, image, address, price
         </div>
         <div className="restaurant-info">
           <div className="restaurant-name-rate">
-
             <p>{name}</p>
 
-      
             <p>
               {rating && (
                 <>

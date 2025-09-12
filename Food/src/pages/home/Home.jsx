@@ -1,22 +1,16 @@
 
 import React, { useState } from 'react';
 import Header from '../../components/Header/Header';
-
-import FoodDisplay from '../../components/FoodDisplay/FoodDisplay';
 import RestaurantDisplay from '../../components/RestaurantDisplay/RestaurantDisplay';
+import Navbar from '../../components/navbar/navbar';
 
 import './Home.css'
-const Home = () => {
-  const [category, setCategory] = useState("All");
-
+const Home = ({ setShowLogin }) => {
   return (
     <div>
+      <Navbar setShowLogin={setShowLogin} />
       <Header />
-     
-      {/* <FoodDisplay category={category} /> */}
-      
       <RestaurantDisplay />
-      
     </div>
   );
 };

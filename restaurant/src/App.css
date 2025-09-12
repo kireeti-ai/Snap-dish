@@ -239,3 +239,139 @@ td .actions button {
   font-weight: bold;
   color: #2c3e50;
 }
+/* -- Status Toggle Switch -- */
+.status-toggle-container {
+    display: flex;
+    align-items: center;
+    gap: 1rem; /* Adds space between text and switch */
+}
+
+.status-toggle-container .online { color: #2ecc71; font-weight: 600; }
+.status-toggle-container .offline { color: #e74c3c; font-weight: 600; }
+
+/* Simple toggle switch CSS */
+.toggle-switch {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 34px;
+}
+.toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+.toggle-switch label {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: .4s;
+    border-radius: 34px;
+}
+.toggle-switch label:before {
+    position: absolute;
+    content: "";
+    height: 26px;
+    width: 26px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+}
+input:checked + label {
+    background-color: #2ecc71; /* Green color for online */
+}
+input:checked + label:before {
+    transform: translateX(26px);
+}
+
+/* Make Navbar responsive with the new toggle */
+.navbar {
+    flex-wrap: wrap; /* Allow items to wrap on smaller screens */
+    gap: 1rem;
+}
+/* --- Navbar --- */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #2c3e50; /* Dark slate blue */
+    padding: 1rem 2rem;
+    color: white;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    flex-wrap: wrap; /* Allows items to wrap on smaller screens */
+    gap: 1.5rem; /* Space between flex items */
+}
+
+/* Container for the navigation links */
+.nav-links {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem; /* Space between links */
+}
+
+/* Styling for each NavLink */
+.nav-links a {
+    color: #ecf0f1; /* Light gray, almost white */
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 1rem;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Style for the link when hovered over */
+.nav-links a:hover {
+    background-color: #34495e; /* Slightly lighter slate blue */
+    color: white;
+}
+
+/* This special class is automatically added by NavLink to the active page link */
+.nav-links a.active {
+    background-color: #4e6a85;
+    color: white;
+    font-weight: 700;
+}
+
+/* Logout Button */
+.btn-logout {
+    background-color: #e74c3c; /* Red */
+    color: white;
+    border: none;
+    padding: 0.6rem 1.2rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 1rem;
+    transition: background-color 0.3s ease;
+}
+
+.btn-logout:hover {
+    background-color: #c0392b; /* Darker red */
+}
+
+
+/* --- Responsive Design for smaller screens --- */
+@media (max-width: 768px) {
+    .navbar {
+        flex-direction: column; /* Stack items vertically */
+        align-items: flex-start; /* Align to the start */
+    }
+
+    .nav-links {
+        flex-direction: column;
+        width: 100%;
+        align-items: stretch; /* Make links fill the width */
+        gap: 0.5rem;
+    }
+
+    .nav-links a {
+        text-align: center; /* Center text inside links */
+    }
+}

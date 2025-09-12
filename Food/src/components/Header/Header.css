@@ -1,4 +1,3 @@
-/* Add animation keyframes at the top of your file */
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -11,17 +10,14 @@
 }
 
 .header {
-    height: 38vw; /* Slightly adjusted for better proportions */
-    min-height: 300px; /* Ensures it's not too short on narrow screens */
+    height: 38vw;
+    min-height: 300px;
     margin: 30px auto;
     position: relative;
-    border-radius: 15px; /* Softer radius */
-
-    /* --- ✨ IMPROVEMENT 1 & 2: Background Image & Overlay --- */
-    /* This creates a dark gradient overlay on top of your image */
+    border-radius: 15px;
     background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.1)), url('/table-2.jpg');
-    background-size: cover; /* Ensures the image fills the container */
-    background-position: center; /* Centers the image */
+    background-size: cover;
+    background-position: center;
     background-repeat: no-repeat;
 }
 
@@ -31,33 +27,29 @@
     flex-direction: column;
     align-items: start;
     gap: 1.5vw;
-    max-width: 55%; /* Slightly more width for content */
+    max-width: 55%;
     bottom: 10%;
     left: 6vw;
     color: white;
-
-    /* --- 🚀 IMPROVEMENT 3: Animation --- */
     animation: fadeIn 1s ease-out;
 }
 
 .header-contents h2 {
-    font-weight: 600; /* Bolder for more impact */
+    font-weight: 600;
     color: white;
-    /* --- ✨ IMPROVEMENT 4: Responsive Typography with clamp() --- */
-    /* Sets min, preferred, and max font size */
     font-size: clamp(28px, 4.5vw, 55px); 
 }
 
 .header-contents p {
-    color: #e0e0e0; /* Slightly off-white for better contrast */
-    font-size: clamp(14px, 1.2vw, 18px); /* Ensures text is readable on all screens */
+    color: #e0e0e0;
+    font-size: clamp(14px, 1.2vw, 18px);
 }
 
 .header-contents button {
     border: none;
-    color: #333; /* Darker text */
+    color: #333;
     font-weight: 500;
-    padding: 0.8vw 2.3vw; /* Responsive padding */
+    padding: 0.8vw 2.3vw;
     background-color: white;
     font-size: clamp(14px, 1.1vw, 16px);
     border-radius: 50px;
@@ -66,5 +58,5 @@
 }
 
 .header-contents button:hover {
-    background-color: #f0f0f0; /* Subtle hover effect */
+    background-color: #f0f0f0;
 }

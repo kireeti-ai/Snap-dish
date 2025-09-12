@@ -1,16 +1,17 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { authService } from '../services/authService';
+import { useAuth } from '../context/AuthContext'; // Use the context hook
 
 function Login() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const navigate = useNavigate();
+  const { login } = useAuth(); // Get the login function from context
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    const success = await authService.login(username, password);
+    const success = await login(username, password); // Use context login
     if (success) {
       navigate('/dashboard');
     } else {

@@ -23,7 +23,6 @@ const Navbar = ({ setShowLogin }) => {
     <>
       {showLocationModal && <LocationModal setShowLocationModal={setShowLocationModal} />}
 
-      {/* Animate navbar on mount */}
       <motion.div
         className="navbar"
         initial={{ y: -80, opacity: 0 }}
