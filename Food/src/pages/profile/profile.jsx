@@ -1,9 +1,9 @@
 import { useState, useEffect, useContext } from "react";
 import { Edit3, Save, X } from "lucide-react";
 import axios from "axios";
-import { StoreContext } from "../../context/StoreContext.jsx";
+import { StoreContext } from "../../context/StoreContext";
 import { toast } from "react-toastify";
-import "./profile.css"
+import "./profile.css";
 
 export default function PersonalInfoEdit() {
   const { token, url } = useContext(StoreContext);

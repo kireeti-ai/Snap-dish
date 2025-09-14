@@ -4,10 +4,10 @@ import dotenv from 'dotenv';
 import { connectDB } from "./config/db.js";
 
 import userRoutes from "./routes/userRoutes.js";
-import restaurantRoutes from "./routes/restaurantRoutes.js";
-import orderRoutes from "./routes/orderRoutes.js";
-import reviewRoutes from "./routes/reviewRoutes.js";
-import deliveryAgentRoutes from "./routes/deliveryAgentRoutes.js";
+// import restaurantRoutes from "./routes/restaurantRoutes.js";
+// import orderRoutes from "./routes/orderRoutes.js";
+// import reviewRoutes from "./routes/reviewRoutes.js";
+// import deliveryAgentRoutes from "./routes/deliveryAgentRoutes.js";
 
 dotenv.config();
 const app = express();
@@ -15,17 +15,21 @@ const port = process.env.PORT || 4000;
 
 // --- Middleware ---
 app.use(express.json()); // To parse JSON bodies
-app.use(cors({ origin: "*" })); 
+app.use(cors({
+  origin: "http://localhost:5173", // frontend origin
+  credentials: true
+}));
+
 
 // --- DB Connection ---
 connectDB();
 
 // --- API Endpoints ---
 app.use("/api/users", userRoutes);
-app.use("/api/restaurants", restaurantRoutes); 
-app.use("/api/orders", orderRoutes);
-app.use("/api/delivery-agents", deliveryAgentRoutes);
-app.use("/api/reviews", reviewRoutes); 
+// app.use("/api/restaurants", restaurantRoutes); 
+// app.use("/api/orders", orderRoutes);
+// app.use("/api/delivery-agents", deliveryAgentRoutes);
+// app.use("/api/reviews", reviewRoutes); 
 
 
 app.get("/", (req, res) => {
