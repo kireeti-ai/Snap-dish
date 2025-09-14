@@ -1,31 +1,13 @@
-import mongoose from 'mongoose';
+// models/Review.js
+import mongoose from "mongoose";
 
 const reviewSchema = new mongoose.Schema({
-    user_id: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
-        required: true,
-    },
-    restaurant_id: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Restaurant',
-        required: true,
-    },
-    rating: {
-        type: Number,
-        required: true,
-        min: 1,
-        max: 5,
-    },
-    comment: {
-        type: String,
-    },
-}, {
-    timestamps: { createdAt: 'created_at', updatedAt: false }
+    user_id: { type: mongoose.Schema.Types.ObjectId, ref: 'user', required: true },
+    restaurant_id: { type: mongoose.Schema.Types.ObjectId, ref: 'restaurant', required: true },
+    rating: { type: Number, required: true, min: 1, max: 5 },
+    comment: { type: String },
+    review_date: { type: Date, default: Date.now }
 });
 
-// To prevent a user from reviewing the same restaurant multiple times
-reviewSchema.index({ user_id: 1, restaurant_id: 1 }, { unique: true });
-
-const Review = mongoose.model('Review', reviewSchema);
-export default Review;
+const reviewModel = mongoose.models.review || mongoose.model("review", reviewSchema);
+export default reviewModel;

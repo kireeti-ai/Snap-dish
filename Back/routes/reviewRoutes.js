@@ -1,12 +1,13 @@
 import express from 'express';
-import { createRestaurantReview, getRestaurantReviews } from '../controllers/reviewController.js';
-import { protect } from '../middleware/authMiddleware.js';
+import { createReview, getReviewsByRestaurant } from '../controllers/reviewController.js';
+import authMiddleware from '../middleware/authMiddleware.js';
 
-const router = express.Router();
+const reviewRouter = express.Router();
 
-// This setup is for routes like POST /api/restaurants/:restaurantId/reviews
-router.route('/restaurants/:restaurantId/reviews')
-    .post(protect, createRestaurantReview)
-    .get(getRestaurantReviews);
+// POST /api/review - Create a new review (requires user to be logged in)
+reviewRouter.post('/', authMiddleware, createReview);
 
-export default router;
+// GET /api/review/:restaurantId - Get all reviews for a restaurant
+reviewRouter.get('/:restaurantId', getReviewsByRestaurant);
+
+export default reviewRouter;

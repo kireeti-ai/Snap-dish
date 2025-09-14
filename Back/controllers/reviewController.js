@@ -1,68 +1,45 @@
-import Review from '../models/Review.js';
-import Restaurant from '../models/Restaurant.js';
+import reviewModel from '../models/Review.js';
+import restaurantModel from '../models/Restaurant.js';
 
-// @desc    Create a new review
-// @route   POST /api/restaurants/:restaurantId/reviews
-// @access  Private
-const createRestaurantReview = async (req, res) => {
-    const { rating, comment } = req.body;
-    const { restaurantId } = req.params;
+// Create a new review for a restaurant
+export const createReview = async (req, res) => {
+    const { restaurantId, rating, comment } = req.body;
 
     try {
-        const restaurant = await Restaurant.findById(restaurantId);
-
+        const restaurant = await restaurantModel.findById(restaurantId);
         if (!restaurant) {
-            return res.status(404).json({ message: 'Restaurant not found' });
+            return res.status(404).json({ success: false, message: "Restaurant not found" });
         }
 
-        // Check if the user has already reviewed this restaurant
-        const alreadyReviewed = await Review.findOne({
-            user_id: req.user._id,
+        const newReview = new reviewModel({
+            user_id: req.body.userId,
             restaurant_id: restaurantId,
+            rating,
+            comment
         });
 
-        if (alreadyReviewed) {
-            return res.status(400).json({ message: 'You have already reviewed this restaurant' });
-        }
+        const savedReview = await newReview.save();
 
-        // Create a new review
-        const review = new Review({
-            user_id: req.user._id,
-            restaurant_id: restaurantId,
-            name: req.user.name, // Add user's name to the review for display
-            rating: Number(rating),
-            comment,
-        });
+        // Optional: Update the restaurant's average rating
+        const reviews = await reviewModel.find({ restaurant_id: restaurantId });
+        const totalRating = reviews.reduce((acc, item) => item.rating + acc, 0);
+        restaurant.rating = totalRating / reviews.length;
+        await restaurant.save();
 
-        await review.save();
-
-        res.status(201).json({ message: 'Review added successfully' });
-
+        res.status(201).json({ success: true, data: savedReview });
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: 'Server Error' });
+        console.log(error);
+        res.status(500).json({ success: false, message: "Server Error" });
     }
 };
 
-
-// @desc    Get reviews for a restaurant
-// @route   GET /api/restaurants/:restaurantId/reviews
-// @access  Public
-const getRestaurantReviews = async (req, res) => {
+// Get all reviews for a specific restaurant
+export const getReviewsByRestaurant = async (req, res) => {
     try {
-        const reviews = await Review.find({ restaurant_id: req.params.restaurantId }).populate('user_id', 'name');
-        
-        if (!reviews) {
-            return res.status(404).json({ message: 'No reviews found for this restaurant' });
-        }
-
-        res.json(reviews);
-
+        const reviews = await reviewModel.find({ restaurant_id: req.params.restaurantId }).populate('user_id', 'name');
+        res.json({ success: true, data: reviews });
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: 'Server Error' });
+        console.log(error);
+        res.status(500).json({ success: false, message: "Server Error" });
     }
 };
-
-
-export { createRestaurantReview, getRestaurantReviews };

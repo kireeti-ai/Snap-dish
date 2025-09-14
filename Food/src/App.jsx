@@ -12,7 +12,7 @@ import { StoreContext } from './Context/StoreContext.jsx';
 import RestaurantChangePrompt from './components/RestaurantChangePrompt/RestaurantChangePrompt.jsx';
 import Footer from './components/Footer/Footer.jsx';
 import ManageRestaurant from './pages/ManageResturant/ManageResturant.jsx';
-
+import PersonalInfoEdit from './pages/profile/profile.jsx';
 import AddressManager from './components/Addresses/AddressManager.jsx';
 import MyOrders from './pages/MyOrders/MyOrders.jsx';
 import Wishlist from './pages/WishList/WishList.jsx';
@@ -30,7 +30,7 @@ const App = () => {
       {showRestaurantPrompt && <RestaurantChangePrompt />}
 
       <div className='app'>
-        
+         <Navbar setShowLogin={setShowLogin} />
         <Routes>
           <Route path="/" element={<Home setShowLogin={setShowLogin} />} />
           <Route path='/cart' element={<Cart />} />
@@ -44,6 +44,7 @@ const App = () => {
           <Route path ='/orderSuccess' element={<OrderSuccess/>}/>
           <Route path='/search' element={<SearchPage/>} />
           <Route path='/reviews-user' element={<MyReviews/>}/>
+          <Route path='/profile-edit' element={<PersonalInfoEdit/>}/>
         
         </Routes>
         

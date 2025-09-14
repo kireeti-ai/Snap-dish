@@ -8,7 +8,7 @@ import './Home.css'
 const Home = ({ setShowLogin }) => {
   return (
     <div>
-      <Navbar setShowLogin={setShowLogin} />
+     
       <Header />
       <RestaurantDisplay />
     </div>

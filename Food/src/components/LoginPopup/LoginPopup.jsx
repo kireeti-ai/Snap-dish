@@ -31,10 +31,10 @@ const LoginPopup = ({ setShowLogin }) => {
         let endpoint = '';
         let payload = {};
         if (currState === 'Login') {
-            endpoint = '/api/users/login';
+            endpoint = '/api/user/login';
             payload = { email: data.email, password: data.password };
         } else {
-            endpoint = '/api/users/register';
+            endpoint = '/api/user/register';
             payload = data; 
         }
         
@@ -51,12 +51,11 @@ const LoginPopup = ({ setShowLogin }) => {
                     setUserName(response.data.name);
                     localStorage.setItem("userName", response.data.name);
                 }
-
                 const userRole = response.data.role;
                 if (userRole === 'restaurant_owner') {
-                    window.location.href = 'https://snap-dish-tfbg.vercel.app/login'; 
+                    window.location.href = 'https://localhost:4000/login'; 
                 } else if (userRole === 'delivery_agent') {
-                    window.location.href = 'https://snap-dish-2p9s.vercel.app/login'; 
+                    window.location.href = 'https://localhost:4000/login'; 
                 } else {
                     setShowLogin(false);
                 }

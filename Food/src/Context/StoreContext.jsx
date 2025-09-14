@@ -1,37 +1,53 @@
 import { createContext, useState, useEffect } from "react";
-import { food_list} from "../assets/assets";
+import axios from "axios";
+import { toast } from 'react-toastify';
 
 export const StoreContext = createContext(null);
-const initialAddresses = [
-  { id: 1, type: 'Home', firstName: "John", lastName: "Doe", street: '123 Palm Grove', city: 'Coimbatore', state: 'Tamil Nadu', zipCode: '641021', country: 'India', phone: '9876543210', email: 'john.doe@example.com', isDefault: true },
-  { id: 2, type: 'Work', firstName: "Jane", lastName: "Smith", street: '456 Tech Park Rd', city: 'Chennai', state: 'Tamil Nadu', zipCode: '600001', country: 'India', phone: '9123456789', email: 'jane.smith@example.com', isDefault: false },
-];
 
 const StoreContextProvider = (props) => {
-
   const [cartItems, setCartItems] = useState({});
+  const [food_list, setFoodList] = useState([]); // State for food list from API
   const [searchQuery, setSearchQuery] = useState("");
-  const url = "https://snap-dish.onrender.com"
-  const [token, setToken] = useState();
-  const [userName, setUserName] = useState("");
+  const url = "http://localhost:4000";
+  const [token, setToken] = useState(localStorage.getItem("token") || "");
+  const [userName, setUserName] = useState(localStorage.getItem("userName") || "");
   const [cartRestaurant, setCartRestaurant] = useState(null);
   const [showRestaurantPrompt, setShowRestaurantPrompt] = useState(false);
   const [pendingItem, setPendingItem] = useState(null);
   const [wishlistItems, setWishlistItems] = useState([]);
   const [orders, setOrders] = useState([]);
-  const [savedAddresses, setSavedAddresses] = useState(initialAddresses);
+  const [savedAddresses, setSavedAddresses] = useState([]); // Start with empty array
 
   const [location, setLocation] = useState({
-    address: "Ettimadai, Coimbatore", 
-    latitude: 10.8817,               
+    address: "Ettimadai, Coimbatore",
+    latitude: 10.8817,
     longitude: 76.9038,
   });
+
+  // --- API Calls ---
+
+  const fetchFoodList = async () => {
+    try {
+      const response = await axios.get(`${url}/api/food/list`);
+      if (response.data.success) {
+        setFoodList(response.data.data);
+      } else {
+        toast.error("Failed to fetch food list.");
+      }
+    } catch (error) {
+      toast.error("Error connecting to the server.");
+    }
+  };
+
+  // --- End API Calls ---
+
   const logout = () => {
     localStorage.removeItem("token");
-    localStorage.removeItem("userName"); 
+    localStorage.removeItem("userName");
     setToken("");
     setUserName("");
   };
+
   const addToCart = (itemId) => {
     const itemToAdd = food_list.find((product) => product._id === itemId);
     if (!itemToAdd) return;
@@ -41,22 +57,18 @@ const StoreContextProvider = (props) => {
     if (Object.keys(cartItems).length === 0) {
       setCartItems({ [itemId]: 1 });
       setCartRestaurant(itemRestaurantId);
-    }
-    else if (itemRestaurantId === cartRestaurant) {
+    } else if (itemRestaurantId === cartRestaurant) {
       setCartItems((prev) => ({ ...prev, [itemId]: (prev[itemId] || 0) + 1 }));
-    }
-    else {
+    } else {
       setPendingItem(itemId);
       setShowRestaurantPrompt(true);
     }
   };
-  
+
   const clearCartAndAddToCart = () => {
     if (!pendingItem) return;
-
     const itemToAdd = food_list.find((product) => product._id === pendingItem);
     if (!itemToAdd) return;
-
     setCartItems({ [pendingItem]: 1 });
     setCartRestaurant(itemToAdd.restaurant_id);
     setShowRestaurantPrompt(false);
@@ -90,7 +102,8 @@ const StoreContextProvider = (props) => {
     }
     return totalAmount;
   };
-    const addToWishlist = (itemId) => {
+
+  const addToWishlist = (itemId) => {
     if (!wishlistItems.includes(itemId)) {
       setWishlistItems((prev) => [...prev, itemId]);
     }
@@ -99,6 +112,7 @@ const StoreContextProvider = (props) => {
   const removeFromWishlist = (itemId) => {
     setWishlistItems((prev) => prev.filter((id) => id !== itemId));
   };
+
   const placeNewOrder = (orderData) => {
     const newOrder = {
       ...orderData,
@@ -107,15 +121,14 @@ const StoreContextProvider = (props) => {
       status: 'Preparing'
     };
     setOrders(prev => [...prev, newOrder]);
-    // After placing an order, the cart should be cleared
-    setCartItems({}); 
+    setCartItems({});
   };
-  // ++ ADD ADDRESS MANAGEMENT FUNCTIONS ++
+
   const addAddress = (addressData) => {
-    const newAddress = { 
-      ...addressData, 
-      id: Date.now(), 
-      isDefault: savedAddresses.length === 0 // Make first address the default
+    const newAddress = {
+      ...addressData,
+      id: Date.now(),
+      isDefault: savedAddresses.length === 0
     };
     setSavedAddresses(prev => [...prev, newAddress]);
   };
@@ -133,26 +146,27 @@ const StoreContextProvider = (props) => {
   };
 
   useEffect(() => {
-    // Load token and name from local storage when the app loads
-    const storedToken = localStorage.getItem("token");
-    const storedUserName = localStorage.getItem("userName");
-    if (storedToken) {
-      setToken(storedToken);
-    }
-    if (storedUserName) {
-      setUserName(storedUserName);
-    }
+    fetchFoodList(); // Fetch food list when the component mounts
     const storedCart = localStorage.getItem("cartItems");
     if (storedCart) setCartItems(JSON.parse(storedCart));
   }, []);
-    useEffect(() => {
-    // Save cart to local storage whenever it changes
+
+  useEffect(() => {
+    if (token) {
+        localStorage.setItem("token", token);
+        localStorage.setItem("userName", userName);
+        // Here you would also fetch user-specific data like cart, addresses, etc.
+    }
+  }, [token, userName]);
+
+  useEffect(() => {
     if (Object.keys(cartItems).length > 0) {
       localStorage.setItem("cartItems", JSON.stringify(cartItems));
     } else {
-      localStorage.removeItem("cartItems"); // Clean up if cart is empty
+      localStorage.removeItem("cartItems");
     }
   }, [cartItems]);
+
   const contextValue = {
     url,
     food_list,
@@ -170,14 +184,16 @@ const StoreContextProvider = (props) => {
     userName,
     setUserName,
     logout,
-    location,       
+    location,
     setLocation,
-    searchQuery,      
+    searchQuery,
     setSearchQuery,
-    addToWishlist,removeFromWishlist,wishlistItems,
-        orders,           
+    addToWishlist,
+    removeFromWishlist,
+    wishlistItems,
+    orders,
     placeNewOrder,
-        savedAddresses,
+    savedAddresses,
     addAddress,
     updateAddress,
     deleteAddress,

@@ -1,57 +1,53 @@
-import Order from '../models/Order.js'; // Make sure the model path is correct
+import orderModel from '../models/Order.js';
+import userModel from '../models/userModel.js';
+import Stripe from 'stripe';
 
-// @desc    Create new order
-// @route   POST /api/orders
-// @access  Private
-export const createOrder = async (req, res) => {
-    const {
-        restaurant_id,
-        items,
-        total_amount,
-        payment_method,
-    } = req.body;
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
-    if (!items || items.length === 0) {
-        return res.status(400).json({ message: 'No order items' });
-    }
-
+// Place an order
+export const placeOrder = async (req, res) => {
+    const frontend_url = "http://localhost:5173";
     try {
-        const order = new Order({
-            user_id: req.user._id, // Assumes `protect` middleware adds `req.user`
-            restaurant_id,
-            items,
-            total_amount,
-            payment: {
-                payment_method,
-            }
+        const newOrder = new orderModel({
+            userId: req.body.userId,
+            items: req.body.items,
+            amount: req.body.amount,
+            address: req.body.address
+        });
+        await newOrder.save();
+        await userModel.findByIdAndUpdate(req.body.userId, { cartData: {} });
+
+        const line_items = req.body.items.map((item) => ({
+            price_data: {
+                currency: "inr",
+                product_data: {
+                    name: item.name
+                },
+                unit_amount: item.price * 100
+            },
+            quantity: item.quantity
+        }));
+
+        line_items.push({
+            price_data: {
+                currency: "inr",
+                product_data: {
+                    name: "Delivery Charges"
+                },
+                unit_amount: 50 * 100
+            },
+            quantity: 1
         });
 
-        const createdOrder = await order.save();
-        res.status(201).json(createdOrder);
+        const session = await stripe.checkout.sessions.create({
+            line_items: line_items,
+            mode: 'payment',
+            success_url: `${frontend_url}/verify?success=true&orderId=${newOrder._id}`,
+            cancel_url: `${frontend_url}/verify?success=false&orderId=${newOrder._id}`,
+        });
+        res.json({ success: true, session_url: session.url });
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: 'Server Error' });
-    }
-};
-
-// @desc    Get order by ID
-// @route   GET /api/orders/:id
-// @access  Private
-export const getOrderById = async (req, res) => {
-    try {
-        const order = await Order.findById(req.params.id).populate('user_id', 'name email');
-
-        if (order) {
-            // Check if the order belongs to the logged-in user or if the user is an admin
-            if (order.user_id.toString() !== req.user._id.toString() && req.user.role !== 'admin') {
-                return res.status(401).json({ message: 'Not authorized to view this order' });
-            }
-            res.json(order);
-        } else {
-            res.status(404).json({ message: 'Order not found' });
-        }
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: 'Server Error' });
+        console.log(error);
+        res.json({ success: false, message: "Error" });
     }
 };

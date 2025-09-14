@@ -1,23 +1,30 @@
-import Restaurant from '../models/Restaurant.js';
+import restaurantModel from '../models/Restaurant.js';
+import userModel from '../models/userModel.js';
 
-export const getRestaurants = async (req, res) => {
+// Get all restaurants
+export const getAllRestaurants = async (req, res) => {
     try {
-        const restaurants = await Restaurant.find({});
-        res.json(restaurants);
+        const restaurants = await restaurantModel.find({});
+        res.json({ success: true, data: restaurants });
     } catch (error) {
-        res.status(500).json({ message: 'Server Error' });
+        res.status(500).json({ success: false, message: 'Server Error' });
     }
 };
 
-export const getRestaurantById = async (req, res) => {
+// Create a new restaurant (for restaurant owners)
+export const createRestaurant = async (req, res) => {
+    const { name, address, cuisine, price_for_two } = req.body;
     try {
-        const restaurant = await Restaurant.findById(req.params.id);
-        if (restaurant) {
-            res.json(restaurant);
-        } else {
-            res.status(404).json({ message: 'Restaurant not found' });
-        }
+        const newRestaurant = new restaurantModel({
+            owner_id: req.body.userId,
+            name,
+            address,
+            cuisine,
+            price_for_two
+        });
+        const restaurant = await newRestaurant.save();
+        res.status(201).json({ success: true, data: restaurant });
     } catch (error) {
-        res.status(500).json({ message: 'Server Error' });
+        res.status(500).json({ success: false, message: 'Server Error' });
     }
 };

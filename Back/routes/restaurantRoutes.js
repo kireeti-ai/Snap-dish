@@ -1,9 +1,10 @@
 import express from 'express';
-import { getRestaurants, getRestaurantById } from '../controllers/restaurantController.js';
+import { getAllRestaurants, createRestaurant } from '../controllers/restaurantController.js';
+import authMiddleware, { isRestaurantOwner } from '../middleware/authMiddleware.js';
 
-const router = express.Router();
+const restaurantRouter = express.Router();
 
-router.get('/', getRestaurants);
-router.get('/:id', getRestaurantById);
+restaurantRouter.get('/', getAllRestaurants);
+restaurantRouter.post('/', authMiddleware, isRestaurantOwner, createRestaurant);
 
-export default router;
+export default restaurantRouter;

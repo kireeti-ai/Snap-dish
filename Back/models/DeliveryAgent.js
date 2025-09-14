@@ -1,52 +1,20 @@
-import mongoose from 'mongoose';
-import bcrypt from 'bcrypt';
+
+import mongoose from "mongoose";
+
 const deliveryAgentSchema = new mongoose.Schema({
-    name: {
+    user_id: { type: mongoose.Schema.Types.ObjectId, ref: 'user', required: true },
+    vehicle_number: { type: String, required: true },
+    availability_status: {
         type: String,
-        required: true,
+        enum: ['online', 'offline'],
+        default: 'offline'
     },
-    phone_number: {
+    approval_status: {
         type: String,
-        required: true,
-        unique: true,
-    },
-    password_hash: {
-        type: String,
-        required: true,
-    },
-    status: {
-        type: String,
-        enum: ['available', 'on_delivery', 'offline'],
-        default: 'offline',
-    },
-    current_location: {
-        type: {
-            type: String,
-            enum: ['Point'],
-        },
-        coordinates: {
-            type: [Number], // [longitude, latitude]
-        }
+        enum: ['pending', 'approved', 'denied'],
+        default: 'pending'
     }
-}, {
-    timestamps: true
 });
 
-// Index for geospatial queries
-deliveryAgentSchema.index({ current_location: '2dsphere' });
-
-// Hash password before saving
-deliveryAgentSchema.pre('save', async function (next) {
-    if (!this.isModified('password_hash')) return next();
-    const salt = await bcrypt.genSalt(10);
-    this.password_hash = await bcrypt.hash(this.password_hash, salt);
-    next();
-});
-
-// Method to compare password
-deliveryAgentSchema.methods.comparePassword = function (candidatePassword) {
-    return bcrypt.compare(candidatePassword, this.password_hash);
-};
-
-const DeliveryAgent = mongoose.model('DeliveryAgent', deliveryAgentSchema);
-export default DeliveryAgent;
+const deliveryAgentModel = mongoose.models.deliveryAgent || mongoose.model("deliveryAgent", deliveryAgentSchema);
+export default deliveryAgentModel;
