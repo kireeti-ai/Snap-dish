@@ -5,6 +5,7 @@ import { StoreContext } from '../../context/StoreContext';
 import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'react-toastify';
+import { useNavigate } from 'react-router-dom';
 
 const LoginPopup = ({ setShowLogin }) => {
   const { url, setToken, setUserName } = useContext(StoreContext);
@@ -18,6 +19,7 @@ const LoginPopup = ({ setShowLogin }) => {
     role: "customer"
   });
   const [error, setError] = useState("");
+  const navigate = useNavigate();
 
   const onChangeHandler = (event) => {
     const { name, value } = event.target;
@@ -37,27 +39,37 @@ const LoginPopup = ({ setShowLogin }) => {
       const response = await axios.post(`${url}${endpoint}`, payload);
 
       if (response.data.token) {
+        // Save token
         setToken(response.data.token);
         localStorage.setItem("token", response.data.token);
 
+        // Save user name
         const name = response.data.firstName || response.data.name;
         setUserName(name);
         localStorage.setItem("userName", name);
 
+        // Save user role
         const userRole = response.data.role;
-        // Redirect based on role
+        localStorage.setItem("role", userRole);
+
+        toast.success(`${currState} successful!`);
+
+        // Role-based redirect
         if (userRole === 'restaurant_owner') {
-          window.location.href = '/restaurant-dashboard';
+          navigate('/restaurant-dashboard');
         } else if (userRole === 'delivery_agent') {
-          window.location.href = '/delivery-dashboard';
+          navigate('/delivery-dashboard');
         } else {
-          setShowLogin(false);
+          setShowLogin(false); // Customer → just close popup
         }
       } else {
         setError(response.data.message || "An unexpected error occurred.");
+        toast.error(response.data.message || "An unexpected error occurred.");
       }
     } catch (err) {
-      setError(err.response?.data?.message || "Login failed. Please check your credentials.");
+      const msg = err.response?.data?.message || "Login failed. Please check your credentials.";
+      setError(msg);
+      toast.error(msg);
     }
   };
 
@@ -200,10 +212,12 @@ const LoginPopup = ({ setShowLogin }) => {
             {currState === "Login" ? "Login" : "Create account"}
           </motion.button>
 
-          <div className="login-popup-condition">
-            <input type="checkbox" required />
-            <p>By continuing, I agree to the terms of use & privacy policy.</p>
-          </div>
+          {currState === "Sign Up" && (
+            <div className="login-popup-condition">
+              <input type="checkbox" required />
+              <p>By continuing, I agree to the terms of use & privacy policy.</p>
+            </div>
+          )}
 
           {currState === "Login"
             ? <p>Create a new account? <span onClick={() => { setCurrState('Sign Up'); setError(""); }}>Click here</span></p>
@@ -213,6 +227,6 @@ const LoginPopup = ({ setShowLogin }) => {
       </motion.div>
     </AnimatePresence>
   );
-}
+};
 
 export default LoginPopup;

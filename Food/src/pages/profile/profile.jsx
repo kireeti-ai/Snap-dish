@@ -15,7 +15,7 @@ export default function PersonalInfoEdit() {
     const fetchProfile = async () => {
       try {
         const { data } = await axios.get(`${url}/api/users/profile`, {
-          headers: { Authorization: `Bearer ${token}` }
+          headers: { Authorization: `Bearer ${token}` },
         });
 
         if (data.success) {
@@ -39,7 +39,7 @@ export default function PersonalInfoEdit() {
   const handleSave = async () => {
     try {
       const { data } = await axios.put(`${url}/api/users/profile`, formData, {
-        headers: { Authorization: `Bearer ${token}` }
+        headers: { Authorization: `Bearer ${token}` },
       });
 
       if (data.success) {
@@ -69,17 +69,31 @@ export default function PersonalInfoEdit() {
         <div className="personal-form">
           <h2>Personal Information</h2>
 
-          {/* Name */}
+          {/* First Name */}
           <div className="form-group">
-            <label>Name</label>
+            <label>First Name</label>
             {isEditing ? (
               <input
                 type="text"
-                value={formData.name || ""}
-                onChange={(e) => handleInputChange("name", e.target.value)}
+                value={formData.firstName || ""}
+                onChange={(e) => handleInputChange("firstName", e.target.value)}
               />
             ) : (
-              <p>{profileData.name}</p>
+              <p>{profileData.firstName}</p>
+            )}
+          </div>
+
+          {/* Last Name */}
+          <div className="form-group">
+            <label>Last Name</label>
+            {isEditing ? (
+              <input
+                type="text"
+                value={formData.lastName || ""}
+                onChange={(e) => handleInputChange("lastName", e.target.value)}
+              />
+            ) : (
+              <p>{profileData.lastName}</p>
             )}
           </div>
 
@@ -150,8 +164,13 @@ export default function PersonalInfoEdit() {
             alt="Profile"
             className="avatar"
           />
-          <h3>{profileData.name}</h3>
-          <p className="joined">Customer since {new Date(profileData.createdAt).toLocaleDateString()}</p>
+          <h3>
+            {profileData.firstName} {profileData.lastName}
+          </h3>
+          <p className="joined">
+            Customer since{" "}
+            {new Date(profileData.createdAt).toLocaleDateString()}
+          </p>
         </div>
       </div>
     </div>
