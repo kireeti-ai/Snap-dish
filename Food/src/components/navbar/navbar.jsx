@@ -117,7 +117,7 @@ const Navbar = ({ setShowLogin }) => {
                     exit={{ opacity: 0, y: -10 }}
                     transition={{ duration: 0.2 }}
                   >
-                    <li className="dropdown-user-info"><p>Hi, {userName}</p></li>
+                    <Link to="/profile-edit"><li className="dropdown-user-info"><p>Hi, {userName}</p></li></Link>
                     <hr />
                     <Link to="/myOrders"><li><img src={assets.bag_icon} alt="Orders" /><p>Orders</p></li></Link>
                     <Link to="/partner-with-us"><li><img src={assets.agent} alt="agents" /><p>Partner with us</p></li></Link>

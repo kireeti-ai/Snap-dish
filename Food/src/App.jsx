@@ -19,6 +19,7 @@ import OrderSuccess from './pages/OrderSuccess/OrderSuccess.jsx';
 import SearchPage from './pages/SearchPage/SearchPage.jsx';
 import RestaurantDisplay from './components/RestaurantDisplay/RestaurantDisplay.jsx';
 import MyReviews from './pages/MyReviews/MyReviews.jsx';
+import PersonalInfoEdit from './pages/profile/profile.jsx';
 const App = () => {
   const [showLogin, setShowLogin] = useState(false);
   const { showRestaurantPrompt } = useContext(StoreContext);
@@ -43,6 +44,7 @@ const App = () => {
           <Route path ='/orderSuccess' element={<OrderSuccess/>}/>
           <Route path='/search' element={<SearchPage/>} />
           <Route path='/reviews-user' element={<MyReviews/>}/>
+          <Route path='/profile-edit' element={<PersonalInfoEdit/>}/>
         
         </Routes>
         
