@@ -14,8 +14,6 @@ const RestaurantItem = ({ id, name, cuisine, rating, time, image, address, price
           <div className="restaurant-name-rate">
 
             <p>{name}</p>
-
-      
             <p>
               {rating && (
                 <>
