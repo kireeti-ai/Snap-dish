@@ -1,10 +1,21 @@
 import express from 'express';
-import { getAllRestaurants, createRestaurant } from '../controllers/restaurantController.js';
+import { 
+    getAllRestaurants, 
+    createRestaurant, 
+    getMyRestaurant, 
+    updateRestaurant 
+} from '../controllers/restaurantController.js';
 import { protect } from '../middleware/authMiddleware.js';
+import upload from '../middleware/uploadMiddleware.js';
 
-const restaurantRouter = express.Router();
+const router = express.Router();
 
-restaurantRouter.get('/', getAllRestaurants);
-restaurantRouter.post('/', protect, createRestaurant);
+// Public routes
+router.get('/', getAllRestaurants);
 
-export default restaurantRouter;
+// Protected routes
+router.get('/my-restaurant', protect, getMyRestaurant);
+router.post('/', protect, upload.single("image"), createRestaurant);
+router.put('/my-restaurant', protect, upload.single("image"), updateRestaurant);
+
+export default router;

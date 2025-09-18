@@ -1,18 +1,15 @@
-// Back/middleware/uploadMiddleware.js
 import multer from "multer";
 import path from "path";
 
-// Destination folder
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, "uploads/avatars"); // Make sure this folder exists
+    cb(null, "uploads/avatars");
   },
   filename: function (req, file, cb) {
-    cb(null, Date.now() + path.extname(file.originalname)); // unique filename
+    cb(null, Date.now() + path.extname(file.originalname));
   }
 });
 
-// Accept only images
 const fileFilter = (req, file, cb) => {
   if (file.mimetype.startsWith("image/")) {
     cb(null, true);

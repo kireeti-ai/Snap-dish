@@ -9,7 +9,6 @@ const createToken = (id) => {
     return jwt.sign({ id }, process.env.JWT_SECRET);
 };
 
-// Login user
 export const loginUser = async (req, res) => {
     const { email, password } = req.body;
     try {
@@ -220,7 +219,6 @@ export const uploadAvatar = async (req, res) => {
         });
     } catch (error) {
         console.log(error);
-        // Delete uploaded file if there's an error
         if (req.file) {
             fs.unlinkSync(req.file.path);
         }

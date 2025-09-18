@@ -1,18 +1,53 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import axios from "axios";
 
 const Restaurants = () => {
   const [restaurant, setRestaurant] = useState({
-    name: "My Restaurant",
-    address: "123 Main St",
-    cuisine: "Indian",
-    price_for_two: 500,
-    status: "active",
-    timing: "10:00 AM - 10:00 PM",
-    image: null, // for image upload
+    name: "",
+    address: "",
+    cuisine: "",
+    price_for_two: "",
+    status: "pending_approval",
+    timing: "",
+    image: null,
   });
 
   const [isEditing, setIsEditing] = useState(false);
   const [preview, setPreview] = useState(null);
+  const [hasRestaurant, setHasRestaurant] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  const getAuthToken = () => localStorage.getItem("token");
+
+  // Fetch existing restaurant data
+  useEffect(() => {
+    const fetchRestaurantData = async () => {
+      try {
+        const response = await axios.get(
+          "http://localhost:4000/api/restaurants/my-restaurant",
+          {
+            headers: {
+              Authorization: `Bearer ${getAuthToken()}`,
+            },
+          }
+        );
+
+        if (response.data.success) {
+          setRestaurant(response.data.data);
+          setHasRestaurant(true);
+          if (response.data.data.image) {
+            setPreview(`http://localhost:4000/uploads/avatars/${response.data.data.image}`);
+          }
+        }
+      } catch (error) {
+        console.log("No restaurant found, can create new one");
+        setHasRestaurant(false);
+      }
+      setLoading(false);
+    };
+
+    fetchRestaurantData();
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -23,25 +58,68 @@ const Restaurants = () => {
     const file = e.target.files[0];
     if (file) {
       setRestaurant((prev) => ({ ...prev, image: file }));
-      setPreview(URL.createObjectURL(file)); // preview
+      setPreview(URL.createObjectURL(file));
     }
   };
 
-  const handleSave = () => {
-    console.log("Updated restaurant:", restaurant);
-    // TODO: send to backend with FormData if API supports file uploads
-    setIsEditing(false);
+  const handleSave = async () => {
+    try {
+      const formData = new FormData();
+      formData.append("name", restaurant.name);
+      formData.append("address", restaurant.address);
+      formData.append("cuisine", restaurant.cuisine);
+      formData.append("price_for_two", restaurant.price_for_two);
+      formData.append("status", restaurant.status);
+      formData.append("timing", restaurant.timing);
+      if (restaurant.image && typeof restaurant.image === 'object') {
+        formData.append("image", restaurant.image);
+      }
+
+      const token = getAuthToken();
+      const url = hasRestaurant 
+        ? "http://localhost:4000/api/restaurants/my-restaurant"
+        : "http://localhost:4000/api/restaurants";
+      
+      const method = hasRestaurant ? 'put' : 'post';
+
+      const { data } = await axios[method](url, formData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      if (data.success) {
+        alert(`Restaurant ${hasRestaurant ? 'updated' : 'created'} successfully!`);
+        setIsEditing(false);
+        setHasRestaurant(true);
+        setRestaurant(data.data);
+      } else {
+        alert(data.message || "Failed to save");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Server Error");
+    }
   };
+
+  if (loading) {
+    return (
+      <div className="max-w-lg mx-auto bg-white p-6 rounded-2xl shadow-md border border-gray-200">
+        <div className="text-center">Loading...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-lg mx-auto bg-white p-6 rounded-2xl shadow-md border border-gray-200">
       <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">
-        🍽️ Manage Restaurant
+        🍽️ {hasRestaurant ? 'Manage Restaurant' : 'Create Restaurant'}
       </h2>
 
-      {isEditing ? (
+      {isEditing || !hasRestaurant ? (
         <div className="space-y-4">
-          {/* Image Upload */}
+          {/* Form fields... (same as before) */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Upload Restaurant Image
@@ -68,6 +146,7 @@ const Restaurants = () => {
             onChange={handleChange}
             placeholder="Restaurant Name"
             className="border border-gray-300 rounded-lg p-3 w-full focus:ring-2 focus:ring-blue-500 outline-none"
+            required
           />
           <input
             type="text"
@@ -76,6 +155,7 @@ const Restaurants = () => {
             onChange={handleChange}
             placeholder="Address"
             className="border border-gray-300 rounded-lg p-3 w-full focus:ring-2 focus:ring-blue-500 outline-none"
+            required
           />
           <input
             type="text"
@@ -84,6 +164,7 @@ const Restaurants = () => {
             onChange={handleChange}
             placeholder="Cuisine"
             className="border border-gray-300 rounded-lg p-3 w-full focus:ring-2 focus:ring-blue-500 outline-none"
+            required
           />
           <input
             type="number"
@@ -92,14 +173,16 @@ const Restaurants = () => {
             onChange={handleChange}
             placeholder="Price for Two"
             className="border border-gray-300 rounded-lg p-3 w-full focus:ring-2 focus:ring-blue-500 outline-none"
+            required
           />
           <input
             type="text"
             name="timing"
             value={restaurant.timing}
             onChange={handleChange}
-            placeholder="Opening Hours"
+            placeholder="Opening Hours (e.g., 10:00 AM - 10:00 PM)"
             className="border border-gray-300 rounded-lg p-3 w-full focus:ring-2 focus:ring-blue-500 outline-none"
+            required
           />
           <select
             name="status"
@@ -117,14 +200,16 @@ const Restaurants = () => {
               onClick={handleSave}
               className="bg-green-600 hover:bg-green-700 text-white px-5 py-2 rounded-lg shadow transition"
             >
-              Save
+              {hasRestaurant ? 'Update' : 'Create'}
             </button>
-            <button
-              onClick={() => setIsEditing(false)}
-              className="bg-gray-500 hover:bg-gray-600 text-white px-5 py-2 rounded-lg shadow transition"
-            >
-              Cancel
-            </button>
+            {hasRestaurant && (
+              <button
+                onClick={() => setIsEditing(false)}
+                className="bg-gray-500 hover:bg-gray-600 text-white px-5 py-2 rounded-lg shadow transition"
+              >
+                Cancel
+              </button>
+            )}
           </div>
         </div>
       ) : (
@@ -141,13 +226,21 @@ const Restaurants = () => {
           <p><span className="font-semibold">Cuisine:</span> {restaurant.cuisine}</p>
           <p><span className="font-semibold">Price for Two:</span> ₹{restaurant.price_for_two}</p>
           <p><span className="font-semibold">Timing:</span> {restaurant.timing}</p>
-          <p><span className="font-semibold">Status:</span> {restaurant.status}</p>
+          <p><span className="font-semibold">Status:</span> 
+            <span className={`ml-2 px-2 py-1 rounded-full text-xs ${
+              restaurant.status === 'active' ? 'bg-green-100 text-green-800' :
+              restaurant.status === 'inactive' ? 'bg-red-100 text-red-800' :
+              'bg-yellow-100 text-yellow-800'
+            }`}>
+              {restaurant.status}
+            </span>
+          </p>
 
           <button
             onClick={() => setIsEditing(true)}
             className="mt-4 w-full bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg shadow transition"
           >
-            ✏️ Edit
+            ✏️ Edit Restaurant
           </button>
         </div>
       )}
