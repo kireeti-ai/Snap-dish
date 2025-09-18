@@ -18,10 +18,8 @@ const port = process.env.PORT || 4000;
 // --- Middleware ---
 app.use(express.json()); // Parse JSON bodies
 const allowedOrigins = [
-  "http://localhost:5173", // local dev
- // backend
-  "https://snap-dish-xi.vercel.app",
-   // replace with actual frontend
+  "http://localhost:5173",             // local dev
+  "https://snap-dish-xi.vercel.app",   // deployed frontend
 ];
 
 app.use(cors({
