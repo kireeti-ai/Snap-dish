@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import axios from 'axios';
 
-const API_URL = "http://localhost:4000";
+const API_URL = "https://snap-dish.onrender.com";
 
 const MenuManagement = () => {
   const [menuItems, setMenuItems] = useState([]);

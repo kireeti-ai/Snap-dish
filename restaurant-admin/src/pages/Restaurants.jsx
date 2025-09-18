@@ -24,7 +24,7 @@ const Restaurants = () => {
     const fetchRestaurantData = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:4000/api/restaurants/my-restaurant",
+          "https://snap-dish.onrender.com/api/restaurants/my-restaurant",
           {
             headers: {
               Authorization: `Bearer ${getAuthToken()}`,
@@ -36,7 +36,7 @@ const Restaurants = () => {
           setRestaurant(response.data.data);
           setHasRestaurant(true);
           if (response.data.data.image) {
-            setPreview(`http://localhost:4000/uploads/avatars/${response.data.data.image}`);
+            setPreview(`https://snap-dish.onrender.com/uploads/avatars/${response.data.data.image}`);
           }
         }
       } catch (error) {
@@ -77,8 +77,8 @@ const Restaurants = () => {
 
       const token = getAuthToken();
       const url = hasRestaurant 
-        ? "http://localhost:4000/api/restaurants/my-restaurant"
-        : "http://localhost:4000/api/restaurants";
+        ? "https://snap-dish.onrender.com/api/restaurants/my-restaurant"
+        : "https://snap-dish.onrender.com/api/restaurants";
       
       const method = hasRestaurant ? 'put' : 'post';
 

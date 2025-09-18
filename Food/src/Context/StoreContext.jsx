@@ -8,7 +8,7 @@ const StoreContextProvider = (props) => {
   const [cartItems, setCartItems] = useState({});
   const [food_list, setFoodList] = useState([]); // State for food list from API
   const [searchQuery, setSearchQuery] = useState("");
-  const url = "http://localhost:4000";
+  const url = "https://snap-dish.onrender.com";
   const [token, setToken] = useState(localStorage.getItem("token") || "");
   const [userName, setUserName] = useState(localStorage.getItem("userName") || "");
   const [cartRestaurant, setCartRestaurant] = useState(null);

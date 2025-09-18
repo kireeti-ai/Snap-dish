@@ -1,6 +1,6 @@
 import express from 'express';
 import { addMenuItem, listAllMenuItems, listMenuItemsByRestaurant, removeMenuItem } from '../controllers/menuItemController.js';
-import {protect} from '../middleware/authMiddleware.js';
+import { protect } from '../middleware/authMiddleware.js';
 import multer from 'multer';
 
 const menuItemRouter = express.Router();

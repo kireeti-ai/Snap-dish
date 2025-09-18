@@ -1,7 +1,8 @@
-import { Routes, Route } from "react-router-dom";
+// App.jsx
+import { useState, useEffect } from "react";
+import { Routes, Route, Navigate } from "react-router-dom";
 import Sidebar from "./components/Sidebar";
 import Navbar from "./components/Navbar";
-
 import Dashboard from "./pages/Dashboard";
 import Restaurants from "./pages/Restaurants";
 import MenuManagement from "./pages/Menu";
@@ -10,8 +11,21 @@ import Users from "./pages/Users";
 import Reports from "./pages/Reports";
 import Settings from "./pages/Settings";
 import Login from "./pages/Login";
+import { AuthProvider, useAuth } from "./context/AuthContext";
 
-export default function App() {
+// Protected Route Component
+const ProtectedRoute = ({ children }) => {
+  const { user } = useAuth();
+  return user ? children : <Navigate to="/login" />;
+};
+
+function AppContent() {
+  const { user, logout } = useAuth();
+
+  if (!user) {
+    return <Login />;
+  }
+
   return (
     <div className="flex h-screen bg-gray-100">
       <Sidebar />
@@ -19,17 +33,26 @@ export default function App() {
         <Navbar />
         <main className="p-6 overflow-y-auto">
           <Routes>
-            <Route path="/" element={<Dashboard />} />
-            <Route path="/restaurants" element={<Restaurants />} />
-            <Route path="/menu" element={< MenuManagement/>} />
-            <Route path="/orders" element={<Orders />} />
-            <Route path="/users" element={<Users />} />
-            <Route path="/reports" element={<Reports />} />
-            <Route path="/settings" element={<Settings />} />
+            <Route path="/" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+            <Route path="/restaurants" element={<ProtectedRoute><Restaurants /></ProtectedRoute>} />
+            <Route path="/menu" element={<ProtectedRoute><MenuManagement /></ProtectedRoute>} />
+            <Route path="/orders" element={<ProtectedRoute><Orders /></ProtectedRoute>} />
+            <Route path="/users" element={<ProtectedRoute><Users /></ProtectedRoute>} />
+            <Route path="/reports" element={<ProtectedRoute><Reports /></ProtectedRoute>} />
+            <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
             <Route path="/login" element={<Login />} />
+            <Route path="*" element={<Navigate to="/" />} />
           </Routes>
         </main>
       </div>
     </div>
+  );
+}
+
+export default function App() {
+  return (
+    <AuthProvider>
+      <AppContent />
+    </AuthProvider>
   );
 }
