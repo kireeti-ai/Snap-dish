@@ -1,7 +1,7 @@
 import { useState, useEffect, useContext, useRef } from "react";
 import { Edit3, Save, X, Camera, User } from "lucide-react";
 import axios from "axios";
-import { StoreContext } from "../../context/StoreContext.jsx";
+import { StoreContext } from '../../Context/StoreContext';
 import { toast } from "react-toastify";
 import "./profile.css";
 
