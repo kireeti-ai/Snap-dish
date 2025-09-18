@@ -19,6 +19,7 @@ const LoginPopup = ({ setShowLogin }) => {
     role: "customer"
   });
   const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
   const onChangeHandler = (event) => {
@@ -29,6 +30,22 @@ const LoginPopup = ({ setShowLogin }) => {
   const onLogin = async (event) => {
     event.preventDefault();
     setError("");
+    setIsLoading(true);
+
+    // Basic validation
+    if (!data.email || !data.password) {
+      setError("Please fill in all required fields");
+      setIsLoading(false);
+      return;
+    }
+
+    if (currState === 'Sign Up') {
+      if (!data.firstName) {
+        setError("First name is required");
+        setIsLoading(false);
+        return;
+      }
+    }
 
     const endpoint = currState === 'Login' ? '/api/users/login' : '/api/users/register';
     const payload = currState === 'Login'
@@ -37,19 +54,25 @@ const LoginPopup = ({ setShowLogin }) => {
 
     try {
       const response = await axios.post(`${url}${endpoint}`, payload);
+      console.log('Response:', response.data); // Debug log
 
-      if (response.data.token) {
+      if (response.data.success && response.data.token) {
         // Save token
         setToken(response.data.token);
         localStorage.setItem("token", response.data.token);
 
-        // Save user name
-        const name = response.data.firstName || response.data.name;
+        // Save user name - check different possible sources
+        const name = response.data.firstName || 
+                    (response.data.user && response.data.user.firstName) || 
+                    response.data.name || 
+                    "User";
         setUserName(name);
         localStorage.setItem("userName", name);
 
         // Save user role
-        const userRole = response.data.role;
+        const userRole = response.data.role || 
+                        (response.data.user && response.data.user.role) || 
+                        "customer";
         localStorage.setItem("role", userRole);
 
         toast.success(`${currState} successful!`);
@@ -63,13 +86,19 @@ const LoginPopup = ({ setShowLogin }) => {
           setShowLogin(false); // Customer → just close popup
         }
       } else {
-        setError(response.data.message || "An unexpected error occurred.");
-        toast.error(response.data.message || "An unexpected error occurred.");
+        const errorMessage = response.data.message || "An unexpected error occurred.";
+        setError(errorMessage);
+        toast.error(errorMessage);
       }
     } catch (err) {
-      const msg = err.response?.data?.message || "Login failed. Please check your credentials.";
+      console.error('Login error:', err); // Debug log
+      const msg = err.response?.data?.message || 
+                  err.message || 
+                  "Login failed. Please check your credentials.";
       setError(msg);
       toast.error(msg);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -174,7 +203,6 @@ const LoginPopup = ({ setShowLogin }) => {
                   value={data.lastName}
                   onChange={onChangeHandler}
                   placeholder='Last Name'
-                  required
                 />
                 <input
                   name='phone_number'
@@ -182,7 +210,6 @@ const LoginPopup = ({ setShowLogin }) => {
                   value={data.phone_number}
                   onChange={onChangeHandler}
                   placeholder='Phone number'
-                  required
                 />
                 <input
                   name='email'
@@ -197,8 +224,9 @@ const LoginPopup = ({ setShowLogin }) => {
                   type="password"
                   value={data.password}
                   onChange={onChangeHandler}
-                  placeholder='Password'
+                  placeholder='Password (min 8 characters)'
                   required
+                  minLength={8}
                 />
               </motion.div>
             )}
@@ -206,10 +234,14 @@ const LoginPopup = ({ setShowLogin }) => {
 
           <motion.button
             type='submit'
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
+            disabled={isLoading}
+            whileHover={{ scale: isLoading ? 1 : 1.05 }}
+            whileTap={{ scale: isLoading ? 1 : 0.95 }}
           >
-            {currState === "Login" ? "Login" : "Create account"}
+            {isLoading 
+              ? `${currState === "Login" ? "Logging in..." : "Creating account..."}` 
+              : `${currState === "Login" ? "Login" : "Create account"}`
+            }
           </motion.button>
 
           {currState === "Sign Up" && (

@@ -4,12 +4,12 @@ import dotenv from 'dotenv';
 import { connectDB } from "./config/db.js";
 
 import userRoutes from "./routes/userRoutes.js";
-// import restaurantRoutes from "./routes/restaurantRoutes.js";
-// import orderRoutes from "./routes/orderRoutes.js";
-// import reviewRoutes from "./routes/reviewRoutes.js";
-// import deliveryAgentRoutes from "./routes/deliveryAgentRoutes.js";
+import path from 'path';
+import { fileURLToPath } from 'url';
 
 dotenv.config();
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 const app = express();
 const port = process.env.PORT || 4000;
 
@@ -19,6 +19,10 @@ app.use(cors({
   origin: "http://localhost:5173", // frontend origin
   credentials: true
 }));
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+app.listen(port, () => {
+  console.log(`🚀 Server started on http://localhost:${port}`); // Add the port here
+});
 
 
 // --- DB Connection ---
@@ -26,16 +30,9 @@ connectDB();
 
 // --- API Endpoints ---
 app.use("/api/users", userRoutes);
-// app.use("/api/restaurants", restaurantRoutes); 
-// app.use("/api/orders", orderRoutes);
-// app.use("/api/delivery-agents", deliveryAgentRoutes);
-// app.use("/api/reviews", reviewRoutes); 
+
 
 
 app.get("/", (req, res) => {
   res.send("SnapDish API is running...");
-});
-
-app.listen(port, () => {
-  console.log(`🚀 Server started on`);
 });

@@ -1,22 +1,17 @@
-import express from "express";
-import {
-  registerUser,
-  loginUser,
-  getUserProfile,
-  updateUserProfile,
-  uploadAvatar
-} from "../controllers/userController.js";
-import { protect } from "../middleware/authMiddleware.js";
-import upload from "../middleware/uploadMiddleware.js"; // multer middleware
+import express from 'express';
+import { loginUser, registerUser, getUserProfile, updateUserProfile, uploadAvatar } from '../controllers/userController.js';
+import { protect } from '../middleware/authMiddleware.js';
+import upload from '../middleware/uploadMiddleware.js';
 
-const router = express.Router();
+const userRouter = express.Router();
 
-router.post("/register", registerUser);
-router.post("/login", loginUser);
-router.get("/profile", protect, getUserProfile);
-router.put("/profile", protect, updateUserProfile);
+// Public routes
+userRouter.post('/register', registerUser);
+userRouter.post('/login', loginUser);
 
-// Avatar upload
-router.post("/upload-avatar", protect, upload.single("avatar"), uploadAvatar);
+// Protected routes
+userRouter.get('/profile', protect, getUserProfile);
+userRouter.put('/profile', protect, updateUserProfile);
+userRouter.post('/upload-avatar', protect, upload.single('avatar'), uploadAvatar);
 
-export default router;
+export default userRouter;
