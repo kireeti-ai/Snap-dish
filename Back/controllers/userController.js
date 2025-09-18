@@ -225,3 +225,32 @@ export const uploadAvatar = async (req, res) => {
         res.status(500).json({ success: false, message: "Error uploading avatar" });
     }
 };
+// Delete user
+export const deleteUser = async (req, res) => {
+    try {
+        const userId = req.user._id;
+        const user = await userModel.findById(userId);
+
+        if (!user) {
+            return res.status(404).json({ success: false, message: "User not found" });
+        }
+
+        // If avatar exists, remove file
+        if (user.avatar) {
+            const avatarPath = path.join(process.cwd(), user.avatar);
+            if (fs.existsSync(avatarPath)) {
+                fs.unlinkSync(avatarPath);
+            }
+        }
+
+        await userModel.findByIdAndDelete(userId);
+
+        res.json({
+            success: true,
+            message: "Account deleted successfully. Thank you for using our service!",
+        });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ success: false, message: "Error deleting account" });
+    }
+};

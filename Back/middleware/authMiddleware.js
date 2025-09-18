@@ -4,7 +4,6 @@ import userModel from "../models/userModel.js";
 export const protect = async (req, res, next) => {
   let token;
   
-  // Check for token in Authorization header (Bearer token)
   if (req.headers.authorization && req.headers.authorization.startsWith("Bearer")) {
     try {
       token = req.headers.authorization.split(" ")[1];
@@ -20,7 +19,6 @@ export const protect = async (req, res, next) => {
       return res.status(401).json({ success: false, message: "Not authorized, token failed" });
     }
   }
-  // Check for token in custom 'token' header (for backward compatibility)
   else if (req.headers.token) {
     try {
       token = req.headers.token;
@@ -38,4 +36,17 @@ export const protect = async (req, res, next) => {
   } else {
     return res.status(401).json({ success: false, message: "No token provided" });
   }
+};
+
+// Role-based access control middleware
+export const restrictTo = (...roles) => {
+  return (req, res, next) => {
+    if (!roles.includes(req.user.role)) {
+      return res.status(403).json({
+        success: false,
+        message: 'You do not have permission to perform this action'
+      });
+    }
+    next();
+  };
 };

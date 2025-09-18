@@ -48,7 +48,7 @@ export default function PersonalInfoEdit() {
         toast.error('Please select an image file');
         return;
       }
-      
+
       // Validate file size (max 5MB)
       if (file.size > 5 * 1024 * 1024) {
         toast.error('Image size should be less than 5MB');
@@ -56,7 +56,7 @@ export default function PersonalInfoEdit() {
       }
 
       setImageFile(file);
-      
+
       // Create preview
       const reader = new FileReader();
       reader.onload = (e) => {
@@ -92,6 +92,28 @@ export default function PersonalInfoEdit() {
       return null;
     } finally {
       setUploading(false);
+    }
+  };
+  const handleDelete = async () => {
+    if (!window.confirm("Are you sure you want to delete your account? This action cannot be undone.")) {
+      return;
+    }
+
+    try {
+      const { data } = await axios.delete(`${url}/api/users/profile`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (data.success) {
+        toast.success(data.message);
+        // Clear local storage/session
+        localStorage.removeItem("token");
+        window.location.href = "/"; // redirect to homepage or login
+      } else {
+        toast.error(data.message || "Failed to delete account.");
+      }
+    } catch (error) {
+      toast.error("Error deleting account.");
     }
   };
 
@@ -230,8 +252,8 @@ export default function PersonalInfoEdit() {
               </button>
             ) : (
               <>
-                <button 
-                  className="save-btn" 
+                <button
+                  className="save-btn"
                   onClick={handleSave}
                   disabled={uploading}
                 >
@@ -252,9 +274,9 @@ export default function PersonalInfoEdit() {
               {imagePreview ? (
                 <img src={imagePreview} alt="Preview" className="avatar" />
               ) : profileData.avatar ? (
-                <img 
-                  src={`${url}/${profileData.avatar}`} 
-                  alt="Profile" 
+                <img
+                  src={`${url}/${profileData.avatar}`}
+                  alt="Profile"
                   className="avatar"
                   onError={(e) => {
                     e.target.style.display = 'none';
@@ -266,10 +288,10 @@ export default function PersonalInfoEdit() {
                   <User size={40} />
                 </div>
               )}
-              
+
               {isEditing && (
-                <button 
-                  className="camera-btn" 
+                <button
+                  className="camera-btn"
                   onClick={triggerFileInput}
                   type="button"
                 >
@@ -277,7 +299,7 @@ export default function PersonalInfoEdit() {
                 </button>
               )}
             </div>
-            
+
             <input
               ref={fileInputRef}
               type="file"
@@ -294,6 +316,35 @@ export default function PersonalInfoEdit() {
             Customer since{" "}
             {new Date(profileData.createdAt).toLocaleDateString()}
           </p>
+          <div className="button-group">
+            {!isEditing ? (
+              <>
+                <button className="edit-btn" onClick={() => setIsEditing(true)}>
+                  <Edit3 size={16} /> Edit
+                </button>
+                <button
+                  className="delete-btn"
+                  onClick={handleDelete}
+                  style={{ background: "red", color: "white" }}
+                >
+                  <X size={16} /> Delete Account
+                </button>
+              </>
+            ) : (
+              <>
+                <button
+                  className="save-btn"
+                  onClick={handleSave}
+                  disabled={uploading}
+                >
+                  <Save size={16} /> {uploading ? 'Uploading...' : 'Save'}
+                </button>
+                <button className="cancel-btn" onClick={handleCancel}>
+                  <X size={16} /> Cancel
+                </button>
+              </>
+            )}
+          </div>
         </div>
       </div>
     </div>

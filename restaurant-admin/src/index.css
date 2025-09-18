@@ -1,3 +1,28 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* react-toastify override */
+.Toastify__toast {
+  @apply rounded-xl shadow-lg px-4 py-3 text-white font-medium;
+}
+
+.Toastify__toast--success {
+  @apply bg-green-500;
+}
+
+.Toastify__toast--error {
+  @apply bg-red-500;
+}
+
+.Toastify__toast--info {
+  @apply bg-blue-500;
+}
+
+.Toastify__toast--warning {
+  @apply bg-yellow-500 text-black;
+}
+
+.Toastify__close-button {
+  @apply text-white hover:text-gray-200;
+}

@@ -1,5 +1,5 @@
 import express from 'express';
-import { addMenuItem, listAllMenuItems, listMenuItemsByRestaurant, removeMenuItem } from '../controllers/menuItemController.js';
+import { addMenuItem, listAllMenuItems, listMenuItemsByRestaurant,updateMenuItem, removeMenuItem } from '../controllers/menuItemController.js';
 import { protect } from '../middleware/authMiddleware.js';
 import multer from 'multer';
 
@@ -21,5 +21,6 @@ menuItemRouter.post("/add", protect, upload.single("image"), addMenuItem);
 menuItemRouter.get("/list", listAllMenuItems);
 menuItemRouter.get("/list/:restaurantId", listMenuItemsByRestaurant);
 menuItemRouter.post("/remove", protect, removeMenuItem);
+menuItemRouter.put("/update", protect, upload.single("image"), updateMenuItem); 
 
 export default menuItemRouter;

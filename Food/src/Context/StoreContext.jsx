@@ -1,14 +1,14 @@
 import { createContext, useState, useEffect } from "react";
 import axios from "axios";
-import { toast } from 'react-toastify';
+import { toast } from "react-toastify";
 
 export const StoreContext = createContext(null);
 
 const StoreContextProvider = (props) => {
   const [cartItems, setCartItems] = useState({});
-  const [food_list, setFoodList] = useState([]); // State for food list from API
+  const [food_list, setFoodList] = useState([]); 
   const [searchQuery, setSearchQuery] = useState("");
-  const url = "https://snap-dish.onrender.com";
+  const url = "http://localhost:4000"; // Backend server URL
   const [token, setToken] = useState(localStorage.getItem("token") || "");
   const [userName, setUserName] = useState(localStorage.getItem("userName") || "");
   const [cartRestaurant, setCartRestaurant] = useState(null);
@@ -16,7 +16,7 @@ const StoreContextProvider = (props) => {
   const [pendingItem, setPendingItem] = useState(null);
   const [wishlistItems, setWishlistItems] = useState([]);
   const [orders, setOrders] = useState([]);
-  const [savedAddresses, setSavedAddresses] = useState([]); // Start with empty array
+  const [savedAddresses, setSavedAddresses] = useState([]); 
 
   const [location, setLocation] = useState({
     address: "Ettimadai, Coimbatore",
@@ -24,8 +24,7 @@ const StoreContextProvider = (props) => {
     longitude: 76.9038,
   });
 
-  // --- API Calls ---
-
+  // ---------------- FOOD LIST ----------------
   const fetchFoodList = async () => {
     try {
       const response = await axios.get(`${url}/api/food/list`);
@@ -39,15 +38,81 @@ const StoreContextProvider = (props) => {
     }
   };
 
-  // --- End API Calls ---
-
-  const logout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("userName");
-    setToken("");
-    setUserName("");
+  // ---------------- ADDRESS API ----------------
+  const fetchAddresses = async () => {
+    if (!token) return;
+    try {
+      const res = await axios.get(`${url}/api/address`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (res.data.success) {
+        setSavedAddresses(res.data.data);
+      }
+    } catch (error) {
+      toast.error("Failed to load addresses");
+    }
   };
 
+  const addAddress = async (addressData) => {
+    try {
+      const res = await axios.post(`${url}/api/address`, addressData, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (res.data.success) {
+        setSavedAddresses((prev) => [...prev, res.data.data]);
+        toast.success("Address added");
+      }
+    } catch (error) {
+      toast.error("Failed to add address");
+    }
+  };
+
+  const updateAddress = async (addressData) => {
+    try {
+      const res = await axios.put(`${url}/api/address/${addressData._id}`, addressData, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (res.data.success) {
+        setSavedAddresses((prev) =>
+          prev.map((addr) => (addr._id === addressData._id ? res.data.data : addr))
+        );
+        toast.success("Address updated");
+      }
+    } catch (error) {
+      toast.error("Failed to update address");
+    }
+  };
+
+  const deleteAddress = async (id) => {
+    try {
+      const res = await axios.delete(`${url}/api/address/${id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (res.data.success) {
+        setSavedAddresses((prev) => prev.filter((addr) => addr._id !== id));
+        toast.success("Address deleted");
+      }
+    } catch (error) {
+      toast.error("Failed to delete address");
+    }
+  };
+
+  const setDefaultAddress = async (id) => {
+    try {
+      const updatedAddresses = savedAddresses.map((addr) =>
+        addr._id === id ? { ...addr, isDefault: true } : { ...addr, isDefault: false }
+      );
+      setSavedAddresses(updatedAddresses);
+      const selected = updatedAddresses.find((a) => a._id === id);
+      if (selected) {
+        await updateAddress(selected);
+      }
+    } catch (error) {
+      toast.error("Failed to set default address");
+    }
+  };
+
+  // ---------------- CART LOGIC ----------------
   const addToCart = (itemId) => {
     const itemToAdd = food_list.find((product) => product._id === itemId);
     if (!itemToAdd) return;
@@ -103,6 +168,7 @@ const StoreContextProvider = (props) => {
     return totalAmount;
   };
 
+  // ---------------- WISHLIST ----------------
   const addToWishlist = (itemId) => {
     if (!wishlistItems.includes(itemId)) {
       setWishlistItems((prev) => [...prev, itemId]);
@@ -113,49 +179,38 @@ const StoreContextProvider = (props) => {
     setWishlistItems((prev) => prev.filter((id) => id !== itemId));
   };
 
+  // ---------------- ORDERS ----------------
   const placeNewOrder = (orderData) => {
     const newOrder = {
       ...orderData,
       id: `ORDER${Date.now()}`,
-      date: new Date().toISOString().split('T')[0],
-      status: 'Preparing'
+      date: new Date().toISOString().split("T")[0],
+      status: "Preparing",
     };
-    setOrders(prev => [...prev, newOrder]);
+    setOrders((prev) => [...prev, newOrder]);
     setCartItems({});
   };
 
-  const addAddress = (addressData) => {
-    const newAddress = {
-      ...addressData,
-      id: Date.now(),
-      isDefault: savedAddresses.length === 0
-    };
-    setSavedAddresses(prev => [...prev, newAddress]);
+  // ---------------- AUTH ----------------
+  const logout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("userName");
+    setToken("");
+    setUserName("");
   };
 
-  const updateAddress = (addressData) => {
-    setSavedAddresses(prev => prev.map(addr => addr.id === addressData.id ? addressData : addr));
-  };
-
-  const deleteAddress = (addressId) => {
-    setSavedAddresses(prev => prev.filter(addr => addr.id !== addressId));
-  };
-
-  const setDefaultAddress = (addressId) => {
-    setSavedAddresses(prev => prev.map(addr => ({ ...addr, isDefault: addr.id === addressId })));
-  };
-
+  // ---------------- EFFECTS ----------------
   useEffect(() => {
-    fetchFoodList(); // Fetch food list when the component mounts
+    fetchFoodList(); 
     const storedCart = localStorage.getItem("cartItems");
     if (storedCart) setCartItems(JSON.parse(storedCart));
   }, []);
 
   useEffect(() => {
     if (token) {
-        localStorage.setItem("token", token);
-        localStorage.setItem("userName", userName);
-        // Here you would also fetch user-specific data like cart, addresses, etc.
+      localStorage.setItem("token", token);
+      localStorage.setItem("userName", userName);
+      fetchAddresses(); // fetch addresses after login
     }
   }, [token, userName]);
 
@@ -167,6 +222,7 @@ const StoreContextProvider = (props) => {
     }
   }, [cartItems]);
 
+  // ---------------- CONTEXT VALUE ----------------
   const contextValue = {
     url,
     food_list,
@@ -194,6 +250,7 @@ const StoreContextProvider = (props) => {
     orders,
     placeNewOrder,
     savedAddresses,
+    fetchAddresses,
     addAddress,
     updateAddress,
     deleteAddress,

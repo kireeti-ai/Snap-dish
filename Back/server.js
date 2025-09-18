@@ -7,6 +7,11 @@ import { connectDB } from "./config/db.js";
 import menuItemRouter from "./routes/menuItemRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
 import restaurantRouter from "./routes/restaurantRoutes.js";
+import cartRouter from "./routes/cartRoutes.js";
+import orderRouter from "./routes/orderRoutes.js";
+import fs from "fs";
+import addressRoutes from "./routes/addressRoutes.js";
+import multer from "multer";
 
 dotenv.config();
 
@@ -15,12 +20,32 @@ const __dirname = path.dirname(__filename);
 const app = express();
 const port = process.env.PORT || 4000;
 
+// Create upload directories if they don't exist
+const createUploadDirs = () => {
+  const dirs = [
+    'uploads/avatars',
+    'uploads/foods', 
+    'uploads/restaurants'
+  ];
+  
+  dirs.forEach(dir => {
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true });
+      console.log(`📁 Created directory: ${dir}`);
+    }
+  });
+};
+
+createUploadDirs();
+
 // --- Middleware ---
-app.use(express.json()); // Parse JSON bodies
+app.use(express.json());
+
 const allowedOrigins = [
-  "http://localhost:5173",             // local dev
-  "https://snap-dish-xi.vercel.app",   // deployed frontend
-];
+  "http://localhost:5173",
+  "https://snap-dish-xi.vercel.app",
+  process.env.FRONTEND_URL
+].filter(Boolean);
 
 app.use(cors({
   origin: (origin, callback) => {
@@ -33,13 +58,38 @@ app.use(cors({
   credentials: true,
 }));
 
+// Global error handler for multer
+app.use((error, req, res, next) => {
+  if (error instanceof multer.MulterError) {
+    if (error.code === 'LIMIT_FILE_SIZE') {
+      return res.status(400).json({
+        success: false,
+        message: 'File too large. Maximum size is 5MB'
+      });
+    }
+  }
+  if (error.message === 'Only image files are allowed!') {
+    return res.status(400).json({
+      success: false,
+      message: 'Only image files are allowed'
+    });
+  }
+  next(error);
+});
+
 // --- Serve uploaded images ---
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // --- API Routes ---
+
+
+app.use("/api/address", addressRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/restaurants", restaurantRouter);
 app.use("/api/menu", menuItemRouter);
+app.use("/api/cart", cartRouter);
+app.use("/api/order", orderRouter);
+
 // --- Test Route ---
 app.get("/", (req, res) => {
   res.send("SnapDish API is running...");

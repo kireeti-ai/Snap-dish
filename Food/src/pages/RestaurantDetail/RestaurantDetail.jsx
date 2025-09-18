@@ -1,20 +1,16 @@
-// src/pages/RestaurantDetail/RestaurantDetail.jsx
-
 import React, { useContext, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { RestaurantContext } from '../../Context/RestaurantContext';
-// import { food_list } from '../../assets/assets'; // <-- 1. REMOVE this line
+import { food_list } from '../../assets/assets';
 import './RestaurantDetail.css';
 import { assets } from '../../assets/assets';
 import FoodItem from '../../components/FoodItem/FoodItem';
 import Reviews from '../../components/Reviews/Reviews';
 import { motion, AnimatePresence } from 'framer-motion';
-import { StoreContext } from '../../Context/StoreContext'; // <-- 2. ADD this import
 
 const RestaurantDetail = () => {
   const { id } = useParams();
   const { restaurant_list } = useContext(RestaurantContext);
-  const { food_list } = useContext(StoreContext); // <-- 3. GET food_list from StoreContext
   const [restaurant, setRestaurant] = useState(null);
   const [restaurantMenu, setRestaurantMenu] = useState({});
   const [searchTerm, setSearchTerm] = useState("");
@@ -26,10 +22,7 @@ const RestaurantDetail = () => {
     const foundRestaurant = restaurant_list.find(r => r._id === id);
     if (foundRestaurant) {
       setRestaurant(foundRestaurant);
-      
-      // 4. USE the food_list from the context
-      const filteredFood = food_list.filter(food => food.restaurant_id === foundRestaurant._id);
-      
+      const filteredFood = food_list.filter(food => food.restaurant === foundRestaurant.name);
       const categorizedMenu = filteredFood.reduce((acc, food) => {
         if (!acc[food.category]) {
           acc[food.category] = [];
@@ -38,12 +31,13 @@ const RestaurantDetail = () => {
         return acc;
       }, {});
       setRestaurantMenu(categorizedMenu);
-      setReviews(foundRestaurant.reviews || []);
+      setReviews(foundRestaurant.reviews || {});
+      // expand all by default
       const initialState = {};
       Object.keys(categorizedMenu).forEach(cat => { initialState[cat] = true; });
       setOpenCategories(initialState);
     }
-  }, [id, restaurant_list, food_list]); // <-- 5. ADD food_list to dependency array
+  }, [id, restaurant_list]);
 
   if (!restaurant) {
     return (
