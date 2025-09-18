@@ -8,7 +8,7 @@ const StoreContextProvider = (props) => {
   const [cartItems, setCartItems] = useState({});
   const [food_list, setFoodList] = useState([]); 
   const [searchQuery, setSearchQuery] = useState("");
-  const url = "http://localhost:4000"; // Backend server URL
+  const url = "https://snap-dish.onrender.com";
   const [token, setToken] = useState(localStorage.getItem("token") || "");
   const [userName, setUserName] = useState(localStorage.getItem("userName") || "");
   const [cartRestaurant, setCartRestaurant] = useState(null);
@@ -24,7 +24,6 @@ const StoreContextProvider = (props) => {
     longitude: 76.9038,
   });
 
-  // ---------------- FOOD LIST ----------------
   const fetchFoodList = async () => {
     try {
       const response = await axios.get(`${url}/api/food/list`);
