@@ -20,7 +20,6 @@ const __dirname = path.dirname(__filename);
 const app = express();
 const port = process.env.PORT || 4000;
 
-// Create upload directories if they don't exist
 const createUploadDirs = () => {
   const dirs = [
     'uploads/avatars',
@@ -31,14 +30,13 @@ const createUploadDirs = () => {
   dirs.forEach(dir => {
     if (!fs.existsSync(dir)) {
       fs.mkdirSync(dir, { recursive: true });
-      console.log(`📁 Created directory: ${dir}`);
+      console.log(`Created directory: ${dir}`);
     }
   });
 };
 
 createUploadDirs();
 
-// --- Middleware ---
 app.use(express.json());
 
 const allowedOrigins = [
@@ -58,7 +56,6 @@ app.use(cors({
   credentials: true,
 }));
 
-// Global error handler for multer
 app.use((error, req, res, next) => {
   if (error instanceof multer.MulterError) {
     if (error.code === 'LIMIT_FILE_SIZE') {
@@ -77,10 +74,8 @@ app.use((error, req, res, next) => {
   next(error);
 });
 
-// --- Serve uploaded images ---
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
-// --- API Routes ---
 
 
 app.use("/api/address", addressRoutes);
@@ -90,18 +85,16 @@ app.use("/api/menu", menuItemRouter);
 app.use("/api/cart", cartRouter);
 app.use("/api/order", orderRouter);
 
-// --- Test Route ---
 app.get("/", (req, res) => {
   res.send("SnapDish API is running...");
 });
 
-// --- Connect DB and start server ---
 connectDB()
   .then(() => {
     app.listen(port, () => {
-      console.log(`🚀 Server running on http://localhost:${port}`);
+      console.log(` Server running on http://localhost:${port}`);
     });
   })
   .catch((err) => {
-    console.error("❌ DB Connection Failed:", err);
+    console.error(" DB Connection Failed:", err);
   });

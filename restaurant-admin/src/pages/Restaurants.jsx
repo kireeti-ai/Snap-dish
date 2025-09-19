@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
-
 const Restaurants = () => {
   const [restaurant, setRestaurant] = useState({
     name: "",
@@ -11,15 +10,12 @@ const Restaurants = () => {
     timing: "",
     image: null,
   });
-
   const [isEditing, setIsEditing] = useState(false);
   const [preview, setPreview] = useState(null);
   const [hasRestaurant, setHasRestaurant] = useState(false);
   const [loading, setLoading] = useState(true);
-
+  const [deleting, setDeleting] = useState(false);
   const getAuthToken = () => localStorage.getItem("token");
-
-  // Fetch existing restaurant data
   useEffect(() => {
     const fetchRestaurantData = async () => {
       try {
@@ -36,7 +32,7 @@ const Restaurants = () => {
           setRestaurant(response.data.data);
           setHasRestaurant(true);
           if (response.data.data.image) {
-            setPreview(`https://snap-dish.onrender.com/uploads/avatars/${response.data.data.image}`);
+            setPreview(`https://snap-dish.onrender.com/uploads/restaurants/${response.data.data.image}`);
           }
         }
       } catch (error) {
@@ -94,12 +90,57 @@ const Restaurants = () => {
         setIsEditing(false);
         setHasRestaurant(true);
         setRestaurant(data.data);
+        // Update preview with correct path after save
+        if (data.data.image) {
+          setPreview(`https://snap-dish.onrender.com/uploads/restaurants/${data.data.image}`);
+        }
       } else {
         alert(data.message || "Failed to save");
       }
     } catch (err) {
       console.error(err);
       alert("Server Error");
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!window.confirm("Are you sure you want to delete your restaurant? This action cannot be undone.")) {
+      return;
+    }
+    setDeleting(true);
+    try {
+      const token = getAuthToken();
+      const { data } = await axios.delete(
+        "https://snap-dish.onrender.com/api/restaurants/my-restaurant",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (data.success) {
+        alert("Restaurant deleted successfully!");
+        setHasRestaurant(false);
+        setRestaurant({
+          name: "",
+          address: "",
+          cuisine: "",
+          price_for_two: "",
+          status: "pending_approval",
+          timing: "",
+          image: null,
+        });
+        setPreview(null);
+        setIsEditing(false);
+      } else {
+        alert(data.message || "Failed to delete restaurant");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Server Error");
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -119,7 +160,6 @@ const Restaurants = () => {
 
       {isEditing || !hasRestaurant ? (
         <div className="space-y-4">
-          {/* Form fields... (same as before) */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Upload Restaurant Image
@@ -236,12 +276,22 @@ const Restaurants = () => {
             </span>
           </p>
 
-          <button
-            onClick={() => setIsEditing(true)}
-            className="mt-4 w-full bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg shadow transition"
-          >
-            ✏️ Edit Restaurant
-          </button>
+          <div className="space-y-3 pt-4">
+            <button
+              onClick={() => setIsEditing(true)}
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg shadow transition"
+            >
+              ✏️ Edit Restaurant
+            </button>
+            
+            <button
+              onClick={handleDelete}
+              disabled={deleting}
+              className="w-full bg-red-600 hover:bg-red-700 disabled:bg-red-400 text-white px-5 py-2 rounded-lg shadow transition"
+            >
+              {deleting ? "Deleting..." : "🗑️ Delete Restaurant"}
+            </button>
+          </div>
         </div>
       )}
     </div>

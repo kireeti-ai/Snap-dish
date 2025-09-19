@@ -114,3 +114,28 @@ export const updateRestaurant = async (req, res) => {
         res.status(500).json({ success: false, message: 'Server Error' });
     }
 };
+export const deleteRestaurant = async (req, res) => {
+    try {
+        const restaurant = await restaurantModel.findOne({ owner_id: req.user._id });
+        
+        if (!restaurant) {
+            return res.status(404).json({ success: false, message: 'Restaurant not found' });
+        }
+
+        // Delete the associated image from storage
+        if (restaurant.image) {
+            fs.unlink(`uploads/restaurants/${restaurant.image}`, (err) => {
+                if (err) console.log("Error deleting restaurant image:", err);
+            });
+        }
+        
+        // Note: You might also want to delete associated menu items here.
+
+        await restaurantModel.deleteOne({ _id: restaurant._id });
+
+        res.json({ success: true, message: 'Restaurant closed successfully.' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ success: false, message: 'Server Error' });
+    }
+};

@@ -54,14 +54,10 @@ const LoginPopup = ({ setShowLogin }) => {
 
     try {
       const response = await axios.post(`${url}${endpoint}`, payload);
-      console.log('Response:', response.data); // Debug log
-
+      console.log('Response:', response.data); 
       if (response.data.success && response.data.token) {
-        // Save token
         setToken(response.data.token);
         localStorage.setItem("token", response.data.token);
-
-        // Save user name - check different possible sources
         const name = response.data.firstName || 
                     (response.data.user && response.data.user.firstName) || 
                     response.data.name || 
