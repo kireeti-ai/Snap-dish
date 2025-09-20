@@ -1,4 +1,3 @@
-// MenuManagement.jsx
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
@@ -21,26 +20,12 @@ const MenuManagement = () => {
   });
   const [preview, setPreview] = useState(null);
 
-  // Modal state for editing
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editItem, setEditItem] = useState(null);
   const [editPreview, setEditPreview] = useState(null);
 
   const getAuthToken = () => localStorage.getItem("token");
   const getAuthHeaders = () => ({ Authorization: `Bearer ${getAuthToken()}` });
-
-  const handleChange = (e, setItem) => {
-    const { name, value } = e.target;
-    setItem((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handleImageChange = (e, setItem, setPreview) => {
-    const file = e.target.files[0];
-    if (file) {
-      setItem((prev) => ({ ...prev, image: file }));
-      setPreview(URL.createObjectURL(file));
-    }
-  };
 
   const fetchRestaurantData = async () => {
     try {
@@ -56,29 +41,52 @@ const MenuManagement = () => {
       }
     } catch (error) {
       console.error("Error fetching restaurant:", error);
-      toast.error("Error fetching restaurant data");
+      toast.error("You must create a restaurant profile before adding menu items.");
       return null;
     }
   };
 
-  const fetchMenuItems = async () => {
-    if (!restaurantData) return;
+  const fetchMenuItems = async (restaurantId) => {
+    if (!restaurantId) return;
     try {
-      const response = await axios.get(`${API_URL}/api/menu/list/${restaurantData._id}`);
-      if (response.data.success) setMenuItems(response.data.data);
+      const response = await axios.get(`${API_URL}/api/menu/list/${restaurantId}`);
+      if (response.data.success) {
+        setMenuItems(response.data.data);
+      }
     } catch (error) {
       console.error("Error fetching items:", error);
     }
   };
 
+  useEffect(() => {
+    const init = async () => {
+      setLoading(true);
+      const restaurantId = await fetchRestaurantData();
+      if (restaurantId) {
+        await fetchMenuItems(restaurantId);
+      }
+      setLoading(false);
+    };
+    init();
+  }, []);
+
+  const handleChange = (e, setItem) => {
+    const { name, value } = e.target;
+    setItem((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleImageChange = (e, setItem, setPreviewState) => {
+    const file = e.target.files[0];
+    if (file) {
+      setItem((prev) => ({ ...prev, image: file }));
+      setPreviewState(URL.createObjectURL(file));
+    }
+  };
+
   const handleAddItem = async (e) => {
     e.preventDefault();
-    if (!newItem.name || !newItem.price || !newItem.category || !newItem.image) {
-      toast.error("Please fill all required fields!");
-      return;
-    }
-    if (!restaurantData) {
-      toast.error("Restaurant not found!");
+    if (!newItem.name || !newItem.price || !newItem.category || !newItem.is_veg || !newItem.image) {
+      toast.error("Please fill all required fields, including the image!");
       return;
     }
 
@@ -94,12 +102,12 @@ const MenuManagement = () => {
         toast.success("Menu Item Added!");
         setNewItem({ name: "", description: "", price: "", category: "", is_veg: "", image: null });
         setPreview(null);
-        fetchMenuItems();
+        e.target.reset(); // Reset form fields including file input
+        await fetchMenuItems(restaurantData._id);
       } else {
         toast.error(response.data.message);
       }
     } catch (error) {
-      console.error("Error adding item:", error);
       toast.error("Error adding menu item.");
     }
   };
@@ -112,30 +120,31 @@ const MenuManagement = () => {
       });
       if (response.data.success) {
         toast.success("Item removed!");
-        fetchMenuItems();
+        await fetchMenuItems(restaurantData._id);
       } else {
         toast.error(response.data.message);
       }
     } catch (error) {
-      console.error("Error deleting item:", error);
       toast.error("Error deleting menu item.");
     }
   };
 
   const openEditModal = (item) => {
     setEditItem({ ...item, is_veg: item.is_veg ? "true" : "false" });
-    setEditPreview(`${API_URL}/uploads/foods/${item.image}`);
+    setEditPreview(item.image ? `${API_URL}/uploads/foods/${item.image}` : null);
     setIsEditModalOpen(true);
   };
 
   const handleEditSave = async () => {
-    try {
-      const formData = new FormData();
-      Object.keys(editItem).forEach((key) => {
-        if (key !== "image" || editItem.image instanceof File) formData.append(key, editItem[key]);
-      });
-      formData.append("id", editItem._id);
+    const formData = new FormData();
+    Object.keys(editItem).forEach((key) => {
+      if (key !== "image" || editItem.image instanceof File) {
+        formData.append(key, editItem[key]);
+      }
+    });
+    formData.append("id", editItem._id);
 
+    try {
       const response = await axios.put(`${API_URL}/api/menu/update`, formData, {
         headers: { ...getAuthHeaders(), "Content-Type": "multipart/form-data" },
       });
@@ -143,99 +152,98 @@ const MenuManagement = () => {
       if (response.data.success) {
         toast.success("Item updated!");
         setIsEditModalOpen(false);
-        fetchMenuItems();
+        await fetchMenuItems(restaurantData._id);
       } else {
         toast.error(response.data.message);
       }
     } catch (error) {
-      console.error("Error updating item:", error);
       toast.error("Error updating item.");
     }
   };
 
-  useEffect(() => {
-    const init = async () => {
-      setLoading(true);
-      const restaurantId = await fetchRestaurantData();
-      if (restaurantId) await fetchMenuItems();
-      setLoading(false);
-    };
-    init();
-  }, []);
-
-  useEffect(() => {
-    if (restaurantData) fetchMenuItems();
-  }, [restaurantData]);
-
-  if (loading) return <div className="text-center p-6">Loading...</div>;
-  if (!restaurantData) return <div className="text-center p-6">No Restaurant Found!</div>;
+  if (loading) return <div className="text-center p-10 text-lg">Loading Menu...</div>;
+  if (!restaurantData) return <div className="text-center p-10 text-lg text-red-600">Could not find your restaurant. Please create one first.</div>;
 
   return (
-    <div className="max-w-3xl mx-auto p-6 bg-white shadow-md rounded-xl">
+    <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
       <ToastContainer position="top-right" autoClose={3000} theme="colored" />
-      <h2 className="text-2xl font-bold text-center mb-6">🍽️ Menu Management</h2>
-
-      {/* Add Item Form */}
-      <form onSubmit={handleAddItem} className="space-y-4 mb-8">
-        <input type="text" name="name" value={newItem.name} onChange={(e) => handleChange(e, setNewItem)} placeholder="Food Name" required className="border border-gray-300 rounded-lg p-3 w-full focus:ring-2 focus:ring-blue-500 outline-none mb-3" />
-        <input type="number" name="price" value={newItem.price} onChange={(e) => handleChange(e, setNewItem)} placeholder="Price" required className="border border-gray-300 rounded-lg p-3 w-full focus:ring-2 focus:ring-blue-500 outline-none mb-3" />
-        <textarea name="description" value={newItem.description} onChange={(e) => handleChange(e, setNewItem)} placeholder="Description" rows="3" className="border border-gray-300 rounded-lg p-3 w-full focus:ring-2 focus:ring-blue-500 outline-none mb-3" />
-        <input type="text" name="category" value={newItem.category} onChange={(e) => handleChange(e, setNewItem)} placeholder="Category" required className="border border-gray-300 rounded-lg p-3 w-full focus:ring-2 focus:ring-blue-500 outline-none mb-3" />
-        <select name="is_veg" value={newItem.is_veg} onChange={(e) => handleChange(e, setNewItem)} className="border border-gray-300 rounded-lg p-3 w-full focus:ring-2 focus:ring-blue-500 outline-none mb-3">
-          <option value="">Select Type</option>
-          <option value="true">🌱 Veg</option>
-          <option value="false">🍖 Non-Veg</option>
-        </select>
-        <input type="file" accept="image/*" onChange={(e) => handleImageChange(e, setNewItem, setPreview)} required className="mb-3" />
-        {preview && <img src={preview} alt="Preview" className="mt-3 w-full h-40 object-cover rounded-lg" />}
-        <button type="submit" className="w-full bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg shadow font-semibold transition">➕ Add Item</button>
-      </form>
-
-      {/* Menu Items */}
-      <h3 className="text-xl font-semibold mb-4">📋 Current Menu ({menuItems.length})</h3>
-      <div className="grid gap-4">
-        {menuItems.map((item) => (
-          <div key={item._id} className="flex items-center justify-between p-4 border rounded-lg bg-gray-50">
-            <div className="flex items-center space-x-4">
-              <img src={`${API_URL}/uploads/foods/${item.image}`} alt={item.name} className="w-20 h-20 object-cover rounded-lg border" />
-              <div>
-                <h4 className="font-semibold">{item.name}</h4>
-                <p className="text-sm text-gray-600">{item.description}</p>
-                <span className="font-bold text-green-600">₹{item.price}</span>
-              </div>
-            </div>
-            <div className="flex space-x-2">
-              <button onClick={() => openEditModal(item)} className="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-lg shadow font-semibold">✏️ Edit</button>
-              <button onClick={() => handleDeleteItem(item._id)} className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg shadow font-semibold">🗑️ Delete</button>
-            </div>
-          </div>
-        ))}
+      <div className="text-center mb-10">
+        <h1 className="text-3xl font-bold text-gray-900">Menu Management</h1>
+        <p className="mt-2 text-md text-gray-500">Add, edit, or remove items from your restaurant's menu.</p>
       </div>
 
-      {/* Edit Modal */}
+      <div className="grid grid-cols-1 lg:grid-cols-5 gap-12">
+        {/* LEFT COLUMN: ADD ITEM FORM */}
+        <div className="lg:col-span-2">
+          <div className="bg-white p-6 rounded-lg border border-gray-200">
+            <h2 className="text-xl font-semibold mb-4 text-gray-800">Add New Item</h2>
+            <form onSubmit={handleAddItem} className="space-y-4">
+              <input type="text" name="name" onChange={(e) => handleChange(e, setNewItem)} placeholder="Food Name*" required className="w-full p-3 bg-gray-50 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"/>
+              <textarea name="description" onChange={(e) => handleChange(e, setNewItem)} placeholder="Description" rows="3" className="w-full p-3 bg-gray-50 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"/>
+              <div className="grid grid-cols-2 gap-4">
+                <input type="number" name="price" onChange={(e) => handleChange(e, setNewItem)} placeholder="Price*" required className="w-full p-3 bg-gray-50 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"/>
+                <input type="text" name="category" onChange={(e) => handleChange(e, setNewItem)} placeholder="Category*" required className="w-full p-3 bg-gray-50 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"/>
+              </div>
+              <select name="is_veg" defaultValue="" onChange={(e) => handleChange(e, setNewItem)} required className="w-full p-3 bg-gray-50 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                <option value="" disabled>Select Type*</option>
+                <option value="true">🌱 Veg</option>
+                <option value="false">🍖 Non-Veg</option>
+              </select>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Image*</label>
+                <input type="file" accept="image/*" onChange={(e) => handleImageChange(e, setNewItem, setPreview)} required className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"/>
+              </div>
+              {preview && <img src={preview} alt="New item preview" className="mt-2 w-full h-40 object-cover rounded-lg" />}
+              <button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition">Add Item to Menu</button>
+            </form>
+          </div>
+        </div>
+
+        {/* RIGHT COLUMN: CURRENT MENU */}
+        <div className="lg:col-span-3">
+          <h2 className="text-xl font-semibold mb-4 text-gray-800">Current Menu ({menuItems.length})</h2>
+          <div className="space-y-4">
+            {menuItems.length > 0 ? menuItems.map((item) => (
+              <div key={item._id} className="flex items-center justify-between p-4 border rounded-lg bg-white shadow-sm">
+                <div className="flex items-center space-x-4 flex-1 min-w-0">
+                  <img src={`${API_URL}/uploads/foods/${item.image}`} alt={item.name} className="w-20 h-20 object-cover rounded-lg border flex-shrink-0" />
+                  <div className="min-w-0">
+                    <p className="font-semibold text-gray-900 truncate">{item.name}</p>
+                    <p className="text-sm text-gray-600 truncate">{item.description}</p>
+                    <span className="font-bold text-green-700">₹{item.price}</span>
+                    <span className="ml-3 text-xs font-medium bg-gray-100 text-gray-600 px-2 py-1 rounded-full">{item.category}</span>
+                  </div>
+                </div>
+                <div className="flex space-x-2 flex-shrink-0 ml-4">
+                  <button onClick={() => openEditModal(item)} className="bg-yellow-400 hover:bg-yellow-500 text-white font-bold p-2 rounded-lg text-sm">Edit</button>
+                  <button onClick={() => handleDeleteItem(item._id)} className="bg-red-500 hover:bg-red-600 text-white font-bold p-2 rounded-lg text-sm">Delete</button>
+                </div>
+              </div>
+            )) : <p className="text-gray-500 text-center py-10">Your menu is empty. Add an item using the form on the left.</p>}
+          </div>
+        </div>
+      </div>
+
+      {/* EDIT MODAL */}
       {isEditModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white p-6 rounded-xl w-full max-w-lg shadow-xl">
             <h3 className="text-xl font-bold mb-4">Edit Menu Item</h3>
-            <input type="text" name="name" value={editItem.name} onChange={(e) => handleChange(e, setEditItem)} placeholder="Food Name" className="border border-gray-300 rounded-lg p-3 w-full focus:ring-2 focus:ring-blue-500 outline-none mb-3" />
-            <input type="number" name="price" value={editItem.price} onChange={(e) => handleChange(e, setEditItem)} placeholder="Price" className="border border-gray-300 rounded-lg p-3 w-full focus:ring-2 focus:ring-blue-500 outline-none mb-3" />
-            <textarea name="description" value={editItem.description} onChange={(e) => handleChange(e, setEditItem)} placeholder="Description" rows="3" className="border border-gray-300 rounded-lg p-3 w-full focus:ring-2 focus:ring-blue-500 outline-none mb-3" />
-            <input type="text" name="category" value={editItem.category} onChange={(e) => handleChange(e, setEditItem)} placeholder="Category" className="border border-gray-300 rounded-lg p-3 w-full focus:ring-2 focus:ring-blue-500 outline-none mb-3" />
-            <select
-              name="is_veg"
-              value={newItem.is_veg}
-              onChange={(e) => handleChange(e, setNewItem)}
-              className="border border-gray-300 rounded-lg p-3 w-full focus:ring-2 focus:ring-blue-500 outline-none bg-white text-gray-700 mb-3"
-            >
-              <option value="" disabled>Select Type</option>
-              <option value="true">🌱 Veg</option>
-              <option value="false">🍖 Non-Veg</option>
-            </select>
-            <input type="file" accept="image/*" onChange={(e) => handleImageChange(e, setEditItem, setEditPreview)} className="mb-3" />
-            {editPreview && <img src={editPreview} alt="Preview" className="mt-3 w-full h-40 object-cover rounded-lg" />}
-            <div className="flex justify-end mt-4 space-x-2">
-              <button onClick={() => setIsEditModalOpen(false)} className="bg-gray-400 hover:bg-gray-500 text-white px-4 py-2 rounded-lg shadow font-semibold">Cancel</button>
-              <button onClick={handleEditSave} className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg shadow font-semibold">Save Changes</button>
+            <div className="space-y-4">
+              <input type="text" name="name" value={editItem.name} onChange={(e) => handleChange(e, setEditItem)} className="w-full p-3 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" />
+              <input type="number" name="price" value={editItem.price} onChange={(e) => handleChange(e, setEditItem)} className="w-full p-3 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" />
+              <textarea name="description" value={editItem.description} onChange={(e) => handleChange(e, setEditItem)} rows="3" className="w-full p-3 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" />
+              <input type="text" name="category" value={editItem.category} onChange={(e) => handleChange(e, setEditItem)} className="w-full p-3 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" />
+              <select name="is_veg" value={editItem.is_veg} onChange={(e) => handleChange(e, setEditItem)} className="w-full p-3 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                <option value="true">🌱 Veg</option>
+                <option value="false">🍖 Non-Veg</option>
+              </select>
+              <input type="file" accept="image/*" onChange={(e) => handleImageChange(e, setEditItem, setEditPreview)} className="w-full text-sm text-gray-500"/>
+              {editPreview && <img src={editPreview} alt="Edit preview" className="mt-2 w-full h-40 object-cover rounded-lg" />}
+            </div>
+            <div className="flex justify-end mt-6 space-x-3">
+              <button onClick={() => setIsEditModalOpen(false)} className="bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold px-4 py-2 rounded-lg">Cancel</button>
+              <button onClick={handleEditSave} className="bg-green-600 hover:bg-green-700 text-white font-bold px-4 py-2 rounded-lg">Save Changes</button>
             </div>
           </div>
         </div>

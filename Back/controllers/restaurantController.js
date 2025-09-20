@@ -1,141 +1,121 @@
-import restaurantModel from '../models/restaurantModel.js';
-import fs from 'fs';
+import restaurantModel from "../models/restaurantModel.js";
+import userModel from "../models/userModel.js"; // <-- ADD THIS LINE
+import fs from "fs";
+import path from "path";
 
+// Helper to delete image file
+const deleteImage = (filename) => {
+  if (!filename) return;
+  const filePath = path.join("uploads/restaurants", filename);
+  fs.unlink(filePath, (err) => {
+    if (err) console.log("Error deleting file:", err);
+  });
+};
+
+// --- Get all active restaurants ---
 export const getAllRestaurants = async (req, res) => {
-    try {
-        const restaurants = await restaurantModel.find({ status: 'active' })
-            .select('-owner_id');
-        res.json({ success: true, data: restaurants });
-    } catch (error) {
-        res.status(500).json({ success: false, message: 'Server Error' });
-    }
+  try {
+    const restaurants = await restaurantModel.find({ status: "active" }).select("-owner_id");
+    res.json({ success: true, data: restaurants });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, message: "Server Error" });
+  }
 };
+
+// --- Get my restaurant ---
 export const getMyRestaurant = async (req, res) => {
-    try {
-        const restaurant = await restaurantModel.findOne({ owner_id: req.user._id });
-        
-        if (!restaurant) {
-            return res.status(404).json({ 
-                success: false, 
-                message: 'No restaurant found. Please create your restaurant first.' 
-            });
-        }
-        res.json({ success: true, data: restaurant });
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ success: false, message: 'Server Error' });
-    }
+  try {
+    const restaurant = await restaurantModel.findOne({ owner_id: req.user._id });
+    if (!restaurant)
+      return res.status(404).json({ success: false, message: "No restaurant found" });
+
+    res.json({ success: true, data: restaurant });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, message: "Server Error" });
+  }
 };
+
+// --- Create restaurant ---
 export const createRestaurant = async (req, res) => {
-    const { name, address, cuisine, price_for_two, status, timing } = req.body;
-    
-    try {
-        const existingRestaurant = await restaurantModel.findOne({ owner_id: req.user._id });
-        if (existingRestaurant) {
-            if (req.file) {
-                fs.unlink(req.file.path, (err) => {
-                    if (err) console.log("Error deleting file:", err);
-                });
-            }
-            return res.status(400).json({ 
-                success: false, 
-                message: 'You already have a restaurant. Use update instead.' 
-            });
-        }
-
-        const newRestaurant = new restaurantModel({
-            owner_id: req.user._id, 
-            name,
-            address,
-            cuisine,
-            price_for_two,
-            status,
-            timing,
-            image: req.file ? req.file.filename : null
-        });
-
-        const restaurant = await newRestaurant.save();
-        res.status(201).json({ success: true, data: restaurant });
-    } catch (error) {
-        if (req.file) {
-            fs.unlink(req.file.path, (err) => {
-                if (err) console.log("Error deleting file:", err);
-            });
-        }
-        console.error(error);
-        res.status(500).json({ success: false, message: 'Server Error' });
+  const { name, address, cuisine, price_for_two, status, timing } = req.body;
+  try {
+    const existing = await restaurantModel.findOne({ owner_id: req.user._id });
+    if (existing) {
+      deleteImage(req.file?.filename);
+      return res.status(400).json({ success: false, message: "You already have a restaurant" });
     }
+
+    const restaurant = await restaurantModel.create({
+      owner_id: req.user._id,
+      name,
+      address,
+      cuisine,
+      price_for_two,
+      status,
+      timing,
+      image: req.file?.filename || null,
+    });
+
+    // This line is correct, but requires the import above
+    await userModel.findByIdAndUpdate(req.user._id, { role: 'restaurant_owner' });
+    
+    res.status(201).json({ success: true, message: "Restaurant created and user role updated successfully!", data: restaurant });
+  } catch (err) {
+    deleteImage(req.file?.filename);
+    console.error(err);
+    res.status(500).json({ success: false, message: "Server Error" });
+  }
 };
 
+// --- Update restaurant ---
 export const updateRestaurant = async (req, res) => {
+  try {
+    const restaurant = await restaurantModel.findOne({ owner_id: req.user._id });
+    if (!restaurant) {
+      deleteImage(req.file?.filename);
+      return res.status(404).json({ success: false, message: "Restaurant not found" });
+    }
+
     const { name, address, cuisine, price_for_two, status, timing } = req.body;
-    
-    try {
-        const restaurant = await restaurantModel.findOne({ owner_id: req.user._id });
-        
-        if (!restaurant) {
-            if (req.file) {
-                fs.unlink(req.file.path, (err) => {
-                    if (err) console.log("Error deleting file:", err);
-                });
-            }
-            return res.status(404).json({ 
-                success: false, 
-                message: 'Restaurant not found' 
-            });
-        }
 
-        restaurant.name = name || restaurant.name;
-        restaurant.address = address || restaurant.address;
-        restaurant.cuisine = cuisine || restaurant.cuisine;
-        restaurant.price_for_two = price_for_two || restaurant.price_for_two;
-        restaurant.status = status || restaurant.status;
-        restaurant.timing = timing || restaurant.timing;
-        
-        if (req.file) {
-            // FIXED: Use correct path for restaurant images
-            if (restaurant.image) {
-                fs.unlink(`uploads/restaurants/${restaurant.image}`, (err) => {
-                    if (err) console.log("Error deleting old file:", err);
-                });
-            }
-            restaurant.image = req.file.filename;
-        }
+    // Update fields if provided
+    if (name) restaurant.name = name;
+    if (address) restaurant.address = address;
+    if (cuisine) restaurant.cuisine = cuisine;
+    if (price_for_two) restaurant.price_for_two = price_for_two;
+    if (status) restaurant.status = status;
+    if (timing) restaurant.timing = timing;
 
-        const updatedRestaurant = await restaurant.save();
-        res.json({ success: true, data: updatedRestaurant });
-    } catch (error) {
-        if (req.file) {
-            fs.unlink(req.file.path, (err) => {
-                if (err) console.log("Error deleting file:", err);
-            });
-        }
-        console.error(error);
-        res.status(500).json({ success: false, message: 'Server Error' });
+    // Update image
+    if (req.file) {
+      deleteImage(restaurant.image);
+      restaurant.image = req.file.filename;
     }
+
+    await restaurant.save();
+    res.json({ success: true, data: restaurant });
+  } catch (err) {
+    deleteImage(req.file?.filename);
+    console.error(err);
+    res.status(500).json({ success: false, message: "Server Error" });
+  }
 };
+
+// --- Delete restaurant ---
 export const deleteRestaurant = async (req, res) => {
-    try {
-        const restaurant = await restaurantModel.findOne({ owner_id: req.user._id });
-        
-        if (!restaurant) {
-            return res.status(404).json({ success: false, message: 'Restaurant not found' });
-        }
+  try {
+    const restaurant = await restaurantModel.findOne({ owner_id: req.user._id });
+    if (!restaurant) return res.status(404).json({ success: false, message: "Restaurant not found" });
 
-        // Delete the associated image from storage
-        if (restaurant.image) {
-            fs.unlink(`uploads/restaurants/${restaurant.image}`, (err) => {
-                if (err) console.log("Error deleting restaurant image:", err);
-            });
-        }
-        
-        // Note: You might also want to delete associated menu items here.
+    deleteImage(restaurant.image);
 
-        await restaurantModel.deleteOne({ _id: restaurant._id });
+    await restaurantModel.deleteOne({ _id: restaurant._id });
 
-        res.json({ success: true, message: 'Restaurant closed successfully.' });
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ success: false, message: 'Server Error' });
-    }
+    res.json({ success: true, message: "Restaurant deleted successfully" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, message: "Server Error" });
+  }
 };

@@ -43,21 +43,18 @@ export default function PersonalInfoEdit() {
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      // Validate file type
-      if (!file.type.startsWith('image/')) {
-        toast.error('Please select an image file');
+      if (!file.type.startsWith("image/")) {
+        toast.error("Please select an image file");
         return;
       }
 
-      // Validate file size (max 5MB)
       if (file.size > 5 * 1024 * 1024) {
-        toast.error('Image size should be less than 5MB');
+        toast.error("Image size should be less than 5MB");
         return;
       }
 
       setImageFile(file);
 
-      // Create preview
       const reader = new FileReader();
       reader.onload = (e) => {
         setImagePreview(e.target.result);
@@ -70,32 +67,41 @@ export default function PersonalInfoEdit() {
     if (!imageFile) return null;
 
     const formData = new FormData();
-    formData.append('avatar', imageFile);
+    formData.append("avatar", imageFile);
 
     try {
       setUploading(true);
-      const { data } = await axios.post(`${url}/api/users/upload-avatar`, formData, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'multipart/form-data',
-        },
-      });
+      const { data } = await axios.post(
+        `${url}/api/users/upload-avatar`,
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
 
       if (data.success) {
         return data.avatarPath;
       } else {
-        toast.error(data.message || 'Failed to upload image');
+        toast.error(data.message || "Failed to upload image");
         return null;
       }
     } catch (error) {
-      toast.error('Error uploading image');
+      toast.error("Error uploading image");
       return null;
     } finally {
       setUploading(false);
     }
   };
+
   const handleDelete = async () => {
-    if (!window.confirm("Are you sure you want to delete your account? This action cannot be undone.")) {
+    if (
+      !window.confirm(
+        "Are you sure you want to delete your account? This action cannot be undone."
+      )
+    ) {
       return;
     }
 
@@ -106,9 +112,8 @@ export default function PersonalInfoEdit() {
 
       if (data.success) {
         toast.success(data.message);
-        // Clear local storage/session
         localStorage.removeItem("token");
-        window.location.href = "/"; // redirect to homepage or login
+        window.location.href = "/";
       } else {
         toast.error(data.message || "Failed to delete account.");
       }
@@ -121,24 +126,27 @@ export default function PersonalInfoEdit() {
     try {
       let avatarPath = formData.avatar;
 
-      // Upload image if there's a new one
       if (imageFile) {
         const uploadedPath = await uploadImage();
         if (uploadedPath) {
           avatarPath = uploadedPath;
         } else {
-          return; // Don't proceed if image upload failed
+          return;
         }
       }
 
       const updateData = {
         ...formData,
-        avatar: avatarPath
+        avatar: avatarPath,
       };
 
-      const { data } = await axios.put(`${url}/api/users/profile`, updateData, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const { data } = await axios.put(
+        `${url}/api/users/profile`,
+        updateData,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
 
       if (data.success) {
         setProfileData(data.user);
@@ -233,13 +241,96 @@ export default function PersonalInfoEdit() {
             )}
           </div>
 
-          {/* Role (read-only) */}
+          {/* Address */}
+          <div className="form-group">
+            <label>Address</label>
+            {isEditing ? (
+              <input
+                type="text"
+                value={formData.address || ""}
+                onChange={(e) => handleInputChange("address", e.target.value)}
+              />
+            ) : (
+              <p>{profileData.address || "Not provided"}</p>
+            )}
+          </div>
+
+          {/* Date of Birth */}
+          <div className="form-group">
+            <label>Date of Birth</label>
+            {isEditing ? (
+              <input
+                type="date"
+                value={formData.dob || ""}
+                onChange={(e) => handleInputChange("dob", e.target.value)}
+              />
+            ) : (
+              <p>{profileData.dob || "Not provided"}</p>
+            )}
+          </div>
+
+          {/* Gender */}
+          <div className="form-group">
+            <label>Gender</label>
+            {isEditing ? (
+              <select
+                value={formData.gender || ""}
+                onChange={(e) => handleInputChange("gender", e.target.value)}
+              >
+                <option value="">Select Gender</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+                <option value="Other">Other</option>
+              </select>
+            ) : (
+              <p>{profileData.gender || "Not provided"}</p>
+            )}
+          </div>
+
+          {/* Notifications */}
+          <div className="form-group">
+            <label>Notifications</label>
+            {isEditing ? (
+              <div className="notification-options">
+                <label className="notification-toggle">
+                  Email Notifications
+                  <input
+                    type="checkbox"
+                    checked={formData.emailNotifications || false}
+                    onChange={(e) =>
+                      handleInputChange("emailNotifications", e.target.checked)
+                    }
+                  />
+                  <span className="switch"></span>
+                </label>
+
+                <label className="notification-toggle">
+                  SMS Notifications
+                  <input
+                    type="checkbox"
+                    checked={formData.smsNotifications || false}
+                    onChange={(e) =>
+                      handleInputChange("smsNotifications", e.target.checked)
+                    }
+                  />
+                  <span className="switch"></span>
+                </label>
+              </div>
+            ) : (
+              <p>
+                Email: {formData.emailNotifications ? "On" : "Off"}, SMS:{" "}
+                {formData.smsNotifications ? "On" : "Off"}
+              </p>
+            )}
+          </div>
+
+          {/* Role */}
           <div className="form-group">
             <label>Role</label>
             <p>{profileData.role}</p>
           </div>
 
-          {/* Status (read-only) */}
+          {/* Status */}
           <div className="form-group">
             <label>Status</label>
             <p>{profileData.status}</p>
@@ -257,7 +348,7 @@ export default function PersonalInfoEdit() {
                   onClick={handleSave}
                   disabled={uploading}
                 >
-                  <Save size={16} /> {uploading ? 'Uploading...' : 'Save'}
+                  <Save size={16} /> {uploading ? "Uploading..." : "Save"}
                 </button>
                 <button className="cancel-btn" onClick={handleCancel}>
                   <X size={16} /> Cancel
@@ -279,8 +370,8 @@ export default function PersonalInfoEdit() {
                   alt="Profile"
                   className="avatar"
                   onError={(e) => {
-                    e.target.style.display = 'none';
-                    e.target.nextSibling.style.display = 'flex';
+                    e.target.style.display = "none";
+                    e.target.nextSibling.style.display = "flex";
                   }}
                 />
               ) : (
@@ -305,7 +396,7 @@ export default function PersonalInfoEdit() {
               type="file"
               accept="image/*"
               onChange={handleImageChange}
-              style={{ display: 'none' }}
+              style={{ display: "none" }}
             />
           </div>
 
@@ -319,9 +410,7 @@ export default function PersonalInfoEdit() {
           <div className="button-group">
             {!isEditing ? (
               <>
-                <button className="edit-btn" onClick={() => setIsEditing(true)}>
-                  <Edit3 size={16} /> Edit
-                </button>
+
                 <button
                   className="delete-btn"
                   onClick={handleDelete}
@@ -337,7 +426,7 @@ export default function PersonalInfoEdit() {
                   onClick={handleSave}
                   disabled={uploading}
                 >
-                  <Save size={16} /> {uploading ? 'Uploading...' : 'Save'}
+                  <Save size={16} /> {uploading ? "Uploading..." : "Save"}
                 </button>
                 <button className="cancel-btn" onClick={handleCancel}>
                   <X size={16} /> Cancel
