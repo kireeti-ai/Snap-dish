@@ -3,7 +3,7 @@ import jwt from "jsonwebtoken";
 import validator from "validator";
 import fs from "fs";
 import path from "path";
-
+import uploadToCloudinary from '../utils/cloudinary.js'; 
 // Helper function to create a token
 const createToken = (id) => {
     return jwt.sign({ id }, process.env.JWT_SECRET);
@@ -179,51 +179,42 @@ export const updateUserProfile = async (req, res) => {
     }
 };
 
-// Upload avatar
 export const uploadAvatar = async (req, res) => {
-    try {
-        if (!req.file) {
-            return res.status(400).json({ success: false, message: "No file uploaded" });
-        }
-
-        const userId = req.user._id;
-        const avatarPath = `uploads/avatars/${req.file.filename}`;
-
-        // Update user's avatar in database
-        const updatedUser = await userModel.findByIdAndUpdate(
-            userId,
-            { avatar: avatarPath },
-            { new: true }
-        ).select("-password");
-
-        if (!updatedUser) {
-            // Delete uploaded file if user not found
-            fs.unlinkSync(req.file.path);
-            return res.status(404).json({ success: false, message: "User not found" });
-        }
-
-        res.json({
-            success: true,
-            message: "Avatar uploaded successfully",
-            avatarPath: avatarPath,
-            user: {
-                firstName: updatedUser.firstName,
-                lastName: updatedUser.lastName,
-                email: updatedUser.email,
-                phone_number: updatedUser.phone_number,
-                role: updatedUser.role,
-                status: updatedUser.status,
-                avatar: updatedUser.avatar,
-                createdAt: updatedUser.createdAt,
-            }
-        });
-    } catch (error) {
-        console.log(error);
-        if (req.file) {
-            fs.unlinkSync(req.file.path);
-        }
-        res.status(500).json({ success: false, message: "Error uploading avatar" });
+  try {
+    const user = await User.findById(req.params.id);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
     }
+
+    if (!req.file) {
+      return res.status(400).json({ message: 'No file uploaded.' });
+    }
+
+    // Get the temporary local file path from multer
+    const localFilePath = req.file.path;
+
+    // Upload to Cloudinary
+    const imageUrl = await uploadToCloudinary(localFilePath, 'avatars');
+
+    if (!imageUrl) {
+      return res.status(500).json({ message: 'Error uploading image to cloud.' });
+    }
+
+    // Save the Cloudinary URL to the database
+    user.avatar = imageUrl;
+    await user.save();
+
+    res.status(200).json({
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      avatar: user.avatar,
+      token: generateToken(user._id),
+    });
+  } catch (error) {
+    res.status(500).json({ message: 'Error processing image upload', error });
+  }
 };
 // Delete user
 export const deleteUser = async (req, res) => {
@@ -254,3 +245,4 @@ export const deleteUser = async (req, res) => {
         res.status(500).json({ success: false, message: "Error deleting account" });
     }
 };
+

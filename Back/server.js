@@ -74,8 +74,7 @@ app.use((error, req, res, next) => {
   next(error);
 });
 
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
-
+app.use('/images', express.static(path.join(__dirname, 'uploads')));
 
 
 app.use("/api/address", addressRoutes);

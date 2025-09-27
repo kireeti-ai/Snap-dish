@@ -1,18 +1,8 @@
 import restaurantModel from "../models/restaurantModel.js";
-import userModel from "../models/userModel.js"; // <-- ADD THIS LINE
-import fs from "fs";
-import path from "path";
+import userModel from "../models/userModel.js";
+import uploadToCloudinary from '../utils/cloudinary.js';
 
-// Helper to delete image file
-const deleteImage = (filename) => {
-  if (!filename) return;
-  const filePath = path.join("uploads/restaurants", filename);
-  fs.unlink(filePath, (err) => {
-    if (err) console.log("Error deleting file:", err);
-  });
-};
-
-// --- Get all active restaurants ---
+// --- Get all active restaurants (No changes) ---
 export const getAllRestaurants = async (req, res) => {
   try {
     const restaurants = await restaurantModel.find({ status: "active" }).select("-owner_id");
@@ -23,7 +13,7 @@ export const getAllRestaurants = async (req, res) => {
   }
 };
 
-// --- Get my restaurant ---
+// --- Get my restaurant (No changes) ---
 export const getMyRestaurant = async (req, res) => {
   try {
     const restaurant = await restaurantModel.findOne({ owner_id: req.user._id });
@@ -31,7 +21,8 @@ export const getMyRestaurant = async (req, res) => {
       return res.status(404).json({ success: false, message: "No restaurant found" });
 
     res.json({ success: true, data: restaurant });
-  } catch (err) {
+  } catch (err)
+  {
     console.error(err);
     res.status(500).json({ success: false, message: "Server Error" });
   }
@@ -43,8 +34,16 @@ export const createRestaurant = async (req, res) => {
   try {
     const existing = await restaurantModel.findOne({ owner_id: req.user._id });
     if (existing) {
-      deleteImage(req.file?.filename);
       return res.status(400).json({ success: false, message: "You already have a restaurant" });
+    }
+
+    let imageUrl = null;
+    if (req.file) {
+      // --- FIX: Upload to Cloudinary instead of saving locally ---
+      imageUrl = await uploadToCloudinary(req.file.path, 'restaurants');
+      if (!imageUrl) {
+        return res.status(500).json({ success: false, message: 'Error uploading image' });
+      }
     }
 
     const restaurant = await restaurantModel.create({
@@ -55,15 +54,13 @@ export const createRestaurant = async (req, res) => {
       price_for_two,
       status,
       timing,
-      image: req.file?.filename || null,
+      image: imageUrl, // Save the full Cloudinary URL
     });
 
-    // This line is correct, but requires the import above
     await userModel.findByIdAndUpdate(req.user._id, { role: 'restaurant_owner' });
     
-    res.status(201).json({ success: true, message: "Restaurant created and user role updated successfully!", data: restaurant });
+    res.status(201).json({ success: true, message: "Restaurant created successfully!", data: restaurant });
   } catch (err) {
-    deleteImage(req.file?.filename);
     console.error(err);
     res.status(500).json({ success: false, message: "Server Error" });
   }
@@ -74,13 +71,11 @@ export const updateRestaurant = async (req, res) => {
   try {
     const restaurant = await restaurantModel.findOne({ owner_id: req.user._id });
     if (!restaurant) {
-      deleteImage(req.file?.filename);
       return res.status(404).json({ success: false, message: "Restaurant not found" });
     }
 
     const { name, address, cuisine, price_for_two, status, timing } = req.body;
 
-    // Update fields if provided
     if (name) restaurant.name = name;
     if (address) restaurant.address = address;
     if (cuisine) restaurant.cuisine = cuisine;
@@ -88,29 +83,29 @@ export const updateRestaurant = async (req, res) => {
     if (status) restaurant.status = status;
     if (timing) restaurant.timing = timing;
 
-    // Update image
+    // --- FIX: Update image with Cloudinary ---
     if (req.file) {
-      deleteImage(restaurant.image);
-      restaurant.image = req.file.filename;
+      const imageUrl = await uploadToCloudinary(req.file.path, 'restaurants');
+      if (imageUrl) {
+        restaurant.image = imageUrl;
+      }
     }
 
     await restaurant.save();
     res.json({ success: true, data: restaurant });
   } catch (err) {
-    deleteImage(req.file?.filename);
     console.error(err);
     res.status(500).json({ success: false, message: "Server Error" });
   }
 };
 
-// --- Delete restaurant ---
+// --- Delete restaurant (No changes needed) ---
 export const deleteRestaurant = async (req, res) => {
   try {
     const restaurant = await restaurantModel.findOne({ owner_id: req.user._id });
     if (!restaurant) return res.status(404).json({ success: false, message: "Restaurant not found" });
 
-    deleteImage(restaurant.image);
-
+    // No need to delete image from local storage
     await restaurantModel.deleteOne({ _id: restaurant._id });
 
     res.json({ success: true, message: "Restaurant deleted successfully" });

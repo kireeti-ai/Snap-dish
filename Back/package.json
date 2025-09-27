@@ -13,6 +13,7 @@
     "bcrypt": "^6.0.0",
     "bcryptjs": "^3.0.2",
     "body-parser": "^2.2.0",
+    "cloudinary": "^2.7.0",
     "cors": "^2.8.5",
     "dotenv": "^17.2.2",
     "express": "^5.1.0",
@@ -21,6 +22,7 @@
     "mongoose": "^8.18.1",
     "multer": "^2.0.2",
     "nodemon": "^3.1.10",
+    "sharp": "^0.34.4",
     "stripe": "^18.5.0",
     "validator": "^13.15.15"
   },
