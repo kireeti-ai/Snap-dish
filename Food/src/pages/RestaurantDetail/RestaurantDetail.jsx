@@ -1,7 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import {  } from '../../Context/StoreContext';
-import { food_list } from '../../assets/assets';
+import { StoreContext } from '../../Context/StoreContext';
 import './RestaurantDetail.css';
 import { assets } from '../../assets/assets';
 import FoodItem from '../../components/FoodItem/FoodItem';
@@ -10,7 +9,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 const RestaurantDetail = () => {
   const { id } = useParams();
-  const { restaurant_list } = useContext(RestaurantContext);
+  const { restaurant_list, food_list } = useContext(StoreContext);
   const [restaurant, setRestaurant] = useState(null);
   const [restaurantMenu, setRestaurantMenu] = useState({});
   const [searchTerm, setSearchTerm] = useState("");
@@ -22,7 +21,10 @@ const RestaurantDetail = () => {
     const foundRestaurant = restaurant_list.find(r => r._id === id);
     if (foundRestaurant) {
       setRestaurant(foundRestaurant);
-      const filteredFood = food_list.filter(food => food.restaurant === foundRestaurant.name);
+      
+      // Corrected line: Filter food list by restaurant's unique ID
+      const filteredFood = food_list.filter(food => food.restaurant_id === foundRestaurant._id);
+      
       const categorizedMenu = filteredFood.reduce((acc, food) => {
         if (!acc[food.category]) {
           acc[food.category] = [];
@@ -30,14 +32,15 @@ const RestaurantDetail = () => {
         acc[food.category].push(food);
         return acc;
       }, {});
+      
       setRestaurantMenu(categorizedMenu);
       setReviews(foundRestaurant.reviews || {});
-      // expand all by default
+      
       const initialState = {};
       Object.keys(categorizedMenu).forEach(cat => { initialState[cat] = true; });
       setOpenCategories(initialState);
     }
-  }, [id, restaurant_list]);
+  }, [id, restaurant_list, food_list]);
 
   if (!restaurant) {
     return (
@@ -47,17 +50,13 @@ const RestaurantDetail = () => {
       </div>
     );
   }
-
+  
   const toggleCategory = (category) => {
-    setOpenCategories(prev => ({
-      ...prev,
-      [category]: !prev[category],
-    }));
+    setOpenCategories(prev => ({ ...prev, [category]: !prev[category] }));
   };
 
   return (
     <div className="restaurant-detail-page">
-      {/* Header */}
       <motion.div
         className="restaurant-detail-header"
         initial={{ opacity: 0, y: 30 }}
@@ -74,7 +73,7 @@ const RestaurantDetail = () => {
         <p className="cuisine">{restaurant.cuisine}</p>
         <div className="location-time">
           <p>📍{restaurant.address}</p>
-          <p><img src={assets.time} alt="time" className="icon" /> {restaurant.time}</p>
+          <p><img src={assets.time} alt="time" className="icon" /> {restaurant.timing || restaurant.time}</p>
         </div>
         <div className="offer-banner">
           <img src={assets.offer} alt="offer" className="icon" /> Free delivery on orders above ₹199
@@ -83,7 +82,6 @@ const RestaurantDetail = () => {
 
       <hr className="separator" />
 
-      {/* Search + Filter */}
       <div className="menu-search-filter">
         <h3 className="menu-heading"> MENU</h3>
         <div className="search-bar">
@@ -108,12 +106,11 @@ const RestaurantDetail = () => {
 
       <hr className="separator" />
 
-      {/* Menu */}
       <div className="full-menu-section">
         {Object.keys(restaurantMenu).map(category => {
           const filteredItems = restaurantMenu[category].filter(food => {
             const matchesSearch = food.name.toLowerCase().includes(searchTerm.toLowerCase());
-            const matchesVeg = !vegOnly || food.type === 'Veg';
+            const matchesVeg = !vegOnly || food.is_veg === true;
             return matchesSearch && matchesVeg;
           });
 
@@ -121,10 +118,7 @@ const RestaurantDetail = () => {
 
           return (
             <div key={category} className="menu-category">
-              <div
-                className="category-header"
-                onClick={() => toggleCategory(category)}
-              >
+              <div className="category-header" onClick={() => toggleCategory(category)}>
                 <h3>{category} ({filteredItems.length})</h3>
                 <motion.span
                   className="dropdown-arrow"
@@ -134,7 +128,6 @@ const RestaurantDetail = () => {
                   ▼
                 </motion.span>
               </div>
-
               <AnimatePresence>
                 {openCategories[category] && (
                   <motion.div
@@ -157,6 +150,8 @@ const RestaurantDetail = () => {
                           price={food.price}
                           description={food.description}
                           image={food.image}
+                          is_veg={food.is_veg}
+                          rating={food.rating} 
                         />
                       </motion.div>
                     ))}
@@ -167,7 +162,6 @@ const RestaurantDetail = () => {
           );
         })}
       </div>
-
       <hr className="separator" />
       <Reviews reviews={reviews} />
     </div>

@@ -40,7 +40,7 @@ createUploadDirs();
 app.use(express.json());
 
 const allowedOrigins = [
-  "http://localhost:5173",
+  "http://localhost:5174","http://localhost:5173",
   "https://snap-dish-xi.vercel.app","https://snap-dish-qulq.vercel.app",
   process.env.FRONTEND_URL
 ].filter(Boolean);

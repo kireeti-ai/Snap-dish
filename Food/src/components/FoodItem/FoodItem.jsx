@@ -3,7 +3,8 @@ import './FoodItem.css';
 import { assets } from '../../assets/assets.js';
 import { StoreContext } from '../../Context/StoreContext';
 
-const FoodItem = ({ id, name, price, description, image, is_veg, restaurant_id }) => {
+// **FIX: Accept `rating` as a prop**
+const FoodItem = ({ id, name, price, description, image, is_veg, restaurant_id, rating }) => {
     const { 
         cartItems, 
         addToCart, 
@@ -16,9 +17,8 @@ const FoodItem = ({ id, name, price, description, image, is_veg, restaurant_id }
 
     const isWishlisted = wishlistItems.includes(id);
 
-    // Handle image URL - if it's already a full URL, use as is; otherwise prepend backend URL
     const getImageUrl = (imagePath) => {
-        if (!imagePath) return '/placeholder-food.jpg'; // fallback image
+        if (!imagePath) return '/placeholder-food.jpg';
         if (imagePath.startsWith('http')) return imagePath;
         return `${BACKEND_URL}/uploads/foods/${imagePath}`;
     };
@@ -28,51 +28,34 @@ const FoodItem = ({ id, name, price, description, image, is_veg, restaurant_id }
     return (
         <div className='food-item'>
             <div className="food-item-img-container">
+                {/* Image and add/remove icons... */}
                 <img 
                     className='wishlist-icon'
                     onClick={() => isWishlisted ? removeFromWishlist(id) : addToWishlist(id)}
                     src={isWishlisted ? assets.heart_solid : assets.heart_outline}
                     alt="Add to wishlist"
                 />
-
                 <img 
                     className="food-item-image" 
                     src={imageUrl} 
                     alt={name} 
-                    onError={(e) => {
-                        // Fallback if image fails to load
-                        e.target.src = '/placeholder-food.jpg';
-                    }}
+                    onError={(e) => { e.target.src = '/placeholder-food.jpg'; }}
                 />
-
-                {!cartItems[id] ?
-                    <img
-                        className='add'
-                        onClick={() => addToCart(id)}
-                        src={assets.add_icon_white}
-                        alt="Add to cart"
-                    />
-                    :
-                    <div className='food-item-counter'>
-                        <img
-                            src={assets.remove_icon_red}
-                            onClick={() => removeFromCart(id)}
-                            alt="Remove from cart"
-                        />
+                {!cartItems[id] 
+                    ? <img className='add' onClick={() => addToCart(id)} src={assets.add_icon_white} alt="Add to cart" />
+                    : <div className='food-item-counter'>
+                        <img src={assets.remove_icon_red} onClick={() => removeFromCart(id)} alt="Remove from cart" />
                         <p>{cartItems[id]}</p>
-                        <img
-                            src={assets.add_icon_green}
-                            onClick={() => addToCart(id)}
-                            alt="Add more"
-                        />
-                    </div>
+                        <img src={assets.add_icon_green} onClick={() => addToCart(id)} alt="Add more" />
+                      </div>
                 }
             </div>
             <div className="food-item-info">
                 <div className="food-item-name-rating">
                     <p className="food-item-name">{name}</p>
                     <div className="item-rating">
-                        <span>⭐ 4.2</span>
+                        {/* **FIX: Use the dynamic `rating` prop here** */}
+                        {rating && <span>⭐ {rating}</span>}
                     </div>
                 </div>
                 

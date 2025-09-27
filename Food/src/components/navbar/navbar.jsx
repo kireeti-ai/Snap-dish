@@ -11,7 +11,7 @@ const Navbar = ({ setShowLogin }) => {
   const [showLocationModal, setShowLocationModal] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
 
-  const { token, userName, logout, location } = useContext(StoreContext);
+  const { token, userName, logout, location, cartItems, wishlistItems } = useContext(StoreContext);
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -19,11 +19,13 @@ const Navbar = ({ setShowLogin }) => {
     navigate("/");
   };
 
+  const totalCartItems = Object.values(cartItems).reduce((sum, quantity) => sum + quantity, 0);
+  const wishlistCount = wishlistItems ? wishlistItems.length : 0;
+
   return (
     <>
       {showLocationModal && <LocationModal setShowLocationModal={setShowLocationModal} />}
 
-      {/* Animate navbar on mount */}
       <motion.div
         className="navbar"
         initial={{ y: -80, opacity: 0 }}
@@ -31,6 +33,7 @@ const Navbar = ({ setShowLogin }) => {
         transition={{ type: "spring", stiffness: 80, damping: 12 }}
       >
         <div className="navbar-left">
+          {/* ... left side of navbar ... */}
           <Link to='/'>
             <motion.img 
               src={assets.logo} 
@@ -40,7 +43,6 @@ const Navbar = ({ setShowLogin }) => {
               whileTap={{ scale: 0.95 }}
             />
           </Link>
-
           <div className="navbar-location" onClick={() => setShowLocationModal(true)}>
             <motion.svg 
               xmlns="http://www.w3.org/2000/svg" 
@@ -62,7 +64,8 @@ const Navbar = ({ setShowLogin }) => {
         </div>
 
         <ul className="navbar-menu">
-          <li>
+           {/* ... menu items ... */}
+           <li>
             <Link to="/" onClick={() => setMenu("Home")} className={menu === "Home" ? "active" : ""}>
               Home
             </Link>
@@ -78,20 +81,8 @@ const Navbar = ({ setShowLogin }) => {
               <img src={assets.search_icon} alt="Search" />
             </Link>
           </motion.div>
-
-          <motion.div className="navbar-cart-icon" whileHover={{ scale: 1.1 }}>
-            <Link to='/cart'>
-              <img src={assets.basket_icon} alt="Cart" />
-              <div className="dot"></div>
-            </Link>
-          </motion.div>
-
-          <motion.div className="favorites" whileHover={{ scale: 1.1 }}>
-            <Link to='wishList'>
-              <img src={assets.save} alt="Wish List" />
-            </Link>
-          </motion.div>
-
+          
+          {/* Conditional rendering starts here */}
           {!token ? (
             <motion.button 
               onClick={() => setShowLogin(true)} 
@@ -101,35 +92,51 @@ const Navbar = ({ setShowLogin }) => {
               Sign In
             </motion.button>
           ) : (
-            <div 
-              className="navbar-profile" 
-              onMouseEnter={() => setShowDropdown(true)} 
-              onMouseLeave={() => setShowDropdown(false)}
-            >
-              <img src={assets.user} alt="User" className="user-icon"/>
-              
-              <AnimatePresence>
-                {showDropdown && (
-                  <motion.ul 
-                    className="navbar-profile-dropdown"
-                    initial={{ opacity: 0, y: -10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -10 }}
-                    transition={{ duration: 0.2 }}
-                  >
-                    <Link to="/profile-edit"><li className="dropdown-user-info"><p>Hi, {userName}</p></li></Link>
-                    <hr />
-                    <Link to="/myOrders"><li><img src={assets.bag_icon} alt="Orders" /><p>Orders</p></li></Link>
-                    <Link to="/partner-with-us"><li><img src={assets.agent} alt="agents" /><p>Partner with us</p></li></Link>
-                    <Link to="/address"><li><img src={assets.ping} alt="address" /><p>Saved Address</p></li></Link>
-                    <Link to="/reviews-user"><li><img src={assets.review} alt="reviews" /><p>My Reviews</p></li></Link>
+            // This entire block shows only when the user is logged in
+            <>
+              <motion.div className="navbar-cart-icon" whileHover={{ scale: 1.1 }}>
+                <Link to='/cart'>
+                  <img src={assets.basket_icon} alt="Cart" />
+                  {totalCartItems > 0 && <div className="dot">{totalCartItems}</div>}
+                </Link>
+              </motion.div>
 
-                    <hr />
-                    <li onClick={handleLogout}><img src={assets.logout_icon} alt="Logout" /><p>Logout</p></li>
-                  </motion.ul>
-                )}
-              </AnimatePresence>
-            </div>
+              <motion.div className="favorites" whileHover={{ scale: 1.1 }}>
+                <Link to='/wishList'>
+                  <img src={assets.save} alt="Wish List" />
+                  {wishlistCount > 0 && <div className="dot">{wishlistCount}</div>}
+                </Link>
+              </motion.div>
+
+              <div 
+                className="navbar-profile" 
+                onMouseEnter={() => setShowDropdown(true)} 
+                onMouseLeave={() => setShowDropdown(false)}
+              >
+                <img src={assets.user} alt="User" className="user-icon"/>
+                
+                <AnimatePresence>
+                  {showDropdown && (
+                    <motion.ul 
+                      className="navbar-profile-dropdown"
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      <Link to="/profile-edit"><li className="dropdown-user-info"><p>Hi, {userName}</p></li></Link>
+                      <hr />
+                      <Link to="/myOrders"><li><img src={assets.bag_icon} alt="Orders" /><p>Orders</p></li></Link>
+                      <Link to="/partner-with-us"><li><img src={assets.agent} alt="agents" /><p>Partner with us</p></li></Link>
+                      <Link to="/address"><li><img src={assets.ping} alt="address" /><p>Saved Address</p></li></Link>
+                      <Link to="/reviews-user"><li><img src={assets.review} alt="reviews" /><p>My Reviews</p></li></Link>
+                      <hr />
+                      <li onClick={handleLogout}><img src={assets.logout_icon} alt="Logout" /><p>Logout</p></li>
+                    </motion.ul>
+                  )}
+                </AnimatePresence>
+              </div>
+            </>
           )}
         </div>
       </motion.div>

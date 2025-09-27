@@ -7,15 +7,15 @@ export const StoreContext = createContext(null);
 const StoreContextProvider = (props) => {
   // State management
   const [cartItems, setCartItems] = useState({});
-  const [food_list, setFoodList] = useState([]); 
+  const [food_list, setFoodList] = useState([]);
   const [restaurant_list, setRestaurantList] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   
-  // Backend URL configuration - safe for all environments
+  // Backend URL configuration
   const BACKEND_URL = "https://snap-dish.onrender.com";
   const url = BACKEND_URL;
   
-  // Auth state (using in-memory storage instead of localStorage)
+  // Auth state
   const [token, setToken] = useState("");
   const [userName, setUserName] = useState("");
   
@@ -25,7 +25,7 @@ const StoreContextProvider = (props) => {
   const [pendingItem, setPendingItem] = useState(null);
   const [wishlistItems, setWishlistItems] = useState([]);
   const [orders, setOrders] = useState([]);
-  const [savedAddresses, setSavedAddresses] = useState([]); 
+  const [savedAddresses, setSavedAddresses] = useState([]);
 
   // Location state
   const [location, setLocation] = useState({
@@ -34,10 +34,10 @@ const StoreContextProvider = (props) => {
     longitude: 76.9038,
   });
 
-  // API functions
+  // API functions with fallback mock data
   const fetchFoodList = async () => {
     try {
-      const response = await axios.get(`${url}/api/menuItem/list`);
+      const response = await axios.get(`${url}/api/menu/list`);
       if (response.data.success) {
         setFoodList(response.data.data || []);
       } else {
@@ -46,18 +46,21 @@ const StoreContextProvider = (props) => {
       }
     } catch (error) {
       console.error("Error fetching food list:", error);
-      setFoodList([]);
+      const mockFoodData = [
+        { _id: "1", name: "Margherita Pizza", description: "Classic pizza with tomato sauce and mozzarella", price: 299, category: "Pizza", is_veg: true, restaurant_id: "r1", image: "pizza1.jpg", rating: 4.5 },
+        { _id: "2", name: "Chicken Biryani", description: "Aromatic rice dish with tender chicken", price: 349, category: "Biryani", is_veg: false, restaurant_id: "r2", image: "biryani1.jpg", rating: 4.8 }
+      ];
+      setFoodList(mockFoodData);
       if (toast) {
-        toast.error("Error connecting to the server.");
+        toast.error("Using mock data - Backend unavailable");
       }
     }
   };
 
   const fetchRestaurantList = async () => {
     try {
-      const response = await axios.get(`${url}/api/restaurant`);
+      const response = await axios.get(`${url}/api/restaurants`);
       if (response.data.success) {
-        // Sort by rating (highest first) for homepage display
         const sortedRestaurants = (response.data.data || []).sort((a, b) => (b.rating || 0) - (a.rating || 0));
         setRestaurantList(sortedRestaurants);
       } else {
@@ -66,9 +69,13 @@ const StoreContextProvider = (props) => {
       }
     } catch (error) {
       console.error("Error fetching restaurants:", error);
-      setRestaurantList([]);
+      const mockRestaurantData = [
+        { _id: "r1", name: "Pizza Palace", cuisine: "Italian", rating: 4.5, timing: "30-40 mins", address: "123 Main St, City", price_for_two: 600, people: 2.3, image: "restaurant1.jpg" },
+        { _id: "r2", name: "Biryani House", cuisine: "Indian", rating: 4.3, timing: "25-35 mins", address: "456 Food St, City", price_for_two: 500, people: 1.8, image: "restaurant2.jpg" }
+      ];
+      setRestaurantList(mockRestaurantData);
       if (toast) {
-        toast.error("Error connecting to the server.");
+        toast.error("Using mock data - Backend unavailable");
       }
     }
   };
@@ -77,17 +84,13 @@ const StoreContextProvider = (props) => {
   const fetchAddresses = async () => {
     if (!token) return;
     try {
-      const res = await axios.get(`${url}/api/address`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const res = await axios.get(`${url}/api/address`, { headers: { Authorization: `Bearer ${token}` } });
       if (res.data.success) {
         setSavedAddresses(res.data.data || []);
       }
     } catch (error) {
       console.error("Error fetching addresses:", error);
-      if (toast) {
-        toast.error("Failed to load addresses");
-      }
+      if (toast) toast.error("Failed to load addresses");
     }
   };
 
@@ -278,28 +281,33 @@ const StoreContextProvider = (props) => {
 
   // Auth functions
   const logout = () => {
-    try {
-      setToken("");
-      setUserName("");
-      setCartItems({});
-      setWishlistItems([]);
-      setSavedAddresses([]);
-    } catch (error) {
-      console.error("Error during logout:", error);
-    }
+    localStorage.removeItem("token");
+    localStorage.removeItem("userName");
+    localStorage.removeItem("role");
+    
+    setToken("");
+    setUserName("");
+    setCartItems({});
+    setWishlistItems([]);
+    setSavedAddresses([]);
   };
 
   // Effects
   useEffect(() => {
-    const initializeData = async () => {
-      try {
-        await Promise.all([fetchFoodList(), fetchRestaurantList()]);
-      } catch (error) {
-        console.error("Error initializing data:", error);
+    const loadInitialData = async () => {
+      const storedToken = localStorage.getItem("token");
+      if (storedToken) {
+        setToken(storedToken);
       }
+      const storedUserName = localStorage.getItem("userName");
+      if (storedUserName) {
+        setUserName(storedUserName);
+      }
+      
+      await Promise.all([fetchFoodList(), fetchRestaurantList()]);
     };
-    
-    initializeData();
+
+    loadInitialData();
   }, []);
 
   useEffect(() => {

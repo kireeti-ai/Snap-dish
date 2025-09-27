@@ -6,7 +6,7 @@ const restaurantSchema = new mongoose.Schema({
   address: { type: String, required: true },
   cuisine: { type: String, required: true },
   price_for_two: { type: Number, required: true },
-  status: { type: String, enum: ['active','inactive'], default:'pending_approval' },
+  status: { type: String, enum: ['active','inactive','pending_approval'], default:'pending_approval' },
   timing: { type: String },
   image: { type: String } 
 });

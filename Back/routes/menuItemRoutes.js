@@ -20,7 +20,7 @@ const upload = multer({ storage: storage });
 menuItemRouter.post("/add", protect, upload.single("image"), addMenuItem);
 menuItemRouter.get("/list", listAllMenuItems);
 menuItemRouter.get("/list/:restaurantId", listMenuItemsByRestaurant);
-menuItemRouter.post("/remove", protect, removeMenuItem);
+menuItemRouter.post("/remove/:id", protect, removeMenuItem);
 menuItemRouter.put("/update", protect, upload.single("image"), updateMenuItem); 
 
 export default menuItemRouter;

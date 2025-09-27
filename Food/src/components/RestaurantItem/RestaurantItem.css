@@ -1,25 +1,27 @@
 .restaurant-box {
-
-    width: 100%; 
-    margin: 0; 
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    transition: transform 0.3s ease-in-out;
+    width: 100%;
+    max-width: 350px;
+    margin: 15px auto;
+    border-radius: 12px;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
     background-color: #fff;
     overflow: hidden;
+    cursor: pointer;
 }
 
 .restaurant-box:hover {
-    transform: translateY(-5px);
+    transform: translateY(-6px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.18);
 }
-
 
 .restaurant-img-box {
     width: 100%;
-    height: 180px;
+    height: 200px;
     overflow: hidden;
-    border-top-left-radius: 10px;
-    border-top-right-radius: 10px;
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+    background-color: #f0f0f0;
 }
 
 .restaurant-img {
@@ -27,32 +29,87 @@
     height: 100%;
     object-fit: cover;
     display: block;
+    transition: transform 0.3s ease;
+}
+
+.restaurant-box:hover .restaurant-img {
+    transform: scale(1.05);
 }
 
 .restaurant-info {
-    padding: 15px;
+    padding: 16px 18px;
 }
 
 .restaurant-name-rate {
     display: flex;
     flex-direction: column;
-    gap: 5px;
-    margin-bottom: 10px;
+    gap: 6px;
+    margin-bottom: 12px;
 }
 
-.restaurant-name-rate p:first-child {
-    font-size: 1.2em;
-    font-weight: bold;
-    color: #333;
+.restaurant-name {
+    font-size: 1.3em;
+    font-weight: 600;
+    color: #222;
+    margin: 0;
 }
 
-.restaurant-name-rate p {
+.restaurant-rating-time {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.rating-section, .timing-section {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.85em;
+    color: #666;
+}
+
+.rating-icon, .time-icon {
+    width: 14px;
+    height: 14px;
+}
+
+.people-count {
+    font-size: 0.8em;
+    color: #999;
+}
+
+.bullet {
+    font-size: 1em;
+    margin: 0 4px;
+    color: #ccc;
+}
+
+.cuisine-type, .restaurant-address, .price-for-two {
     font-size: 0.9em;
     color: #555;
-    margin: 0;
+    margin: 4px 0;
+}
+
+.price-for-two {
+    font-weight: 500;
+    color: #333;
 }
 
 .restaurant-box-link {
     text-decoration: none;
     color: inherit;
+    display: block;
+    transition: all 0.3s ease;
+}
+
+@media (max-width: 768px) {
+    .restaurant-box {
+        max-width: 100%;
+        margin: 10px 0;
+    }
+
+    .restaurant-img-box {
+        height: 160px;
+    }
 }

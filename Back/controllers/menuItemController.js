@@ -71,7 +71,7 @@ export const removeMenuItem = async (req, res) => {
     try {
         const menuItem = await menuItemModel.findById(req.body.id);
         if (!menuItem) {
-            return res.json({ success: false, message: "Menu item not found" });
+            return res.status(404).json({ success: false, message: "Menu item not found" });
         }
 
         // ADDED: Verify ownership
@@ -81,7 +81,7 @@ export const removeMenuItem = async (req, res) => {
         });
         
         if (!restaurant) {
-            return res.json({ success: false, message: "Unauthorized" });
+            return res.status(403).json({ success: false, message: "Unauthorized" });
         }
         
         fs.unlink(`uploads/foods/${menuItem.image}`, (err) => {
@@ -89,10 +89,11 @@ export const removeMenuItem = async (req, res) => {
         });
         
         await menuItemModel.findByIdAndDelete(req.body.id);
-        res.json({ success: true, message: "Menu Item Removed" });
+         res.json({ success: true, message: "Menu Item Removed" });
+
     } catch (error) {
         console.log(error);
-        res.json({ success: false, message: "Error removing menu item" });
+        res.status(500).json({ success: false, message: "Error removing menu item" });
     }
 };
 
