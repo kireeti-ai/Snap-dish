@@ -1,5 +1,4 @@
 import React, { useContext } from "react";
-import { RestaurantContext } from "../../Context/RestaurantContext";
 import { motion } from "framer-motion";
 import './MyReviews.css';
 

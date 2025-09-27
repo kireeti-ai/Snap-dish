@@ -3,10 +3,27 @@ import './FoodItem.css';
 import { assets } from '../../assets/assets.js';
 import { StoreContext } from '../../Context/StoreContext';
 
-const FoodItem = ({ id, name, price, description, image }) => {
-    const { cartItems, addToCart, removeFromCart, wishlistItems, addToWishlist, removeFromWishlist } = useContext(StoreContext);
+const FoodItem = ({ id, name, price, description, image, is_veg, restaurant_id }) => {
+    const { 
+        cartItems, 
+        addToCart, 
+        removeFromCart, 
+        wishlistItems, 
+        addToWishlist, 
+        removeFromWishlist,
+        BACKEND_URL 
+    } = useContext(StoreContext);
 
     const isWishlisted = wishlistItems.includes(id);
+
+    // Handle image URL - if it's already a full URL, use as is; otherwise prepend backend URL
+    const getImageUrl = (imagePath) => {
+        if (!imagePath) return '/placeholder-food.jpg'; // fallback image
+        if (imagePath.startsWith('http')) return imagePath;
+        return `${BACKEND_URL}/uploads/foods/${imagePath}`;
+    };
+
+    const imageUrl = getImageUrl(image);
 
     return (
         <div className='food-item'>
@@ -18,7 +35,15 @@ const FoodItem = ({ id, name, price, description, image }) => {
                     alt="Add to wishlist"
                 />
 
-                <img className="food-item-image" src={image} alt={name} />
+                <img 
+                    className="food-item-image" 
+                    src={imageUrl} 
+                    alt={name} 
+                    onError={(e) => {
+                        // Fallback if image fails to load
+                        e.target.src = '/placeholder-food.jpg';
+                    }}
+                />
 
                 {!cartItems[id] ?
                     <img
@@ -45,12 +70,21 @@ const FoodItem = ({ id, name, price, description, image }) => {
             </div>
             <div className="food-item-info">
                 <div className="food-item-name-rating">
-                    <p>{name}</p>
-                                        <div className="item-rating">
+                    <p className="food-item-name">{name}</p>
+                    <div className="item-rating">
                         <span>⭐ 4.2</span>
                     </div>
                 </div>
-                <p className='food-item-disc'>{description}</p>
+                
+                {/* Veg/Non-veg indicator */}
+                <div className="food-item-type">
+                    <div className={`veg-indicator ${is_veg ? 'veg' : 'non-veg'}`}>
+                        <div className={`dot ${is_veg ? 'green' : 'red'}`}></div>
+                    </div>
+                    <span className="veg-label">{is_veg ? 'Veg' : 'Non-Veg'}</span>
+                </div>
+                
+                <p className='food-item-desc'>{description}</p>
                 <p className='food-item-price'>₹{price}</p>
             </div>
         </div>

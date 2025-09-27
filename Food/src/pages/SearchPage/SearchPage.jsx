@@ -1,12 +1,11 @@
 import React, { useContext, useState, useEffect } from 'react';
 import './SearchPage.css';
-import { StoreContext } from '../../Context/StoreContext';
-import { RestaurantContext } from '../../Context/RestaurantContext';
+import { StoreContext } from '../../Context/StoreContext'; // Fixed import
 import FoodItem from '../../components/FoodItem/FoodItem';
 import RestaurantItem from "../../components/RestaurantItem/RestaurantItem";
+
 const SearchPage = () => {
-  const { food_list } = useContext(StoreContext);
-  const { restaurant_list } = useContext(RestaurantContext);
+  const { food_list, restaurant_list } = useContext(StoreContext); // Fixed: using StoreContext
 
   const [searchQuery, setSearchQuery] = useState("");
   const [activeFilters, setActiveFilters] = useState({
@@ -14,7 +13,7 @@ const SearchPage = () => {
     rating: 0,
     price: 'Any',
     sortBy: 'relevance',
-    searchIn: 'All' // NEW → All, Foods, Restaurants
+    searchIn: 'All' // All, Foods, Restaurants
   });
 
   const [filteredResults, setFilteredResults] = useState([]);
@@ -31,27 +30,40 @@ const SearchPage = () => {
     }
 
     // Apply search
-    if (searchQuery) {
-      results = results.filter(item =>
-        item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        (item.description && item.description.toLowerCase().includes(searchQuery.toLowerCase()))
-      );
+    if (searchQuery.trim()) {
+      results = results.filter(item => {
+        const searchLower = searchQuery.toLowerCase();
+        const nameMatch = item.name.toLowerCase().includes(searchLower);
+        const descMatch = item.description && item.description.toLowerCase().includes(searchLower);
+        const cuisineMatch = item.cuisine && item.cuisine.toLowerCase().includes(searchLower);
+        const categoryMatch = item.category && item.category.toLowerCase().includes(searchLower);
+        
+        return nameMatch || descMatch || cuisineMatch || categoryMatch;
+      });
     }
 
     // Filters for foods only
     if (activeFilters.searchIn !== "Restaurants") {
       if (activeFilters.category !== 'All') {
-        results = results.filter(item => item.type === "food" && item.category === activeFilters.category);
+        results = results.filter(item => {
+          if (item.type === "restaurant") return true; // keep restaurants when filtering by category
+          return item.category === activeFilters.category || 
+                 (activeFilters.category === 'Veg' && item.is_veg) ||
+                 (activeFilters.category === 'Non-Veg' && !item.is_veg);
+        });
       }
+      
       if (activeFilters.rating > 0) {
-        results = results.filter(item => item.rating >= activeFilters.rating);
+        results = results.filter(item => (item.rating || 0) >= activeFilters.rating);
       }
+      
       if (activeFilters.price !== 'Any') {
         results = results.filter(item => {
           if (item.type !== "food") return true; // skip restaurants for price filter
-          if (activeFilters.price === 'Under ₹200') return item.price < 200;
-          if (activeFilters.price === '₹200-₹400') return item.price >= 200 && item.price <= 400;
-          if (activeFilters.price === 'Over ₹400') return item.price > 400;
+          const price = item.price || 0;
+          if (activeFilters.price === 'Under ₹200') return price < 200;
+          if (activeFilters.price === '₹200-₹400') return price >= 200 && price <= 400;
+          if (activeFilters.price === 'Over ₹400') return price > 400;
           return true;
         });
       }
@@ -63,10 +75,18 @@ const SearchPage = () => {
         case 'rating':
           return (b.rating || 0) - (a.rating || 0);
         case 'price_asc':
+          if (a.type === "restaurant" && b.type === "restaurant") {
+            return (a.price_for_two || 0) - (b.price_for_two || 0);
+          }
           return (a.price || 0) - (b.price || 0);
         case 'price_desc':
+          if (a.type === "restaurant" && b.type === "restaurant") {
+            return (b.price_for_two || 0) - (a.price_for_two || 0);
+          }
           return (b.price || 0) - (a.price || 0);
-        default:
+        case 'name':
+          return a.name.localeCompare(b.name);
+        default: // relevance
           return 0;
       }
     });
@@ -81,17 +101,52 @@ const SearchPage = () => {
     }));
   };
 
+  // Get unique categories from food items
+  const getCategories = () => {
+    const categories = new Set(['All']);
+    food_list.forEach(food => {
+      if (food.category) categories.add(food.category);
+    });
+    categories.add('Veg');
+    categories.add('Non-Veg');
+    return Array.from(categories);
+  };
+
   return (
     <div className="search-page">
       <aside className="filter-sidebar">
         <h3>Filters</h3>
 
-        {/* NEW → Search In filter */}
+        {/* Search In filter */}
         <div className="filter-group">
           <h4>Search In</h4>
-          <label><input type="radio" name="searchIn" checked={activeFilters.searchIn === 'All'} onChange={() => handleFilterChange('searchIn', 'All')} /> All</label>
-          <label><input type="radio" name="searchIn" checked={activeFilters.searchIn === 'Foods'} onChange={() => handleFilterChange('searchIn', 'Foods')} /> Foods</label>
-          <label><input type="radio" name="searchIn" checked={activeFilters.searchIn === 'Restaurants'} onChange={() => handleFilterChange('searchIn', 'Restaurants')} /> Restaurants</label>
+          <label>
+            <input 
+              type="radio" 
+              name="searchIn" 
+              checked={activeFilters.searchIn === 'All'} 
+              onChange={() => handleFilterChange('searchIn', 'All')} 
+            /> 
+            All
+          </label>
+          <label>
+            <input 
+              type="radio" 
+              name="searchIn" 
+              checked={activeFilters.searchIn === 'Foods'} 
+              onChange={() => handleFilterChange('searchIn', 'Foods')} 
+            /> 
+            Foods
+          </label>
+          <label>
+            <input 
+              type="radio" 
+              name="searchIn" 
+              checked={activeFilters.searchIn === 'Restaurants'} 
+              onChange={() => handleFilterChange('searchIn', 'Restaurants')} 
+            /> 
+            Restaurants
+          </label>
         </div>
 
         {/* Keep food-only filters visible only if searching foods */}
@@ -99,27 +154,140 @@ const SearchPage = () => {
           <>
             <div className="filter-group">
               <h4>Category</h4>
-              <label><input type="radio" name="category" checked={activeFilters.category === 'All'} onChange={() => handleFilterChange('category', 'All')} /> All</label>
-              <label><input type="radio" name="category" checked={activeFilters.category === 'Veg'} onChange={() => handleFilterChange('category', 'Veg')} /> Veg</label>
-              <label><input type="radio" name="category" checked={activeFilters.category === 'Non-Veg'} onChange={() => handleFilterChange('category', 'Non-Veg')} /> Non-Veg</label>
+              {getCategories().map(category => (
+                <label key={category}>
+                  <input 
+                    type="radio" 
+                    name="category" 
+                    checked={activeFilters.category === category} 
+                    onChange={() => handleFilterChange('category', category)} 
+                  /> 
+                  {category}
+                </label>
+              ))}
             </div>
 
             <div className="filter-group">
               <h4>Rating</h4>
-              <label><input type="radio" name="rating" checked={activeFilters.rating === 4} onChange={() => handleFilterChange('rating', 4)} /> 4 ★ & above</label>
-              <label><input type="radio" name="rating" checked={activeFilters.rating === 3} onChange={() => handleFilterChange('rating', 3)} /> 3 ★ & above</label>
-              <label><input type="radio" name="rating" checked={activeFilters.rating === 0} onChange={() => handleFilterChange('rating', 0)} /> All Ratings</label>
+              <label>
+                <input 
+                  type="radio" 
+                  name="rating" 
+                  checked={activeFilters.rating === 4} 
+                  onChange={() => handleFilterChange('rating', 4)} 
+                /> 
+                4 ★ & above
+              </label>
+              <label>
+                <input 
+                  type="radio" 
+                  name="rating" 
+                  checked={activeFilters.rating === 3} 
+                  onChange={() => handleFilterChange('rating', 3)} 
+                /> 
+                3 ★ & above
+              </label>
+              <label>
+                <input 
+                  type="radio" 
+                  name="rating" 
+                  checked={activeFilters.rating === 0} 
+                  onChange={() => handleFilterChange('rating', 0)} 
+                /> 
+                All Ratings
+              </label>
             </div>
             
             <div className="filter-group">
               <h4>Price Range</h4>
-              <label><input type="radio" name="price" checked={activeFilters.price === 'Any'} onChange={() => handleFilterChange('price', 'Any')} /> Any</label>
-              <label><input type="radio" name="price" checked={activeFilters.price === 'Under ₹200'} onChange={() => handleFilterChange('price', 'Under ₹200')} /> Under ₹200</label>
-              <label><input type="radio" name="price" checked={activeFilters.price === '₹200-₹400'} onChange={() => handleFilterChange('price', '₹200-₹400')} /> ₹200 - ₹400</label>
-              <label><input type="radio" name="price" checked={activeFilters.price === 'Over ₹400'} onChange={() => handleFilterChange('price', 'Over ₹400')} /> Over ₹400</label>
+              <label>
+                <input 
+                  type="radio" 
+                  name="price" 
+                  checked={activeFilters.price === 'Any'} 
+                  onChange={() => handleFilterChange('price', 'Any')} 
+                /> 
+                Any
+              </label>
+              <label>
+                <input 
+                  type="radio" 
+                  name="price" 
+                  checked={activeFilters.price === 'Under ₹200'} 
+                  onChange={() => handleFilterChange('price', 'Under ₹200')} 
+                /> 
+                Under ₹200
+              </label>
+              <label>
+                <input 
+                  type="radio" 
+                  name="price" 
+                  checked={activeFilters.price === '₹200-₹400'} 
+                  onChange={() => handleFilterChange('price', '₹200-₹400')} 
+                /> 
+                ₹200 - ₹400
+              </label>
+              <label>
+                <input 
+                  type="radio" 
+                  name="price" 
+                  checked={activeFilters.price === 'Over ₹400'} 
+                  onChange={() => handleFilterChange('price', 'Over ₹400')} 
+                /> 
+                Over ₹400
+              </label>
             </div>
           </>
         )}
+
+        <div className="filter-group">
+          <h4>Sort By</h4>
+          <label>
+            <input 
+              type="radio" 
+              name="sortBy" 
+              checked={activeFilters.sortBy === 'relevance'} 
+              onChange={() => handleFilterChange('sortBy', 'relevance')} 
+            /> 
+            Relevance
+          </label>
+          <label>
+            <input 
+              type="radio" 
+              name="sortBy" 
+              checked={activeFilters.sortBy === 'rating'} 
+              onChange={() => handleFilterChange('sortBy', 'rating')} 
+            /> 
+            Rating
+          </label>
+          <label>
+            <input 
+              type="radio" 
+              name="sortBy" 
+              checked={activeFilters.sortBy === 'price_asc'} 
+              onChange={() => handleFilterChange('sortBy', 'price_asc')} 
+            /> 
+            Price: Low to High
+          </label>
+          <label>
+            <input 
+              type="radio" 
+              name="sortBy" 
+              checked={activeFilters.sortBy === 'price_desc'} 
+              onChange={() => handleFilterChange('sortBy', 'price_desc')} 
+            /> 
+            Price: High to Low
+          </label>
+          <label>
+            <input 
+              type="radio" 
+              name="sortBy" 
+              checked={activeFilters.sortBy === 'name'} 
+              onChange={() => handleFilterChange('sortBy', 'name')} 
+            /> 
+            Name (A-Z)
+          </label>
+        </div>
       </aside>
 
       <main className="search-results-content">
@@ -133,17 +301,23 @@ const SearchPage = () => {
           />
           <div className="sort-by">
             <label htmlFor="sort">Sort by:</label>
-            <select id="sort" value={activeFilters.sortBy} onChange={(e) => handleFilterChange('sortBy', e.target.value)}>
+            <select 
+              id="sort" 
+              value={activeFilters.sortBy} 
+              onChange={(e) => handleFilterChange('sortBy', e.target.value)}
+            >
               <option value="relevance">Relevance</option>
               <option value="rating">Rating</option>
               <option value="price_asc">Price: Low to High</option>
               <option value="price_desc">Price: High to Low</option>
+              <option value="name">Name (A-Z)</option>
             </select>
           </div>
         </div>
         
         <h2 className="results-heading">
-          {searchQuery ? `Results for "${searchQuery}"` : "All Items"}
+          {searchQuery ? `Results for "${searchQuery}"` : "All Items"} 
+          <span className="result-count">({filteredResults.length} items)</span>
         </h2>
 
         <div className="results-grid">
@@ -151,29 +325,55 @@ const SearchPage = () => {
             filteredResults.map(item => (
               item.type === "food" ? (
                 <FoodItem 
-                  key={item._id} 
+                  key={`food-${item._id}`} 
                   id={item._id} 
                   name={item.name}
                   price={item.price}
                   description={item.description}
                   image={item.image}
+                  is_veg={item.is_veg}
+                  restaurant_id={item.restaurant_id}
                 />
               ) : (
-<RestaurantItem
-  key={item._id}
-  id={item._id}
-  name={item.name}
-  cuisine={item.cuisine}
-  rating={item.rating}
-  time={item.time}
-  image={item.image}
-  address={item.address}
-  price_for_two={item.price_for_two}
-/>
+                <RestaurantItem
+                  key={`restaurant-${item._id}`}
+                  id={item._id}
+                  name={item.name}
+                  cuisine={item.cuisine}
+                  rating={item.rating}
+                  time={item.timing || item.time}
+                  image={item.image}
+                  address={item.address}
+                  price_for_two={item.price_for_two}
+                  people={item.people}
+                />
               )
             ))
           ) : (
-            <p className="no-results">No items match your search or filters.</p>
+            <div className="no-results">
+              <h3>No items found</h3>
+              <p>
+                {searchQuery 
+                  ? `No items match your search "${searchQuery}" or current filters.`
+                  : "No items match your current filters."
+                }
+              </p>
+              <button 
+                className="clear-filters-btn"
+                onClick={() => {
+                  setSearchQuery("");
+                  setActiveFilters({
+                    category: 'All',
+                    rating: 0,
+                    price: 'Any',
+                    sortBy: 'relevance',
+                    searchIn: 'All'
+                  });
+                }}
+              >
+                Clear All Filters
+              </button>
+            </div>
           )}
         </div>
       </main>

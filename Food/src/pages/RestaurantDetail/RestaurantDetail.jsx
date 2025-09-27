@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { RestaurantContext } from '../../Context/RestaurantContext';
+import {  } from '../../Context/StoreContext';
 import { food_list } from '../../assets/assets';
 import './RestaurantDetail.css';
 import { assets } from '../../assets/assets';

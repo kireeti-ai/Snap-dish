@@ -1,8 +1,8 @@
 import React, { useContext } from "react"
 import "./RestaurantDisplay.css"
-import { RestaurantContext } from "../../Context/RestaurantContext.jsx"
 import RestaurantItem from "../RestaurantItem/RestaurantItem"
 import { motion } from "framer-motion"
+import { StoreContext } from "../../Context/StoreContext" // Fixed import
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -28,7 +28,11 @@ const itemVariants = {
 }
 
 const RestaurantDisplay = () => {
-  const { restaurant_list } = useContext(RestaurantContext)
+  // Fixed: Using StoreContext instead of RestaurantContext
+  const { restaurant_list } = useContext(StoreContext)
+
+  // Display top rated restaurants (limited to first 8 for homepage)
+  const topRestaurants = restaurant_list.slice(0, 8);
 
   return (
     <div className="restaurant-display">
@@ -39,14 +43,14 @@ const RestaurantDisplay = () => {
         initial="hidden"
         animate="show"
       >
-        {restaurant_list.map((item, index) => (
+        {topRestaurants.map((item, index) => (
           <motion.div key={item._id} variants={itemVariants}>
             <RestaurantItem
               id={item._id}
               name={item.name}
               cuisine={item.cuisine}
               rating={item.rating}
-              time={item.time}
+              time={item.timing || item.time} // Handle both timing and time fields
               image={item.image}
               price_for_two={item.price_for_two}
               people={item.people}
@@ -55,6 +59,10 @@ const RestaurantDisplay = () => {
           </motion.div>
         ))}
       </motion.div>
+      
+      {restaurant_list.length === 0 && (
+        <p className="no-restaurants">No restaurants available at the moment.</p>
+      )}
     </div>
   )
 }

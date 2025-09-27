@@ -5,12 +5,21 @@ import { toast } from "react-toastify";
 export const StoreContext = createContext(null);
 
 const StoreContextProvider = (props) => {
+  // State management
   const [cartItems, setCartItems] = useState({});
   const [food_list, setFoodList] = useState([]); 
+  const [restaurant_list, setRestaurantList] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
-  const url = "https://snap-dish.onrender.com";
-  const [token, setToken] = useState(localStorage.getItem("token") || "");
-  const [userName, setUserName] = useState(localStorage.getItem("userName") || "");
+  
+  // Backend URL configuration - safe for all environments
+  const BACKEND_URL = "https://snap-dish.onrender.com";
+  const url = BACKEND_URL;
+  
+  // Auth state (using in-memory storage instead of localStorage)
+  const [token, setToken] = useState("");
+  const [userName, setUserName] = useState("");
+  
+  // Cart and order management
   const [cartRestaurant, setCartRestaurant] = useState(null);
   const [showRestaurantPrompt, setShowRestaurantPrompt] = useState(false);
   const [pendingItem, setPendingItem] = useState(null);
@@ -18,26 +27,53 @@ const StoreContextProvider = (props) => {
   const [orders, setOrders] = useState([]);
   const [savedAddresses, setSavedAddresses] = useState([]); 
 
+  // Location state
   const [location, setLocation] = useState({
     address: "Ettimadai, Coimbatore",
     latitude: 10.8817,
     longitude: 76.9038,
   });
 
+  // API functions
   const fetchFoodList = async () => {
     try {
-      const response = await axios.get(`${url}/api/food/list`);
+      const response = await axios.get(`${url}/api/menuItem/list`);
       if (response.data.success) {
-        setFoodList(response.data.data);
+        setFoodList(response.data.data || []);
       } else {
-        toast.error("Failed to fetch food list.");
+        console.error("Failed to fetch food list:", response.data.message);
+        setFoodList([]);
       }
     } catch (error) {
-      toast.error("Error connecting to the server.");
+      console.error("Error fetching food list:", error);
+      setFoodList([]);
+      if (toast) {
+        toast.error("Error connecting to the server.");
+      }
     }
   };
 
-  // ---------------- ADDRESS API ----------------
+  const fetchRestaurantList = async () => {
+    try {
+      const response = await axios.get(`${url}/api/restaurant`);
+      if (response.data.success) {
+        // Sort by rating (highest first) for homepage display
+        const sortedRestaurants = (response.data.data || []).sort((a, b) => (b.rating || 0) - (a.rating || 0));
+        setRestaurantList(sortedRestaurants);
+      } else {
+        console.error("Failed to fetch restaurant list:", response.data.message);
+        setRestaurantList([]);
+      }
+    } catch (error) {
+      console.error("Error fetching restaurants:", error);
+      setRestaurantList([]);
+      if (toast) {
+        toast.error("Error connecting to the server.");
+      }
+    }
+  };
+
+  // Address API functions
   const fetchAddresses = async () => {
     if (!token) return;
     try {
@@ -45,10 +81,13 @@ const StoreContextProvider = (props) => {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (res.data.success) {
-        setSavedAddresses(res.data.data);
+        setSavedAddresses(res.data.data || []);
       }
     } catch (error) {
-      toast.error("Failed to load addresses");
+      console.error("Error fetching addresses:", error);
+      if (toast) {
+        toast.error("Failed to load addresses");
+      }
     }
   };
 
@@ -59,10 +98,15 @@ const StoreContextProvider = (props) => {
       });
       if (res.data.success) {
         setSavedAddresses((prev) => [...prev, res.data.data]);
-        toast.success("Address added");
+        if (toast) {
+          toast.success("Address added");
+        }
       }
     } catch (error) {
-      toast.error("Failed to add address");
+      console.error("Error adding address:", error);
+      if (toast) {
+        toast.error("Failed to add address");
+      }
     }
   };
 
@@ -75,10 +119,15 @@ const StoreContextProvider = (props) => {
         setSavedAddresses((prev) =>
           prev.map((addr) => (addr._id === addressData._id ? res.data.data : addr))
         );
-        toast.success("Address updated");
+        if (toast) {
+          toast.success("Address updated");
+        }
       }
     } catch (error) {
-      toast.error("Failed to update address");
+      console.error("Error updating address:", error);
+      if (toast) {
+        toast.error("Failed to update address");
+      }
     }
   };
 
@@ -89,10 +138,15 @@ const StoreContextProvider = (props) => {
       });
       if (res.data.success) {
         setSavedAddresses((prev) => prev.filter((addr) => addr._id !== id));
-        toast.success("Address deleted");
+        if (toast) {
+          toast.success("Address deleted");
+        }
       }
     } catch (error) {
-      toast.error("Failed to delete address");
+      console.error("Error deleting address:", error);
+      if (toast) {
+        toast.error("Failed to delete address");
+      }
     }
   };
 
@@ -107,124 +161,159 @@ const StoreContextProvider = (props) => {
         await updateAddress(selected);
       }
     } catch (error) {
-      toast.error("Failed to set default address");
+      console.error("Error setting default address:", error);
+      if (toast) {
+        toast.error("Failed to set default address");
+      }
     }
   };
 
-  // ---------------- CART LOGIC ----------------
+  // Cart logic
   const addToCart = (itemId) => {
-    const itemToAdd = food_list.find((product) => product._id === itemId);
-    if (!itemToAdd) return;
+    try {
+      const itemToAdd = food_list.find((product) => product._id === itemId);
+      if (!itemToAdd) return;
 
-    const itemRestaurantId = itemToAdd.restaurant_id;
+      const itemRestaurantId = itemToAdd.restaurant_id;
 
-    if (Object.keys(cartItems).length === 0) {
-      setCartItems({ [itemId]: 1 });
-      setCartRestaurant(itemRestaurantId);
-    } else if (itemRestaurantId === cartRestaurant) {
-      setCartItems((prev) => ({ ...prev, [itemId]: (prev[itemId] || 0) + 1 }));
-    } else {
-      setPendingItem(itemId);
-      setShowRestaurantPrompt(true);
+      if (Object.keys(cartItems).length === 0) {
+        setCartItems({ [itemId]: 1 });
+        setCartRestaurant(itemRestaurantId);
+      } else if (itemRestaurantId === cartRestaurant) {
+        setCartItems((prev) => ({ ...prev, [itemId]: (prev[itemId] || 0) + 1 }));
+      } else {
+        setPendingItem(itemId);
+        setShowRestaurantPrompt(true);
+      }
+    } catch (error) {
+      console.error("Error adding to cart:", error);
     }
   };
 
   const clearCartAndAddToCart = () => {
-    if (!pendingItem) return;
-    const itemToAdd = food_list.find((product) => product._id === pendingItem);
-    if (!itemToAdd) return;
-    setCartItems({ [pendingItem]: 1 });
-    setCartRestaurant(itemToAdd.restaurant_id);
-    setShowRestaurantPrompt(false);
-    setPendingItem(null);
+    try {
+      if (!pendingItem) return;
+      const itemToAdd = food_list.find((product) => product._id === pendingItem);
+      if (!itemToAdd) return;
+      setCartItems({ [pendingItem]: 1 });
+      setCartRestaurant(itemToAdd.restaurant_id);
+      setShowRestaurantPrompt(false);
+      setPendingItem(null);
+    } catch (error) {
+      console.error("Error clearing cart:", error);
+    }
   };
 
   const removeFromCart = (itemId) => {
-    setCartItems((prev) => {
-      const newCartItems = { ...prev };
-      if (newCartItems[itemId] > 1) {
-        newCartItems[itemId] -= 1;
-      } else {
-        delete newCartItems[itemId];
-        if (Object.keys(newCartItems).length === 0) {
-          setCartRestaurant(null);
+    try {
+      setCartItems((prev) => {
+        const newCartItems = { ...prev };
+        if (newCartItems[itemId] > 1) {
+          newCartItems[itemId] -= 1;
+        } else {
+          delete newCartItems[itemId];
+          if (Object.keys(newCartItems).length === 0) {
+            setCartRestaurant(null);
+          }
         }
-      }
-      return newCartItems;
-    });
+        return newCartItems;
+      });
+    } catch (error) {
+      console.error("Error removing from cart:", error);
+    }
   };
 
   const getTotalCartAmount = () => {
-    let totalAmount = 0;
-    for (const item in cartItems) {
-      if (cartItems[item] > 0) {
-        let itemInfo = food_list.find((product) => product._id === item);
-        if (itemInfo) {
-          totalAmount += itemInfo.price * cartItems[item];
+    try {
+      let totalAmount = 0;
+      for (const item in cartItems) {
+        if (cartItems[item] > 0) {
+          let itemInfo = food_list.find((product) => product._id === item);
+          if (itemInfo) {
+            totalAmount += itemInfo.price * cartItems[item];
+          }
         }
       }
+      return totalAmount;
+    } catch (error) {
+      console.error("Error calculating cart total:", error);
+      return 0;
     }
-    return totalAmount;
   };
 
-  // ---------------- WISHLIST ----------------
+  // Wishlist functions
   const addToWishlist = (itemId) => {
-    if (!wishlistItems.includes(itemId)) {
-      setWishlistItems((prev) => [...prev, itemId]);
+    try {
+      if (!wishlistItems.includes(itemId)) {
+        setWishlistItems((prev) => [...prev, itemId]);
+      }
+    } catch (error) {
+      console.error("Error adding to wishlist:", error);
     }
   };
 
   const removeFromWishlist = (itemId) => {
-    setWishlistItems((prev) => prev.filter((id) => id !== itemId));
+    try {
+      setWishlistItems((prev) => prev.filter((id) => id !== itemId));
+    } catch (error) {
+      console.error("Error removing from wishlist:", error);
+    }
   };
 
-  // ---------------- ORDERS ----------------
+  // Order functions
   const placeNewOrder = (orderData) => {
-    const newOrder = {
-      ...orderData,
-      id: `ORDER${Date.now()}`,
-      date: new Date().toISOString().split("T")[0],
-      status: "Preparing",
-    };
-    setOrders((prev) => [...prev, newOrder]);
-    setCartItems({});
+    try {
+      const newOrder = {
+        ...orderData,
+        id: `ORDER${Date.now()}`,
+        date: new Date().toISOString().split("T")[0],
+        status: "Preparing",
+      };
+      setOrders((prev) => [...prev, newOrder]);
+      setCartItems({});
+    } catch (error) {
+      console.error("Error placing order:", error);
+    }
   };
 
-  // ---------------- AUTH ----------------
+  // Auth functions
   const logout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("userName");
-    setToken("");
-    setUserName("");
+    try {
+      setToken("");
+      setUserName("");
+      setCartItems({});
+      setWishlistItems([]);
+      setSavedAddresses([]);
+    } catch (error) {
+      console.error("Error during logout:", error);
+    }
   };
 
-  // ---------------- EFFECTS ----------------
+  // Effects
   useEffect(() => {
-    fetchFoodList(); 
-    const storedCart = localStorage.getItem("cartItems");
-    if (storedCart) setCartItems(JSON.parse(storedCart));
+    const initializeData = async () => {
+      try {
+        await Promise.all([fetchFoodList(), fetchRestaurantList()]);
+      } catch (error) {
+        console.error("Error initializing data:", error);
+      }
+    };
+    
+    initializeData();
   }, []);
 
   useEffect(() => {
     if (token) {
-      localStorage.setItem("token", token);
-      localStorage.setItem("userName", userName);
-      fetchAddresses(); // fetch addresses after login
+      fetchAddresses();
     }
-  }, [token, userName]);
+  }, [token]);
 
-  useEffect(() => {
-    if (Object.keys(cartItems).length > 0) {
-      localStorage.setItem("cartItems", JSON.stringify(cartItems));
-    } else {
-      localStorage.removeItem("cartItems");
-    }
-  }, [cartItems]);
-
-  // ---------------- CONTEXT VALUE ----------------
+  // Context value
   const contextValue = {
     url,
+    BACKEND_URL,
     food_list,
+    restaurant_list,
     cartItems,
     addToCart,
     removeFromCart,

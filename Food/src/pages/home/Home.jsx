@@ -2,7 +2,6 @@
 import React, { useState } from 'react';
 import Header from '../../components/Header/Header';
 
-import FoodDisplay from '../../components/FoodDisplay/FoodDisplay';
 import RestaurantDisplay from '../../components/RestaurantDisplay/RestaurantDisplay';
 
 import './Home.css'
