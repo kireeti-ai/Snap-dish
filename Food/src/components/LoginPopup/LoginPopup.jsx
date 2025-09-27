@@ -8,7 +8,7 @@ import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 
 const LoginPopup = ({ setShowLogin }) => {
-  const { url, setToken, setUserName } = useContext(StoreContext);
+  const { url, setToken, setUserName, setUserRole } = useContext(StoreContext); // added setUserRole
   const [currState, setCurrState] = useState("Login");
   const [data, setData] = useState({
     firstName: "",
@@ -45,6 +45,11 @@ const LoginPopup = ({ setShowLogin }) => {
         setIsLoading(false);
         return;
       }
+      if (data.password.length < 8) {
+        setError("Password must be at least 8 characters long");
+        setIsLoading(false);
+        return;
+      }
     }
 
     const endpoint = currState === 'Login' ? '/api/users/login' : '/api/users/register';
@@ -55,20 +60,26 @@ const LoginPopup = ({ setShowLogin }) => {
     try {
       const response = await axios.post(`${url}${endpoint}`, payload);
       console.log('Response:', response.data); 
-      if (response.data.success && response.data.token) {
-        setToken(response.data.token);
-        localStorage.setItem("token", response.data.token);
+
+      if (response.data.success) {
+        const token = response.data.token || response.data.user?.token;
+        if (token) {
+          setToken(token);
+          localStorage.setItem("token", token);
+        }
+
         const name = response.data.firstName || 
-                    (response.data.user && response.data.user.firstName) || 
-                    response.data.name || 
-                    "User";
+                     response.data.user?.firstName || 
+                     response.data.name || 
+                     "User";
         setUserName(name);
         localStorage.setItem("userName", name);
 
         // Save user role
         const userRole = response.data.role || 
-                        (response.data.user && response.data.user.role) || 
-                        "customer";
+                         response.data.user?.role || 
+                         "customer";
+        setUserRole(userRole);
         localStorage.setItem("role", userRole);
 
         toast.success(`${currState} successful!`);
@@ -87,7 +98,7 @@ const LoginPopup = ({ setShowLogin }) => {
         toast.error(errorMessage);
       }
     } catch (err) {
-      console.error('Login error:', err); // Debug log
+      console.error('Login error:', err);
       const msg = err.response?.data?.message || 
                   err.message || 
                   "Login failed. Please check your credentials.";

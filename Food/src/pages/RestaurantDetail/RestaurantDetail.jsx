@@ -23,8 +23,8 @@ const RestaurantDetail = () => {
       setRestaurant(foundRestaurant);
       
       // Corrected line: Filter food list by restaurant's unique ID
-      const filteredFood = food_list.filter(food => food.restaurant_id === foundRestaurant._id);
-      
+// This is the new, correct line
+const filteredFood = food_list.filter(food => food.restaurant_id?._id === foundRestaurant._id);      
       const categorizedMenu = filteredFood.reduce((acc, food) => {
         if (!acc[food.category]) {
           acc[food.category] = [];

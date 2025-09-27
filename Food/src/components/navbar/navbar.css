@@ -6,6 +6,7 @@ body {
   padding: 0;
 }
 
+/* Navbar Container */
 .navbar {
   display: grid;
   grid-template-columns: 1fr auto 1fr; /* left | center | right */
@@ -14,17 +15,17 @@ body {
   border-bottom: 1px solid #e0e0e0;
 }
 
-.logo {
-  width: 100px;
-  height: auto;
-  border-radius: 50%;
-}
-
+/* Left Section */
 .navbar-left {
   display: flex;
   align-items: center;
   gap: 15px;
   justify-self: start;
+}
+
+.logo {
+  width: 100px;
+  height: auto; /* remove circular border unless intentional */
 }
 
 .navbar-location {
@@ -39,8 +40,7 @@ body {
 
 .location-text {
   display: flex;
-  align-items: center;
-  gap: 6px;
+  flex-direction: column;
   overflow: hidden;
 }
 
@@ -79,11 +79,13 @@ body {
   text-decoration: none;
   color: #333;
   padding-bottom: 2px;
-  transition: border-color 0.3s;
-  padding: 20px;
+  transition: border-color 0.3s, color 0.3s;
 }
 
-
+.navbar-menu a.active {
+  border-bottom: 2px solid lightcoral;
+  color: lightcoral;
+}
 
 /* Right Section */
 .navbar-right {
@@ -93,24 +95,20 @@ body {
   justify-self: end;
 }
 
+/* Search */
 .navbar-search {
   display: flex;
   align-items: center;
-
-
   border-radius: 50px;
   border: 1px solid transparent;
   transition: all 0.3s ease;
-  
 }
-
-
-
 
 .navbar-search img {
   width: 20px;
 }
 
+/* Cart & Wishlist */
 .navbar-cart-icon,
 .favorites {
   position: relative;
@@ -123,16 +121,24 @@ body {
   height: 22px;
 }
 
-.navbar-cart-icon .dot {
+.navbar-cart-icon .dot,
+.favorites .dot {
   position: absolute;
-  top: -4px;
-  right: -6px;
-  min-width: 8px;
-  min-height: 8px;
+  top: 0;
+  right: 0;
+  transform: translate(50%, -50%);
+  width: 16px;
+  height: 16px;
   background-color: purple;
+  color: white;
+  font-size: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   border-radius: 50%;
 }
 
+/* Button */
 .navbar button {
   background: transparent;
   border: 1px solid lightcoral;
@@ -141,43 +147,37 @@ body {
   border-radius: 20px;
   font-size: 16px;
   cursor: pointer;
-  transition: background-color 0.3s, color 0.3s;
+  transition: all 0.3s;
 }
 
 .navbar button:hover {
-    background-color: lightcoral;
-    color: white;
+  background-color: lightcoral;
+  color: white;
 }
 
+/* Profile Dropdown */
 .navbar-profile {
   position: relative;
   cursor: pointer;
-  padding-bottom: 10px; 
-  margin-bottom: -10px;
 }
 
 .navbar-profile .user-icon {
-    width: 22px;
-    height: 22px;
+  width: 22px;
+  height: 22px;
 }
 
 .navbar-profile-dropdown {
   position: absolute;
-  display: none;
-  top: 100%; 
+  top: 100%;
   right: 0;
-  width: max-content; 
+  width: max-content;
   background-color: white;
   padding: 15px 20px;
   border-radius: 8px;
   border: 1px solid #e0e0e0;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
   z-index: 10;
   list-style: none;
-}
-
-.navbar-profile:hover .navbar-profile-dropdown {
-  display: block;
 }
 
 .navbar-profile-dropdown li {
@@ -209,13 +209,17 @@ body {
 }
 
 .dropdown-user-info p {
-    font-weight: 500;
+  font-weight: 500;
 }
 
 /* Responsive */
 @media (max-width: 1050px) {
   .navbar-menu {
-    display: none;
+    display: none; /* consider adding hamburger later */
+  }
+
+  .navbar {
+    grid-template-columns: 1fr auto; /* left + right only */
   }
 }
 
@@ -227,7 +231,7 @@ body {
   .logo {
     width: 80px;
   }
-  
+
   .navbar-search {
     display: none;
   }
@@ -239,11 +243,11 @@ body {
   .navbar-right {
     gap: 20px;
   }
-  
+
   .favorites {
     display: none;
   }
-  
+
   .navbar button {
     padding: 6px 15px;
     font-size: 14px;

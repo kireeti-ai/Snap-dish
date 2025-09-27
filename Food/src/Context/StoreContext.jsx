@@ -10,14 +10,14 @@ const StoreContextProvider = (props) => {
   const [food_list, setFoodList] = useState([]);
   const [restaurant_list, setRestaurantList] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
-  
-  // Backend URL configuration
-  const BACKEND_URL = "https://snap-dish.onrender.com";
+ 
+  const BACKEND_URL = "http;//localhost:4000";
   const url = BACKEND_URL;
   
   // Auth state
   const [token, setToken] = useState("");
   const [userName, setUserName] = useState("");
+  const [userRole, setUserRole] = useState("customer"); 
   
   // Cart and order management
   const [cartRestaurant, setCartRestaurant] = useState(null);
@@ -278,32 +278,32 @@ const StoreContextProvider = (props) => {
       console.error("Error placing order:", error);
     }
   };
-
-  // Auth functions
   const logout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("userName");
     localStorage.removeItem("role");
-    
+
     setToken("");
     setUserName("");
+    setUserRole("customer");
     setCartItems({});
     setWishlistItems([]);
     setSavedAddresses([]);
   };
 
+
   // Effects
   useEffect(() => {
     const loadInitialData = async () => {
       const storedToken = localStorage.getItem("token");
-      if (storedToken) {
-        setToken(storedToken);
-      }
+      if (storedToken) setToken(storedToken);
+
       const storedUserName = localStorage.getItem("userName");
-      if (storedUserName) {
-        setUserName(storedUserName);
-      }
-      
+      if (storedUserName) setUserName(storedUserName);
+
+      const storedRole = localStorage.getItem("role");
+      if (storedRole) setUserRole(storedRole);
+
       await Promise.all([fetchFoodList(), fetchRestaurantList()]);
     };
 
@@ -350,7 +350,8 @@ const StoreContextProvider = (props) => {
     addAddress,
     updateAddress,
     deleteAddress,
-    setDefaultAddress,
+    setDefaultAddress, userRole,       
+    setUserRole
   };
 
   return (

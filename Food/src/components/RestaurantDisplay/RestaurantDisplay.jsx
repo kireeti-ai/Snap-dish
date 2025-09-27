@@ -29,7 +29,7 @@ const itemVariants = {
 
 const RestaurantDisplay = () => {
   // Fixed: Using StoreContext instead of RestaurantContext
-  const { restaurant_list } = useContext(StoreContext)
+  const { restaurant_list=[] } = useContext(StoreContext)
 
   // Display top rated restaurants (limited to first 8 for homepage)
   const topRestaurants = restaurant_list.slice(0, 8);
