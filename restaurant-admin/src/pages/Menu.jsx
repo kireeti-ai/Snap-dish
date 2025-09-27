@@ -3,7 +3,11 @@ import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-const API_URL = "https://snap-dish.onrender.com";
+// --- CHANGE: Using an environment variable for the API URL ---
+// You should create a .env file in your project's root folder and add:
+// VITE_API_URL="https://snap-dish.onrender.com"
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:4000";
+
 
 const MenuManagement = () => {
   const [menuItems, setMenuItems] = useState([]);
@@ -41,7 +45,8 @@ const MenuManagement = () => {
       }
     } catch (error) {
       console.error("Error fetching restaurant:", error);
-      toast.error("You must create a restaurant profile before adding menu items.");
+      const errorMessage = error.response?.data?.message || "You must create a restaurant profile before adding menu items.";
+      toast.error(errorMessage);
       return null;
     }
   };
@@ -102,20 +107,22 @@ const MenuManagement = () => {
         toast.success("Menu Item Added!");
         setNewItem({ name: "", description: "", price: "", category: "", is_veg: "", image: null });
         setPreview(null);
-        e.target.reset(); // Reset form fields including file input
+        e.target.reset(); // Resets the form fields
         await fetchMenuItems(restaurantData._id);
       } else {
         toast.error(response.data.message);
       }
     } catch (error) {
-      toast.error("Error adding menu item.");
+      // --- CHANGE: More specific error message ---
+      const errorMessage = error.response?.data?.message || "Error adding menu item.";
+      toast.error(errorMessage);
     }
   };
 
   const handleDeleteItem = async (itemId) => {
     if (!window.confirm("Are you sure you want to delete this item?")) return;
     try {
-      const response = await axios.post(`${API_URL}/api/menu/remove`, { id: itemId }, {
+      const response = await axios.delete(`${API_URL}/api/menu/remove/${itemId}`, {
         headers: getAuthHeaders(),
       });
       if (response.data.success) {
@@ -125,19 +132,22 @@ const MenuManagement = () => {
         toast.error(response.data.message);
       }
     } catch (error) {
-      toast.error("Error deleting menu item.");
+      // --- CHANGE: More specific error message ---
+      const errorMessage = error.response?.data?.message || "Error deleting menu item.";
+      toast.error(errorMessage);
     }
   };
 
   const openEditModal = (item) => {
     setEditItem({ ...item, is_veg: item.is_veg ? "true" : "false" });
-    setEditPreview(item.image ? `${API_URL}/uploads/foods/${item.image}` : null);
+    setEditPreview(item.image || null);
     setIsEditModalOpen(true);
   };
 
   const handleEditSave = async () => {
     const formData = new FormData();
     Object.keys(editItem).forEach((key) => {
+      // Only append a new image file if it's been changed
       if (key !== "image" || editItem.image instanceof File) {
         formData.append(key, editItem[key]);
       }
@@ -157,7 +167,9 @@ const MenuManagement = () => {
         toast.error(response.data.message);
       }
     } catch (error) {
-      toast.error("Error updating item.");
+      // --- CHANGE: More specific error message ---
+      const errorMessage = error.response?.data?.message || "Error updating item.";
+      toast.error(errorMessage);
     }
   };
 
@@ -206,7 +218,7 @@ const MenuManagement = () => {
             {menuItems.length > 0 ? menuItems.map((item) => (
               <div key={item._id} className="flex items-center justify-between p-4 border rounded-lg bg-white shadow-sm">
                 <div className="flex items-center space-x-4 flex-1 min-w-0">
-                  <img src={`${API_URL}/uploads/foods/${item.image}`} alt={item.name} className="w-20 h-20 object-cover rounded-lg border flex-shrink-0" />
+                  <img src={item.image} alt={item.name} className="w-20 h-20 object-cover rounded-lg border flex-shrink-0" />
                   <div className="min-w-0">
                     <p className="font-semibold text-gray-900 truncate">{item.name}</p>
                     <p className="text-sm text-gray-600 truncate">{item.description}</p>
