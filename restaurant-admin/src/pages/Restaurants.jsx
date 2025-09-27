@@ -3,7 +3,7 @@ import axios from "axios";
 
 // --- Improvement: API Configuration ---
 // It's better practice to manage the base URL in a central place or via environment variables.
-const API_BASE_URL = "http://localhost:4000";
+const API_BASE_URL = "https://snap-dish.onrender.com";
 
 const api = axios.create({
   baseURL: API_BASE_URL,
