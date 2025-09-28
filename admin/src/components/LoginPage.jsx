@@ -15,7 +15,7 @@ function LoginPage({ onLoginSuccess }) {
     setError(''); // Clear previous errors
 
     try {
-      const response = await axios.post('http://localhost:4000/api/users/login', {
+      const response = await axios.post('https://snap-dish.onrender.com/api/users/login', {
         email,
         password,
       });

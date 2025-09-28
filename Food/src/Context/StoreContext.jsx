@@ -11,7 +11,7 @@ const StoreContextProvider = (props) => {
   const [restaurant_list, setRestaurantList] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
  
-  const BACKEND_URL = "http://localhost:4000";
+  const BACKEND_URL = "https://snap-dish.onrender.com";
   const url = BACKEND_URL;
   
   // Auth state

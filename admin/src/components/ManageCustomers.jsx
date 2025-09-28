@@ -5,7 +5,7 @@ function ManageCustomers() {
   const [customers, setCustomers] = useState([]);
   const [error, setError] = useState('');
   
-  const API_URL = 'http://localhost:4000/api/users'; 
+  const API_URL = 'https://snap-dish.onrender.com/api/users'; 
   const token = localStorage.getItem("token");
 
   useEffect(() => {
