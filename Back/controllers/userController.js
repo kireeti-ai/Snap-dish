@@ -44,6 +44,27 @@ export const loginUser = async (req, res) => {
         res.json({ success: false, message: "Error" });
     }
 };
+export const getWishlist = async (req, res) => {
+    try {
+        const user = await userModel.findById(req.user._id);
+        if (!user) {
+            return res.status(404).json({ success: false, message: "User not found" });
+        }
+        res.json({ success: true, wishlist: user.wishlist });
+    } catch (error) {
+        res.status(500).json({ success: false, message: "Error getting wishlist" });
+    }
+};
+
+// Update user wishlist
+export const updateWishlist = async (req, res) => {
+    try {
+        await userModel.findByIdAndUpdate(req.user._id, { wishlist: req.body.wishlist });
+        res.json({ success: true, message: "Wishlist updated" });
+    } catch (error) {
+        res.status(500).json({ success: false, message: "Error updating wishlist" });
+    }
+};
 
 // Register user
 export const registerUser = async (req, res) => {
@@ -400,3 +421,38 @@ export const updateUserByAdmin = async (req, res) => {
         res.status(500).json({ success: false, message: "Server Error" });
     }
 };
+// [existing code in userController.js]...
+
+// Get user cart
+export const getCart = async (req, res) => {
+    try {
+        const user = await userModel.findById(req.user._id);
+        if (!user) {
+            return res.status(404).json({ success: false, message: "User not found" });
+        }
+        res.json({ success: true, cartData: user.cartData });
+    } catch (error) {
+        console.error("Error getting cart:", error);
+        res.status(500).json({ success: false, message: "Error getting cart data" });
+    }
+};
+
+// Update user cart
+export const updateCart = async (req, res) => {
+    try {
+        const updatedUser = await userModel.findByIdAndUpdate(
+            req.user._id, 
+            { cartData: req.body },
+            { new: true }
+        );
+         if (!updatedUser) {
+            return res.status(404).json({ success: false, message: "User not found" });
+        }
+        res.json({ success: true, message: "Cart updated" });
+    } catch (error) {
+        console.error("Error updating cart:", error);
+        res.status(500).json({ success: false, message: "Error updating cart" });
+    }
+};
+
+// [rest of the existing code in userController.js]...

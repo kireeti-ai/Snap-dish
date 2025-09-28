@@ -9,7 +9,11 @@ import {
   getAllUsers,
   updateUserStatusByAdmin,
   deleteUserByAdmin,
-  updateUserByAdmin
+  updateUserByAdmin,
+    getCart,      // <-- Import getCart
+  updateCart,
+    getWishlist,    // <-- Import getWishlist
+  updateWishlist 
 } from '../controllers/userController.js';
 import {
     getAllRestaurantsForAdmin,
@@ -25,11 +29,13 @@ const userRouter = express.Router();
 // Public routes
 userRouter.post('/register', registerUser);
 userRouter.post('/login', loginUser);
-
+userRouter.get('/cart', protect, getCart);
+userRouter.post('/cart', protect, updateCart);
 // Protected routes - Profile management
 userRouter.get('/profile', protect, getUserProfile);
 userRouter.put('/profile', protect, updateUserProfile);
-
+userRouter.get('/wishlist', protect, getWishlist);
+userRouter.post('/wishlist', protect, updateWishlist);
 // Avatar upload route
 userRouter.post('/upload-avatar', 
   protect, 

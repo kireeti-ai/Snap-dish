@@ -1,11 +1,20 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import './placeOrder.css';
 import { StoreContext } from '../../Context/StoreContext';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { toast } from 'react-toastify';
 
 const PlaceOrder = () => {
-  const { getTotalCartAmount, placeNewOrder, cartItems, savedAddresses, food_list, cartRestaurant } = useContext(StoreContext);
+  const { 
+    getTotalCartAmount, 
+    placeNewOrder, 
+    cartItems, 
+    savedAddresses, 
+    food_list,
+    token 
+  } = useContext(StoreContext);
+  
   const navigate = useNavigate();
 
   const [deliveryData, setDeliveryData] = useState({
@@ -13,42 +22,71 @@ const PlaceOrder = () => {
   });
   const [selectedAddressId, setSelectedAddressId] = useState(null);
 
+  useEffect(() => {
+    if (!token) {
+        toast.info("Please log in to place an order.");
+        navigate('/cart');
+    } else if (getTotalCartAmount() === 0) {
+      navigate('/cart');
+    }
+  }, [token, getTotalCartAmount, navigate]);
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setDeliveryData(prevData => ({ ...prevData, [name]: value }));
     setSelectedAddressId(null);
   };
 
+  // --- FIX IS HERE ---
   const selectAddress = (address) => {
-    setDeliveryData(address);
-    setSelectedAddressId(address.id);
+    // Merge the selected address with the existing data
+    setDeliveryData(prevData => ({
+      ...prevData, // Keep existing data (like email/phone if already entered)
+      firstName: address.firstName || '',
+      lastName: address.lastName || '',
+      street: address.street || '',
+      city: address.city || '',
+      state: address.state || '',
+      zipCode: address.zipCode || '',
+      country: address.country || '',
+      // Note: We intentionally don't pull email/phone from the address object
+      // unless you have them stored there.
+    }));
+    setSelectedAddressId(address._id);
   };
+  // --- END OF FIX ---
 
-  const handleOrderSubmit = (event) => {
+  const handleOrderSubmit = async (event) => {
     event.preventDefault();
 
     const orderItems = Object.keys(cartItems).map((itemId) => {
       const itemInfo = food_list.find((product) => product._id === itemId);
-      return {
-        ...itemInfo,
-        quantity: cartItems[itemId]
-      };
-    }).filter(item => item.name);
+      if (itemInfo) {
+        return { name: itemInfo.name, price: itemInfo.price, quantity: cartItems[itemId] };
+      }
+      return null;
+    }).filter(item => item !== null);
 
-    const restaurantName = orderItems.length > 0 
-      ? food_list.find(food => food.restaurant_id === cartRestaurant)?.restaurant_name 
-      : "Assorted Items";
+    if (orderItems.length === 0) {
+      toast.error("Your cart is empty.");
+      return;
+    }
 
     const orderDetails = {
       items: orderItems,
-      total: getTotalCartAmount() + 50,
+      total: getTotalCartAmount() + (getTotalCartAmount() > 0 ? 50 : 0),
       deliveryInfo: deliveryData,
-      restaurant: restaurantName,
     };
 
-    placeNewOrder(orderDetails);
-    navigate('/orderSuccess');
+    const result = await placeNewOrder(orderDetails);
+    if (result && result.success) {
+      navigate('/orderSuccess');
+      // Success toast is better on the success page itself
+    }
   };
+
+  const totalAmount = getTotalCartAmount();
+  const deliveryFee = totalAmount > 0 ? 50 : 0;
 
   return (
     <motion.form 
@@ -71,8 +109,8 @@ const PlaceOrder = () => {
             <div className="address-card-list">
               {savedAddresses.map(address => (
                 <motion.div 
-                  key={address.id} 
-                  className={`address-card ${selectedAddressId === address.id ? 'selected' : ''}`}
+                  key={address._id} 
+                  className={`address-card ${selectedAddressId === address._id ? 'selected' : ''}`}
                   onClick={() => selectAddress(address)}
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.97 }}
@@ -86,15 +124,10 @@ const PlaceOrder = () => {
         )}
 
         <p className="title">Or Enter New Delivery Information</p>
-        <motion.div 
-          className="multi-fields"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.3 }}
-        >
+        <div className="multi-fields">
           <input type="text" name="firstName" placeholder='First name' value={deliveryData.firstName} onChange={handleInputChange} required />
           <input type="text" name="lastName" placeholder='Last name' value={deliveryData.lastName} onChange={handleInputChange} required />
-        </motion.div>
+        </div>
         <input type="email" name="email" placeholder='Email address' value={deliveryData.email} onChange={handleInputChange} required />
         <input type="text" name="street" placeholder='Street' value={deliveryData.street} onChange={handleInputChange} required />
         <div className="multi-fields">
@@ -108,26 +141,21 @@ const PlaceOrder = () => {
         <input type="text" name="phone" placeholder='Phone' value={deliveryData.phone} onChange={handleInputChange} required />
       </motion.div>
 
-      {/* RIGHT SIDE - CART */}
+      {/* RIGHT SIDE - CART (No Changes) */}
       <motion.div 
         className="place-order-right"
         initial={{ x: 60, opacity: 0 }}
         animate={{ x: 0, opacity: 1 }}
         transition={{ duration: 0.6, delay: 0.4 }}
       >
-        <motion.div 
-          className="cart-total"
-          initial={{ scale: 0.9, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ duration: 0.5, delay: 0.5 }}
-        >
+        <div className="cart-total">
           <h2>Cart Totals</h2>
           <div>
-            <div className="cart-total-details"><p>Subtotal</p><p>₹{getTotalCartAmount()}</p></div>
+            <div className="cart-total-details"><p>Subtotal</p><p>₹{totalAmount}</p></div>
             <hr />
-            <div className="cart-total-details"><p>Delivery Fee</p><p>₹{getTotalCartAmount() === 0 ? 0 : 50}</p></div>
+            <div className="cart-total-details"><p>Delivery Fee</p><p>₹{deliveryFee}</p></div>
             <hr />
-            <div className="cart-total-details"><b>Total</b><b>₹{getTotalCartAmount() === 0 ? 0 : getTotalCartAmount() + 50}</b></div>
+            <div className="cart-total-details"><b>Total</b><b>₹{totalAmount + deliveryFee}</b></div>
           </div>
           <motion.button 
             type='submit'
@@ -136,7 +164,7 @@ const PlaceOrder = () => {
           >
             PROCEED TO PAYMENT
           </motion.button>
-        </motion.div>
+        </div>
       </motion.div>
     </motion.form>
   );

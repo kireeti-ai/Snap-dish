@@ -3,6 +3,7 @@ import './OrderSuccess.css';
 import { StoreContext } from '../../Context/StoreContext';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { toast } from 'react-toastify';
 
 const CheckmarkIcon = () => (
   <motion.svg 
@@ -24,19 +25,24 @@ const OrderSuccess = () => {
   const [hover, setHover] = useState(0);
   const navigate = useNavigate();
 
-  const lastOrder = orders.length > 0 ? orders[orders.length - 1] : null;
+  // --- FIX #1: Get the newest order from the beginning of the array ---
+  const lastOrder = orders.length > 0 ? orders[0] : null;
 
   useEffect(() => {
     if (!lastOrder) {
+      // If there's no order data, redirect to the home page.
       navigate('/');
+    } else {
+      toast.success("Order placed successfully!");
     }
   }, [lastOrder, navigate]);
 
-  if (!lastOrder) return null;
+  if (!lastOrder) return null; // Render nothing while redirecting
 
   const handleFeedbackSubmit = (e) => {
     e.preventDefault();
-    alert(`Thank you for your feedback! You rated ${rating} stars.`);
+    toast.info(`Thank you for your feedback!`);
+    // Here you would typically send the feedback to your backend
   };
 
   return (
@@ -66,7 +72,8 @@ const OrderSuccess = () => {
             animate={{ opacity: 1 }}
             transition={{ delay: 0.5 }}
           >
-            Thank you, {userName || 'Customer'}! Your order from <strong>{lastOrder.restaurant}</strong> is on its way.
+            {/* FIX #2: Removed 'lastOrder.restaurant' as it doesn't exist in the DB model */}
+            Thank you, {userName || 'Customer'}! Your order is on its way.
           </motion.p>
           <p className="email-info">A confirmation has been sent to your email address.</p>
         </div>
@@ -79,9 +86,11 @@ const OrderSuccess = () => {
         >
           <h2>Order Summary</h2>
           <div className="summary-details">
-            <p><strong>Order ID:</strong> #{lastOrder.id}</p>
+            {/* FIX #2: Use '_id' from the database */}
+            <p><strong>Order ID:</strong> #{lastOrder._id.slice(-6)}</p>
             <p><strong>Estimated Arrival:</strong> 30-45 Minutes</p>
-            <p><strong>Deliver To:</strong> {lastOrder.deliveryInfo.street}, {lastOrder.deliveryInfo.city}</p>
+            {/* FIX #2: Use 'address' field from database model */}
+            <p><strong>Deliver To:</strong> {lastOrder.address.street}, {lastOrder.address.city}</p>
           </div>
           <div className="summary-items">
             <h4>Items Ordered</h4>
@@ -100,7 +109,8 @@ const OrderSuccess = () => {
           </div>
           <div className="summary-total">
             <span>Total Paid</span>
-            <strong>₹{lastOrder.total}</strong>
+            {/* FIX #2: Use 'amount' from the database */}
+            <strong>₹{lastOrder.amount}</strong>
           </div>
         </motion.div>
 
@@ -110,7 +120,7 @@ const OrderSuccess = () => {
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 1 }}
         >
-          <Link to="/my-orders" className="btn-primary">Track Your Order</Link>
+          <Link to="/myorders" className="btn-primary">View My Orders</Link>
           <Link to="/" className="btn-secondary">Continue Shopping</Link>
         </motion.div>
 

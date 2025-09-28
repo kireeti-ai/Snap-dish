@@ -1,5 +1,3 @@
-// src/components/Sidebar.jsx
-
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 
@@ -11,12 +9,11 @@ function Sidebar({ handleLogout }) {
         <NavLink to="/"> Dashboard</NavLink>
         <NavLink to="/requests">Manage Requests</NavLink>
         <NavLink to="/restaurants"> Manage Restaurants</NavLink>
-        <NavLink to="/customers"> Manage Customers</NavLink>
-        <NavLink to="/delivery-partners"> Manage Delivery</NavLink>
+        {/* CONSOLIDATED LINK */}
+        <NavLink to="/users"> Manage Users</NavLink>
         <NavLink to="/orders"> View Orders</NavLink>
         <NavLink to="/settings"> Settings</NavLink>
       </nav>
-      {/* Add Logout Button at the bottom */}
       <div className="sidebar-footer">
         <button onClick={handleLogout} className="logout-button">Logout</button>
       </div>

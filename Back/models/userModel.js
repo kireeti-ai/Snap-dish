@@ -57,6 +57,10 @@ const userSchema = new mongoose.Schema(
     cartData: { 
       type: Object, 
       default: {} 
+    },
+    wishlist: {
+      type: [String], // An array of item IDs (as strings)
+      default: []
     }
   },
   { 
