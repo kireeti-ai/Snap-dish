@@ -43,11 +43,9 @@ function AppRoutes() {
 function App() {
     return (
         <div className="app-container">
-            {/* REMOVE <BrowserRouter> from here */}
             <AuthProvider>
                 <AppRoutes />
             </AuthProvider>
-            {/* REMOVE </BrowserRouter> from here */}
         </div>
     );
 }

@@ -7,8 +7,7 @@ import { connectDB } from "./config/db.js";
 import menuItemRouter from "./routes/menuItemRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
 import restaurantRouter from "./routes/restaurantRoutes.js";
-import cartRouter from "./routes/cartRoutes.js";
-import orderRouter from "./routes/orderRoutes.js";
+
 import fs from "fs";
 import addressRoutes from "./routes/addressRoutes.js";
 import multer from "multer";
@@ -81,8 +80,7 @@ app.use("/api/address", addressRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/restaurants", restaurantRouter);
 app.use("/api/menu", menuItemRouter);
-app.use("/api/cart", cartRouter);
-app.use("/api/order", orderRouter);
+
 
 app.get("/", (req, res) => {
   res.send("SnapDish API is running...");
