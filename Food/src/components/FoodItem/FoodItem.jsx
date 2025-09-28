@@ -3,7 +3,6 @@ import './FoodItem.css';
 import { assets } from '../../assets/assets.js';
 import { StoreContext } from '../../Context/StoreContext';
 
-// **FIX: Accept `rating` as a prop**
 const FoodItem = ({ id, name, price, description, image, is_veg, restaurant_id, rating }) => {
     const {
         cartItems,
@@ -12,19 +11,14 @@ const FoodItem = ({ id, name, price, description, image, is_veg, restaurant_id, 
         wishlistItems,
         addToWishlist,
         removeFromWishlist,
-        BACKEND_URL
+        BACKEND_URL 
     } = useContext(StoreContext);
 
     const isWishlisted = wishlistItems.includes(id);
 
-
-
-
-
     return (
         <div className='food-item'>
             <div className="food-item-img-container">
-                {/* Image and add/remove icons... */}
                 <img
                     className='wishlist-icon'
                     onClick={() => isWishlisted ? removeFromWishlist(id) : addToWishlist(id)}
@@ -33,7 +27,8 @@ const FoodItem = ({ id, name, price, description, image, is_veg, restaurant_id, 
                 />
                 <img
                     className="food-item-image"
-                    src={image} alt={name}
+                    src={image}
+                    alt={name}
                     onError={(e) => { e.target.src = '/placeholder-food.jpg'; }}
                 />
                 {!cartItems[id]
@@ -49,12 +44,10 @@ const FoodItem = ({ id, name, price, description, image, is_veg, restaurant_id, 
                 <div className="food-item-name-rating">
                     <p className="food-item-name">{name}</p>
                     <div className="item-rating">
-                        {/* **FIX: Use the dynamic `rating` prop here** */}
                         {rating && <span>⭐ {rating}</span>}
                     </div>
                 </div>
 
-                {/* Veg/Non-veg indicator */}
                 <div className="food-item-type">
                     <div className={`veg-indicator ${is_veg ? 'veg' : 'non-veg'}`}>
                         <div className={`dot ${is_veg ? 'green' : 'red'}`}></div>

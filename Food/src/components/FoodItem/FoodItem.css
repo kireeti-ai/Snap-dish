@@ -7,7 +7,7 @@
   animation: fadeIn 0.5s;
   background-color: #fff;
   display: flex;
-  flex-direction: column; /* This is key for the vertical layout */
+  flex-direction: column;
 }
 
 .food-item:hover {
@@ -17,12 +17,12 @@
 
 /* --- Image Container (Top) --- */
 .food-item-img-container {
-  position: relative; /* This is the anchor for all overlay icons */
+  position: relative;
 }
 
 .food-item-image {
   width: 100%;
-  display: block; /* Removes any extra space below the image */
+  display: block;
   border-radius: 15px 15px 0 0;
 }
 
@@ -84,7 +84,7 @@
   padding: 20px;
   display: flex;
   flex-direction: column;
-  flex-grow: 1; /* Ensures footer content is pushed down */
+  flex-grow: 1; 
 }
 
 .food-item-name-rating {
@@ -100,11 +100,52 @@
   color: #333;
 }
 
-.food-item-name-rating img {
-  width: 70px;
+.item-rating span {
+  font-size: 1rem;
+  background-color: #267E26;
+  color: white;
+  padding: 2px 8px;
+  border-radius: 5px;
 }
 
-.food-item-disc {
+/* --- FIX: Added styles for the veg/non-veg indicator --- */
+.food-item-type {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.veg-indicator {
+  width: 16px;
+  height: 16px;
+  border: 1.5px solid;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.veg-indicator.veg { border-color: green; }
+.veg-indicator.non-veg { border-color: red; }
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.dot.green { background-color: green; }
+.dot.red { background-color: red; }
+
+.veg-label {
+  font-size: 13px;
+  color: #676767;
+}
+/* --- End of Added Styles --- */
+
+
+/* --- FIX: Corrected class name from .food-item-disc to .food-item-desc --- */
+.food-item-desc {
   color: #676767;
   font-size: 13px;
   line-height: 1.5;
@@ -124,9 +165,25 @@
   color: tomato;
   font-size: 1.4rem;
   font-weight: 700;
+  margin-top: auto; /* Pushes the price to the bottom */
 }
 
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }
+}
+/* --- Image Container (Top) --- */
+.food-item-img-container {
+  position: relative;
+  width: 100%; /* Ensures it takes the full width of the card */
+  aspect-ratio: 1 / 1; /* FORCES a square shape. Use 16/9 for wide, or 4/3 for portrait */
+  overflow: hidden; /* Hides any part of the image that overflows */
+}
+
+/* --- The Image Itself --- */
+.food-item-image {
+  width: 100%;
+  height: 100%; /* Makes the image fill the container's height */
+  object-fit: cover; /* Crucial part: Fills the space without stretching/squishing. It crops the image to fit. */
+  border-radius: 15px 15px 0 0;
 }

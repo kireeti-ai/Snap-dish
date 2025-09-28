@@ -39,7 +39,6 @@ export const createRestaurant = async (req, res) => {
 
     let imageUrl = null;
     if (req.file) {
-      // --- FIX: Upload to Cloudinary instead of saving locally ---
       imageUrl = await uploadToCloudinary(req.file.path, 'restaurants');
       if (!imageUrl) {
         return res.status(500).json({ success: false, message: 'Error uploading image' });
@@ -54,7 +53,7 @@ export const createRestaurant = async (req, res) => {
       price_for_two,
       status,
       timing,
-      image: imageUrl, // Save the full Cloudinary URL
+      image: imageUrl,
     });
 
     await userModel.findByIdAndUpdate(req.user._id, { role: 'restaurant_owner' });
@@ -83,7 +82,6 @@ export const updateRestaurant = async (req, res) => {
     if (status) restaurant.status = status;
     if (timing) restaurant.timing = timing;
 
-    // --- FIX: Update image with Cloudinary ---
     if (req.file) {
       const imageUrl = await uploadToCloudinary(req.file.path, 'restaurants');
       if (imageUrl) {
@@ -105,7 +103,6 @@ export const deleteRestaurant = async (req, res) => {
     const restaurant = await restaurantModel.findOne({ owner_id: req.user._id });
     if (!restaurant) return res.status(404).json({ success: false, message: "Restaurant not found" });
 
-    // No need to delete image from local storage
     await restaurantModel.deleteOne({ _id: restaurant._id });
 
     res.json({ success: true, message: "Restaurant deleted successfully" });
@@ -113,4 +110,91 @@ export const deleteRestaurant = async (req, res) => {
     console.error(err);
     res.status(500).json({ success: false, message: "Server Error" });
   }
+};
+
+
+// --- ADMIN FUNCTIONS ---
+
+// [ADMIN] Get all restaurants regardless of status
+export const getAllRestaurantsForAdmin = async (req, res) => {
+    try {
+        const restaurants = await restaurantModel.find({}).populate('owner_id', 'firstName lastName email');
+        res.json({ success: true, data: restaurants });
+    } catch (error) {
+        console.error("Admin Get Restaurants Error:", error);
+        res.status(500).json({ success: false, message: "Server Error" });
+    }
+};
+
+// [ADMIN] Update any restaurant's status
+export const updateRestaurantStatusByAdmin = async (req, res) => {
+    try {
+        const { status } = req.body;
+        const restaurantId = req.params.restaurantId;
+
+        if (!['active', 'inactive', 'pending_approval'].includes(status)) {
+            return res.status(400).json({ success: false, message: "Invalid status value" });
+        }
+
+        const restaurant = await restaurantModel.findByIdAndUpdate(
+            restaurantId,
+            { status },
+            { new: true }
+        );
+
+        if (!restaurant) {
+            return res.status(404).json({ success: false, message: "Restaurant not found" });
+        }
+
+        res.json({ success: true, message: `Restaurant status updated to ${status}`, data: restaurant });
+    } catch (error) {
+        console.error("Admin Update Restaurant Status Error:", error);
+        res.status(500).json({ success: false, message: "Server Error" });
+    }
+};
+
+// [ADMIN] Delete any restaurant
+export const deleteRestaurantByAdmin = async (req, res) => {
+    try {
+        const restaurant = await restaurantModel.findById(req.params.restaurantId);
+        if (!restaurant) {
+            return res.status(404).json({ success: false, message: "Restaurant not found" });
+        }
+        await restaurantModel.deleteOne({ _id: req.params.restaurantId });
+        res.json({ success: true, message: "Restaurant deleted by admin" });
+    } catch (error) {
+        console.error("Admin Delete Restaurant Error:", error);
+        res.status(500).json({ success: false, message: "Server Error" });
+    }
+};
+
+// [ADMIN] Update any restaurant's details
+export const updateRestaurantByAdmin = async (req, res) => {
+    try {
+        const restaurantId = req.params.restaurantId;
+        const updateData = req.body;
+        
+        // Handle image upload if a new one is provided
+        if (req.file) {
+            const imageUrl = await uploadToCloudinary(req.file.path, 'restaurants');
+            if (imageUrl) {
+                updateData.image = imageUrl;
+            }
+        }
+
+        const updatedRestaurant = await restaurantModel.findByIdAndUpdate(
+            restaurantId,
+            updateData,
+            { new: true, runValidators: true }
+        );
+
+        if (!updatedRestaurant) {
+            return res.status(404).json({ success: false, message: "Restaurant not found" });
+        }
+
+        res.json({ success: true, message: "Restaurant details updated by admin", data: updatedRestaurant });
+    } catch (error) {
+        console.error("Admin Update Restaurant Error:", error);
+        res.status(500).json({ success: false, message: "Server Error" });
+    }
 };

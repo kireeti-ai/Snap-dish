@@ -237,7 +237,7 @@ export default function PersonalInfoEdit() {
                 }
               />
             ) : (
-              <p>{profileData.phone_number}</p>
+              <p>{profileData.phone_number || "Not provided"}</p>
             )}
           </div>
 
@@ -261,11 +261,11 @@ export default function PersonalInfoEdit() {
             {isEditing ? (
               <input
                 type="date"
-                value={formData.dob || ""}
+                value={formData.dob ? formData.dob.split('T')[0] : ""}
                 onChange={(e) => handleInputChange("dob", e.target.value)}
               />
             ) : (
-              <p>{profileData.dob || "Not provided"}</p>
+              <p>{profileData.dob ? new Date(profileData.dob).toLocaleDateString() : "Not provided"}</p>
             )}
           </div>
 
@@ -287,43 +287,6 @@ export default function PersonalInfoEdit() {
             )}
           </div>
 
-          {/* Notifications */}
-          <div className="form-group">
-            <label>Notifications</label>
-            {isEditing ? (
-              <div className="notification-options">
-                <label className="notification-toggle">
-                  Email Notifications
-                  <input
-                    type="checkbox"
-                    checked={formData.emailNotifications || false}
-                    onChange={(e) =>
-                      handleInputChange("emailNotifications", e.target.checked)
-                    }
-                  />
-                  <span className="switch"></span>
-                </label>
-
-                <label className="notification-toggle">
-                  SMS Notifications
-                  <input
-                    type="checkbox"
-                    checked={formData.smsNotifications || false}
-                    onChange={(e) =>
-                      handleInputChange("smsNotifications", e.target.checked)
-                    }
-                  />
-                  <span className="switch"></span>
-                </label>
-              </div>
-            ) : (
-              <p>
-                Email: {formData.emailNotifications ? "On" : "Off"}, SMS:{" "}
-                {formData.smsNotifications ? "On" : "Off"}
-              </p>
-            )}
-          </div>
-
           {/* Role */}
           <div className="form-group">
             <label>Role</label>
@@ -333,7 +296,7 @@ export default function PersonalInfoEdit() {
           {/* Status */}
           <div className="form-group">
             <label>Status</label>
-            <p>{profileData.status}</p>
+            <p className={`status ${profileData.status}`}>{profileData.status}</p>
           </div>
 
           <div className="button-group">
@@ -366,7 +329,10 @@ export default function PersonalInfoEdit() {
                 <img src={imagePreview} alt="Preview" className="avatar" />
               ) : profileData.avatar ? (
                 <img
-                  src={`${url}/${profileData.avatar}`}
+                  src={profileData.avatar.startsWith('http') 
+                    ? profileData.avatar 
+                    : `${url}/${profileData.avatar}`
+                  }
                   alt="Profile"
                   className="avatar"
                   onError={(e) => {
@@ -374,7 +340,9 @@ export default function PersonalInfoEdit() {
                     e.target.nextSibling.style.display = "flex";
                   }}
                 />
-              ) : (
+              ) : null}
+              
+              {(!profileData.avatar || profileData.avatar === null) && !imagePreview && (
                 <div className="avatar-placeholder">
                   <User size={40} />
                 </div>
@@ -404,21 +372,19 @@ export default function PersonalInfoEdit() {
             {profileData.firstName} {profileData.lastName}
           </h3>
           <p className="joined">
-            Customer since{" "}
+            Member since{" "}
             {new Date(profileData.createdAt).toLocaleDateString()}
           </p>
+          
           <div className="button-group">
             {!isEditing ? (
-              <>
-
-                <button
-                  className="delete-btn"
-                  onClick={handleDelete}
-                  style={{ background: "red", color: "white" }}
-                >
-                  <X size={16} /> Delete Account
-                </button>
-              </>
+              <button
+                className="delete-btn"
+                onClick={handleDelete}
+                style={{ background: "red", color: "white" }}
+              >
+                <X size={16} /> Delete Account
+              </button>
             ) : (
               <>
                 <button

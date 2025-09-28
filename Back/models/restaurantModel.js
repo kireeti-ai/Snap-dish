@@ -1,7 +1,8 @@
 import mongoose from "mongoose";
 
 const restaurantSchema = new mongoose.Schema({
-  owner_id: { type: mongoose.Schema.Types.ObjectId, ref: 'user', required: true },
+  // FIX: Changed ref from 'user' to 'User' to match the User model name
+  owner_id: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   name: { type: String, required: true },
   address: { type: String, required: true },
   cuisine: { type: String, required: true },

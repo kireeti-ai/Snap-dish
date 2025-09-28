@@ -1,59 +1,112 @@
-import React, { useState } from 'react';
-
-// Mock data for customers
-const initialCustomers = [
-  { id: 101, name: 'Alice Johnson', email: 'alice@example.com', joinDate: '2025-08-15', status: 'Active' },
-  { id: 102, name: 'Bob Williams', email: 'bob@example.com', joinDate: '2025-07-22', status: 'Active' },
-  { id: 103, name: 'Charlie Brown', email: 'charlie@example.com', joinDate: '2025-06-01', status: 'Suspended' },
-  { id: 104, name: 'Diana Miller', email: 'diana@example.com', joinDate: '2025-08-20', status: 'Active' },
-];
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 
 function ManageCustomers() {
-  const [customers, setCustomers] = useState(initialCustomers);
+  const [customers, setCustomers] = useState([]);
+  const [error, setError] = useState('');
+  
+  const API_URL = 'http://localhost:4000/api/users'; 
+  const token = localStorage.getItem("token");
 
-  // Function to toggle a customer's status between Active and Suspended
-  const handleToggleStatus = (id) => {
-    setCustomers(
-      customers.map((customer) =>
-        customer.id === id
-          ? { ...customer, status: customer.status === 'Active' ? 'Suspended' : 'Active' }
-          : customer
-      )
-    );
+  useEffect(() => {
+    const fetchCustomers = async () => {
+      try {
+        const response = await axios.get(`${API_URL}/admin/users`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        if (response.data.success) {
+          setCustomers(response.data.data);
+        } else {
+          setError('Failed to fetch customers.');
+        }
+      } catch (err) {
+        setError('An error occurred while fetching customers.');
+        console.error(err);
+      }
+    };
+
+    if (token) {
+      fetchCustomers();
+    } else {
+      setError("Not authorized. Please log in as admin.");
+    }
+  }, [token]);
+
+  const handleToggleStatus = async (id, currentStatus) => {
+    const newStatus = currentStatus === 'active' ? 'suspended' : 'active';
+    try {
+      const response = await axios.put(`${API_URL}/admin/users/${id}/status`, 
+        { status: newStatus },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      if (response.data.success) {
+        setCustomers(customers.map(customer =>
+          customer._id === id ? { ...customer, status: newStatus } : customer
+        ));
+      } else {
+        alert('Failed to update status.');
+      }
+    } catch (err) {
+      alert('An error occurred.');
+      console.error(err);
+    }
+  };
+
+  const handleDelete = async (id) => {
+    if (window.confirm("Are you sure you want to permanently delete this user?")) {
+      try {
+        const response = await axios.delete(`${API_URL}/admin/users/${id}`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        if (response.data.success) {
+          setCustomers(customers.filter(c => c._id !== id));
+        } else {
+          alert('Failed to delete user.');
+        }
+      } catch (err) {
+        alert('An error occurred during deletion.');
+        console.error(err);
+      }
+    }
   };
 
   return (
     <div className="page">
       <h2>Manage Customers</h2>
+      {error && <p className="error-message">{error}</p>}
       <table>
         <thead>
           <tr>
-            <th>Customer ID</th>
             <th>Name</th>
             <th>Email</th>
-            <th>Join Date</th>
+            <th>Role</th>
             <th>Status</th>
             <th>Actions</th>
           </tr>
         </thead>
         <tbody>
           {customers.map((customer) => (
-            <tr key={customer.id}>
-              <td>{customer.id}</td>
-              <td>{customer.name}</td>
+            <tr key={customer._id}>
+              <td>{customer.firstName} {customer.lastName}</td>
               <td>{customer.email}</td>
-              <td>{customer.joinDate}</td>
+              <td>{customer.role}</td>
               <td>
                 <span className={`status ${customer.status.toLowerCase()}`}>
                   {customer.status}
                 </span>
               </td>
-              <td>
+              <td className='action-buttons'>
                 <button
-                  className={`btn ${customer.status === 'Active' ? 'btn-deny' : 'btn-approve'}`}
-                  onClick={() => handleToggleStatus(customer.id)}
+                  className={`btn ${customer.status === 'active' ? 'btn-deny' : 'btn-approve'}`}
+                  onClick={() => handleToggleStatus(customer._id, customer.status)}
                 >
-                  {customer.status === 'Active' ? 'Suspend' : 'Activate'}
+                  {customer.status === 'active' ? 'Suspend' : 'Activate'}
+                </button>
+                <button 
+                  className="btn btn-delete"
+                  onClick={() => handleDelete(customer._id)}
+                >
+                  Delete
                 </button>
               </td>
             </tr>

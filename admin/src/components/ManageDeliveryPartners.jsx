@@ -1,64 +1,95 @@
-import React, { useState } from 'react';
-
-// Updated mock data with a 'status' field
-const initialPartners = [
-  { id: 1, name: 'John Doe', city: 'New York', status: 'Approved' },
-  { id: 2, name: 'Jane Smith', city: 'Chicago', status: 'Pending' },
-  { id: 3, name: 'Sam Wilson', city: 'Los Angeles', status: 'Approved' },
-  { id: 4, name: 'Maria Garcia', city: 'Chicago', status: 'Denied' },
-  { id: 5, name: 'Ken Adams', city: 'New York', status: 'Pending' },
-];
+import React from 'react';
+import { useState, useEffect } from 'react';
+import axios from 'axios';
 
 function ManageDeliveryPartners() {
-  const [partners, setPartners] = useState(initialPartners);
+  const [partners, setPartners] = useState([]);
+  const [error, setError] = useState('');
 
-  // Function to handle approving a request
-  const handleApprove = (id) => {
-    setPartners(partners.map(partner => 
-      partner.id === id ? { ...partner, status: 'Approved' } : partner
-    ));
-  };
+  const API_URL = 'http://localhost:4000/api/users';
+  const token = localStorage.getItem("token");
 
-  // Function to handle denying a request
-  const handleDeny = (id) => {
-    setPartners(partners.map(partner => 
-      partner.id === id ? { ...partner, status: 'Denied' } : partner
-    ));
+  useEffect(() => {
+    const fetchPartners = async () => {
+      try {
+        const response = await axios.get(`${API_URL}/admin/users`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        if (response.data.success) {
+          // Filter the full user list to get only delivery agents
+          const deliveryAgents = response.data.data.filter(
+            user => user.role === 'delivery_agent'
+          );
+          setPartners(deliveryAgents);
+        } else {
+          setError('Failed to fetch users.');
+        }
+      } catch (err) {
+        setError('An error occurred while fetching users.');
+        console.error(err);
+      }
+    };
+
+    if (token) {
+      fetchPartners();
+    }
+  }, [token]);
+
+  // Function to change a partner's status (e.g., 'active' or 'suspended')
+  const handleUpdateStatus = async (id, newStatus) => {
+    try {
+      const response = await axios.put(`${API_URL}/admin/users/${id}/status`, 
+        { status: newStatus },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      if (response.data.success) {
+        // Update the status in our local state to immediately reflect the change
+        setPartners(partners.map(partner =>
+          partner._id === id ? { ...partner, status: newStatus } : partner
+        ));
+      } else {
+        alert('Failed to update status.');
+      }
+    } catch (err) {
+      alert('An error occurred while updating status.');
+      console.error(err);
+    }
   };
 
   return (
     <div className="page">
-      <h2>Manage Delivery Partner Requests</h2>
+      <h2>Manage Delivery Partners</h2>
+      {error && <p className="error-message">{error}</p>}
       <table>
         <thead>
           <tr>
-            <th>ID</th>
             <th>Name</th>
-            <th>City</th>
+            <th>Email</th>
             <th>Status</th>
             <th>Actions</th>
           </tr>
         </thead>
         <tbody>
           {partners.map(partner => (
-            <tr key={partner.id}>
-              <td>{partner.id}</td>
-              <td>{partner.name}</td>
-              <td>{partner.city}</td>
+            <tr key={partner._id}>
+              <td>{partner.firstName} {partner.lastName}</td>
+              <td>{partner.email}</td>
               <td>
-                <span className={`status ${partner.status.toLowerCase()}`}>{partner.status}</span>
+                <span className={`status ${partner.status.toLowerCase()}`}>
+                  {partner.status}
+                </span>
               </td>
               <td>
-                {/* Only show buttons if the status is 'Pending' */}
-                {partner.status === 'Pending' && (
-                  <>
-                    <button className="btn btn-approve" onClick={() => handleApprove(partner.id)}>
-                      Approve
-                    </button>
-                    <button className="btn btn-deny" onClick={() => handleDeny(partner.id)}>
-                      Deny
-                    </button>
-                  </>
+                {partner.status === 'active' && (
+                  <button className="btn btn-deny" onClick={() => handleUpdateStatus(partner._id, 'suspended')}>
+                    Suspend
+                  </button>
+                )}
+                {partner.status === 'suspended' && (
+                  <button className="btn btn-approve" onClick={() => handleUpdateStatus(partner._id, 'active')}>
+                    Activate
+                  </button>
                 )}
               </td>
             </tr>

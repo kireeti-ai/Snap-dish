@@ -113,3 +113,10 @@
         height: 160px;
     }
 }
+/* The container holding all the cards */
+.items-list {
+  display: grid;
+  /* This creates a responsive grid of columns */
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 24px; /* Adjust the space between cards */
+}
