@@ -1,90 +1,109 @@
 :root {
-  --primary-color:  rgb(155, 140, 113);
-  --secondary-color:  rgb(134, 101, 41);
+  --primary-color: rgb(155, 140, 113);
+  --secondary-color: rgb(134, 101, 41);
   --accent-color: #3498db;
-  --bg-color: #ecf0f1;
+  --bg-color: #f8f9fa;
   --text-color: #2c3e50;
   --light-text-color: #fff;
-  --border-color: #bdc3c7;
+  --border-color: #dcdfe3;
+
+  /* New */
+  --sidebar-gradient: linear-gradient(135deg, rgb(138, 131, 118), rgb(109, 95, 72));
+  --card-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
+  font-family: "Inter", "Segoe UI", sans-serif;
   background-color: var(--bg-color);
   color: var(--text-color);
+  line-height: 1.6;
 }
 
+/* Layout */
 .app-container {
   display: flex;
 }
 
 .sidebar {
   width: 250px;
-  background-color: rgb(138, 131, 118);
+  background: var(--sidebar-gradient);
   color: var(--light-text-color);
   height: 100vh;
   padding: 20px;
   position: fixed;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
 }
 
 .sidebar-title {
   text-align: center;
-  margin-bottom: 30px;
-  font-size: 1.5rem;
+  margin-bottom: 40px;
+  font-size: 1.8rem;
+  font-weight: bold;
+  letter-spacing: 1px;
 }
 
 .sidebar-nav a {
   display: block;
   color: var(--light-text-color);
   text-decoration: none;
-  padding: 15px;
+  padding: 12px 15px;
   margin-bottom: 10px;
-  border-radius: 5px;
-  transition: background-color 0.3s;
+  border-radius: 8px;
+  transition: all 0.3s ease;
 }
 
 .sidebar-nav a:hover,
 .sidebar-nav a.active {
-  background-color: var(--secondary-color);
+  background: rgba(255, 255, 255, 0.15);
+  transform: translateX(5px);
 }
 
 .main-content {
   margin-left: 270px;
-  padding: 20px;
+  padding: 30px;
   width: calc(100% - 270px);
+  background: #fafafa;
 }
 
 .page h2 {
   border-bottom: 2px solid var(--border-color);
   padding-bottom: 10px;
   margin-bottom: 20px;
+  font-weight: 600;
 }
 
 /* Dashboard Stats */
 .stats-container {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 20px;
 }
 
 .stat-card {
-  background-color: #fff;
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  background: white;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: var(--card-shadow);
   text-align: center;
+  transition: transform 0.3s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-5px);
 }
 
 .stat-card h3 {
   margin-top: 0;
   color: var(--secondary-color);
+  font-weight: 600;
 }
 
 .stat-card p {
-  font-size: 2rem;
+  font-size: 2.2rem;
   font-weight: bold;
   margin-bottom: 0;
   color: var(--accent-color);
@@ -95,110 +114,90 @@ table {
   width: 100%;
   border-collapse: collapse;
   margin-top: 20px;
+  overflow: hidden;
+  border-radius: 8px;
+  box-shadow: var(--card-shadow);
 }
 
 th, td {
-  padding: 12px;
+  padding: 14px 16px;
   border: 1px solid var(--border-color);
   text-align: left;
 }
 
 thead {
-  background-color: var(--secondary-color);
+  background: var(--secondary-color);
   color: var(--light-text-color);
+  font-weight: 600;
 }
 
 tbody tr:nth-child(even) {
-  background-color: #fff;
+  background-color: #fdfdfd;
+}
+
+tbody tr:hover {
+  background: #f1f3f6;
 }
 
 /* Buttons */
 .btn {
-  padding: 8px 12px;
+  padding: 10px 16px;
   border: none;
-  border-radius: 4px;
+  border-radius: 6px;
   cursor: pointer;
   color: #fff;
-  margin-right: 5px;
+  margin-right: 8px;
+  transition: all 0.3s ease;
+  font-weight: 500;
 }
-.btn-edit { background-color: #2980b9; }
-.btn-delete { background-color: #c0392b; }
+.btn:hover { opacity: 0.9; transform: translateY(-2px); }
+
+.btn-edit { background: #2980b9; }
+.btn-delete { background: #c0392b; }
+.btn-approve { background: #27ae60; }
+.btn-deny { background: #e74c3c; }
 
 /* Status Labels */
 .status {
-  padding: 5px 10px;
-  border-radius: 12px;
+  padding: 6px 12px;
+  border-radius: 20px;
   color: #fff;
-  font-weight: bold;
+  font-weight: 600;
   font-size: 0.8rem;
 }
-.status.delivered { background-color: #27ae60; }
-.status.in.progress { background-color: #f39c12; }
-.status.cancelled { background-color: #c0392b; }
+.status.approved { background: #27ae60; }
+.status.pending { background: #f39c12; }
+.status.denied { background: #c0392b; }
+.status.delivered { background: #27ae60; }
+.status.in.progress { background: #f39c12; }
+.status.cancelled { background: #c0392b; }
+.status.suspended { background: #7f8c8d; }
+.status.active { background: #27ae60; }
 
-/* Settings Form */
-.settings-form .form-group {
-  margin-bottom: 20px;
-}
-.settings-form label {
-  display: block;
-  margin-bottom: 5px;
-  font-weight: bold;
-}
-.settings-form input {
-  width: 300px;
-  padding: 10px;
-  border-radius: 4px;
-  border: 1px solid var(--border-color);
-}
-.settings-form .btn {
-  background-color: var(--accent-color);
-  padding: 12px 20px;
-  font-size: 1rem;
-}
-/* Add these to your App.css file */
-
-/* New Buttons for Approve/Deny */
-.btn-approve { background-color: #27ae60; } /* Green */
-.btn-deny { background-color: #e74c3c; }    /* Red */
-
-/* New Status Labels for Pending/Approved/Denied */
-.status.approved { background-color: #27ae60; }
-.status.pending { background-color: #f39c12; }
-.status.denied { background-color: #c0392b; }
-.status.delivered { background-color: #27ae60; }
-.status.in.progress { background-color: #f39c12; }
-.status.cancelled { background-color: #c0392b; }
-/* Add this to your App.css file */
-
-.status.suspended { background-color: #7f8c8d; } /* Gray for suspended */
-.status.active { background-color: #27ae60; } /* Green for active */
-
-
-/* Add these styles to your App.css file */
-
-/* Login Page Styles */
+/* Login Page */
 .login-container {
   display: flex;
   justify-content: center;
   align-items: center;
   height: 100vh;
-  background-color: #f0f2f5;
+  background: linear-gradient(135deg, #ece9e6, #ffffff);
 }
 
 .login-box {
   padding: 40px;
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: var(--card-shadow);
   width: 100%;
   max-width: 400px;
   text-align: center;
+  animation: fadeIn 0.6s ease;
 }
 
 .login-box h2 {
   margin-bottom: 24px;
   color: #333;
+  font-weight: 700;
 }
 
 .login-form .input-group {
@@ -215,27 +214,32 @@ tbody tr:nth-child(even) {
 
 .login-form input {
   width: 100%;
-  padding: 10px 12px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+  padding: 12px 14px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
   font-size: 16px;
+  transition: border 0.3s;
+}
+.login-form input:focus {
+  border-color: var(--accent-color);
+  outline: none;
 }
 
 .login-button {
   width: 100%;
   padding: 12px;
   border: none;
-  background-color: #007bff;
+  background: var(--accent-color);
   color: white;
   font-size: 16px;
   font-weight: bold;
-  border-radius: 4px;
+  border-radius: 6px;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  transition: background 0.3s ease;
 }
 
 .login-button:hover {
-  background-color: #0056b3;
+  background: #217dbb;
 }
 
 .error-message {
@@ -244,31 +248,30 @@ tbody tr:nth-child(even) {
   font-size: 14px;
 }
 
-/* Sidebar Logout Button */
+/* Sidebar Footer (Logout) */
 .sidebar-footer {
-  margin-top: auto; /* Pushes the logout button to the bottom */
+  margin-top: auto;
   padding: 20px;
 }
 
 .logout-button {
   width: 100%;
-  padding: 10px;
-  background-color: #dc3545;
+  padding: 12px;
+  background: #dc3545;
   color: white;
   border: none;
-  border-radius: 5px;
+  border-radius: 6px;
   cursor: pointer;
   font-size: 16px;
   font-weight: bold;
+  transition: background 0.3s;
 }
-
 .logout-button:hover {
-  background-color: #c82333;
+  background: #b52d2d;
 }
 
-/* Make sidebar fill height */
-.sidebar {
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
