@@ -9,7 +9,7 @@ import AdminOrdersDashboard from './components/ViewOrders';
 import Settings from './components/Settings';
 import LoginPage from './components/LoginPage';
 import './App.css';
-
+import ManageCreators from './components/ManageCreators';
 function App() {
   const [isAdminAuthenticated, setIsAdminAuthenticated] = useState(false);
 
@@ -39,6 +39,7 @@ function App() {
               <Route path="/users" element={<ManageUsers />} /> 
               <Route path="/orders" element={<AdminOrdersDashboard/>} />
               <Route path="/settings" element={<Settings />} />
+               <Route path="/manage-creators" element={<ManageCreators />} />
             </Routes>
           </main>
         </div>

@@ -19,6 +19,7 @@ import SearchPage from './pages/SearchPage/SearchPage.jsx';
 import RestaurantDisplay from './components/RestaurantDisplay/RestaurantDisplay.jsx';
 import MyReviews from './pages/MyReviews/MyReviews.jsx';
 import PersonalInfoEdit from './pages/profile/profile.jsx';
+import CreatorCommunity from './pages/Affiliate/CreatorCommunity.jsx';
 
 const App = () => {
   const [showLogin, setShowLogin] = useState(false);
@@ -78,6 +79,7 @@ const App = () => {
           <Route path='/search' element={<SearchPage />} />
           <Route path='/reviews-user' element={<MyReviews />} />
           <Route path='/profile-edit' element={<PersonalInfoEdit />} />
+          <Route path='/affiliate' element={<CreatorCommunity/>}/>
         </Routes>
       </div>
       <Footer />

@@ -130,6 +130,7 @@ const Navbar = ({ setShowLogin }) => {
                       <Link to="/partner-with-us"><li><img src={assets.agent} alt="agents" /><p>Partner with us</p></li></Link>
                       <Link to="/address"><li><img src={assets.ping} alt="address" /><p>Saved Address</p></li></Link>
                       <Link to="/reviews-user"><li><img src={assets.review} alt="reviews" /><p>My Reviews</p></li></Link>
+                      <Link to="/affiliate">Join community</Link>
                       <hr />
                       <li onClick={handleLogout}><img src={assets.logout_icon} alt="Logout" /><p>Logout</p></li>
                     </motion.ul>

@@ -1,0 +1,140 @@
+.creator-community-page {
+    padding: 40px 20px;
+    background-color: #f9f9f9;
+    display: flex;
+    justify-content: center;
+}
+
+.creator-form-container {
+    width: 100%;
+    max-width: 800px;
+    background: #fff;
+    padding: 30px 40px;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+.form-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.form-header h1 {
+    font-size: 2.5rem;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.form-header p {
+    font-size: 1.1rem;
+    color: #666;
+}
+
+.creator-form fieldset {
+    border: 1px solid #e0e0e0;
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 25px;
+}
+
+.creator-form legend {
+    padding: 0 10px;
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #ff6f61;
+}
+
+.creator-form input[type="text"],
+.creator-form input[type="email"],
+.creator-form input[type="tel"],
+.creator-form input[type="url"],
+.creator-form input[type="number"],
+.creator-form textarea,
+.creator-form select {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 1rem;
+    box-sizing: border-box;
+}
+
+.creator-form textarea {
+    min-height: 120px;
+    resize: vertical;
+}
+
+.platform-group {
+    display: grid;
+    grid-template-columns: 1fr 2fr 1fr;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.add-platform-btn {
+    background-color: #e7e7e7;
+    color: #333;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: background-color 0.3s;
+}
+
+.add-platform-btn:hover {
+    background-color: #dcdcdc;
+}
+
+.checkbox-group p,
+.creator-form > p {
+    font-weight: 500;
+    color: #444;
+    margin-bottom: 10px;
+}
+
+.checkbox-group label {
+    display: block;
+    margin-bottom: 8px;
+    color: #555;
+}
+
+.terms-agreement {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+}
+
+.terms-agreement input[type="checkbox"] {
+    margin-top: 5px;
+    width: auto;
+}
+
+.submit-application-btn {
+    width: 100%;
+    padding: 15px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #fff;
+    background-color: #ff6f61;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.submit-application-btn:hover {
+    background-color: #e65a4f;
+}
+
+@media (max-width: 768px) {
+    .creator-form-container {
+        padding: 20px;
+    }
+    .platform-group {
+        grid-template-columns: 1fr;
+    }
+}

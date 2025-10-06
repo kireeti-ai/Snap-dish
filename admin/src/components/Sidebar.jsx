@@ -13,6 +13,7 @@ function Sidebar({ handleLogout }) {
         <NavLink to="/users"> Manage Users</NavLink>
         <NavLink to="/orders"> View Orders</NavLink>
         <NavLink to="/settings"> Settings</NavLink>
+<NavLink to="/manage-creators">Manage Creators</NavLink>
       </nav>
       <div className="sidebar-footer">
         <button onClick={handleLogout} className="logout-button">Logout</button>
