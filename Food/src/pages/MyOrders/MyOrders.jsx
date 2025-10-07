@@ -6,16 +6,30 @@ import OrderStatusTracker from '../../components/OrderStatusTracker/OrderStatusT
 import { FaShoppingBag } from 'react-icons/fa';
 
 const MyOrders = () => {
-  const { orders } = useContext(StoreContext);
+
   const [activeOrders, setActiveOrders] = useState([]);
   const [pastOrders, setPastOrders] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
+    const { orders, socket } = useContext(StoreContext); // <-- Get socket from context
+
 
   useEffect(() => {
     const allOrders = orders || [];
-    const active = allOrders.filter(order => ['Order Placed', 'Preparing', 'Out for Delivery'].includes(order.status));
+    
+    // --- FIX: Added the missing active statuses ---
+    const active = allOrders.filter(order => 
+      [
+        'Pending Confirmation', // For newly placed orders
+        'Order Placed', 
+        'Preparing', 
+        'Awaiting Delivery Agent', // When food is ready for pickup
+        'Out for Delivery'
+      ].includes(order.status)
+    );
+
     const past = allOrders.filter(order => ['Delivered', 'Cancelled'].includes(order.status));
+    
     setActiveOrders(active);
     setPastOrders(past);
   }, [orders]);

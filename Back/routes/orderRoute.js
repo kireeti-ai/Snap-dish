@@ -5,7 +5,7 @@ import {
     listAllOrders,
     updateOrderStatus,
     updateOrderByRestaurant, // <-- Import new function
-    acceptDelivery           // <-- Import new function
+    acceptDelivery,getRestaurantOrders           // <-- Import new function
 } from "../controllers/orderController.js";
 import { protect, restrictTo } from "../middleware/authMiddleware.js";
 
@@ -16,6 +16,7 @@ orderRouter.post("/place", protect, placeOrder);
 orderRouter.get("/myorders", protect, getUserOrders);
 
 // -- Restaurant Route --
+orderRouter.get("/restaurant", protect, restrictTo('restaurant_owner', 'admin'), getRestaurantOrders);
 orderRouter.post("/restaurant/update", protect, restrictTo('restaurant_owner', 'admin'), updateOrderByRestaurant);
 
 // -- Delivery Agent Route --

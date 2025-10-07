@@ -2,10 +2,12 @@ import React, { useContext } from 'react';
 import { OrderContext } from '../context/OrderContext';
 import OrderNotification from '../components/OrderNotification';
 import ActiveOrder from '../components/ActiveOrder';
-import './DashboardPage.css';
 
 const DashboardPage = () => {
-    const { isOnline, toggleOnlineStatus, newOrder, activeOrder } = useContext(OrderContext);
+    const { isOnline, toggleOnlineStatus, availableOrders, activeOrder } = useContext(OrderContext);
+
+    // We'll just show the first available order as a notification
+    const newOrderToShow = availableOrders.length > 0 ? availableOrders[0] : null;
 
     return (
         <div>
@@ -16,17 +18,20 @@ const DashboardPage = () => {
                 </button>
             </div>
             
-            {/* Show Order Components based on state */}
-            <OrderNotification />
+            {/* Show notification only if we're online and not busy */}
+            {isOnline && !activeOrder && <OrderNotification order={newOrderToShow} />}
+            
+            {/* Show active order if we have one */}
             <ActiveOrder />
 
-            {/* Show a default message if no orders are active */}
-            {!newOrder && !activeOrder && (
+            {/* Default messages */}
+            {!activeOrder && !newOrderToShow && (
                 <div className="card info-card">
-                    {isOnline ? "You are online and ready to receive orders." : "You are offline. Go online to start working."}
+                    {isOnline ? "You are online. Waiting for available orders..." : "You are offline."}
                 </div>
             )}
         </div>
     );
 };
+
 export default DashboardPage;

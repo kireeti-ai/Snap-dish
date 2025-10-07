@@ -1,5 +1,5 @@
-import React, { useState, useContext, useEffect } from 'react'; // Import useEffect
-import axios from 'axios'; // Import axios
+import React, { useState, useContext, useEffect } from 'react'; 
+import axios from 'axios'; 
 import Navbar from './components/navbar/navbar.jsx';
 import { Route, Routes } from 'react-router-dom';
 import Home from './pages/home/Home';

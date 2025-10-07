@@ -2,22 +2,93 @@ import React, { useContext } from 'react';
 import { OrderContext } from '../context/OrderContext';
 import './OrderNotification.css';
 
-const OrderNotification = () => {
-    const { newOrder, acceptOrder, rejectOrder } = useContext(OrderContext);
+const OrderNotification = ({ order }) => {
+    const { acceptOrder, loading } = useContext(OrderContext);
 
-    if (!newOrder) return null;
+    if (!order) return null;
+
+    // Helper to get restaurant info
+    const getRestaurantInfo = () => {
+        if (order.restaurantId) {
+            if (typeof order.restaurantId === 'object') {
+                return {
+                    name: order.restaurantId.name || 'Restaurant',
+                    address: order.restaurantId.address || {}
+                };
+            }
+        }
+        return {
+            name: 'Restaurant',
+            address: {}
+        };
+    };
+
+    // Helper to format address
+    const formatAddress = (address) => {
+        if (typeof address === 'object' && address !== null) {
+            return `${address.street || ''}, ${address.city || ''}`.trim() || 'Address not available';
+        }
+        return 'Address not available';
+    };
+
+    // Helper to get delivery address
+    const getDeliveryAddress = () => {
+        if (order.address) {
+            return formatAddress(order.address);
+        }
+        return 'Address not available';
+    };
+
+    // Calculate estimated earnings (could be enhanced with actual calculation)
+    const estimatedEarnings = order.amount ? (order.amount * 0.15).toFixed(2) : '50.00';
+
+    const restaurant = getRestaurantInfo();
 
     return (
         <div className="card new-order-card">
-            <h3>New Order!</h3>
-            <p><strong>From:</strong> {newOrder.restaurant}</p>
-            <p><strong>To:</strong> {newOrder.customer}</p>
-            <p className="earnings"><strong>Earnings: {newOrder.earnings}</strong></p>
+            <h3>🔔 New Order Available!</h3>
+            
+            <div className="order-info">
+                <div className="info-row">
+                    <span className="label">📍 Pickup:</span>
+                    <span className="value">
+                        <strong>{restaurant.name}</strong>
+                        <br />
+                        <small>{formatAddress(restaurant.address)}</small>
+                    </span>
+                </div>
+
+                <div className="info-row">
+                    <span className="label">🏠 Delivery:</span>
+                    <span className="value">
+                        <small>{getDeliveryAddress()}</small>
+                    </span>
+                </div>
+
+                <div className="info-row">
+                    <span className="label">💵 Est. Earnings:</span>
+                    <span className="value earnings">₹{estimatedEarnings}</span>
+                </div>
+
+                {order.items && order.items.length > 0 && (
+                    <div className="info-row">
+                        <span className="label">📦 Items:</span>
+                        <span className="value">{order.items.length} item(s)</span>
+                    </div>
+                )}
+            </div>
+
             <div className="actions">
-                <button onClick={rejectOrder} className="btn btn-secondary">Reject</button>
-                <button onClick={acceptOrder} className="btn btn-primary">Accept</button>
+                <button 
+                    onClick={() => acceptOrder(order._id)} 
+                    className="btn btn-primary"
+                    disabled={loading}
+                >
+                    {loading ? 'Accepting...' : 'Accept Order'}
+                </button>
             </div>
         </div>
     );
 };
+
 export default OrderNotification;

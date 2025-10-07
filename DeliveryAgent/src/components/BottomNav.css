@@ -1,26 +1,46 @@
 .bottom-nav {
-    position: fixed;
-    bottom: 0;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 100%;
-    max-width: 450px;
-    display: flex;
-    justify-content: space-around;
-    background-color: var(--card-bg);
-    box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
-    border-top: 1px solid #eee;
-    z-index: 10;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: space-around;
+  background-color: var(--card-bg);
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+  border-top: 1px solid var(--border-color);
+  z-index: 1000;
+  height: 65px;
 }
+
 .bottom-nav a {
-    flex-grow: 1;
-    text-align: center;
-    padding: 1rem 0;
-    text-decoration: none;
-    color: var(--light-text);
-    font-weight: 500;
+  flex-grow: 1;
+  text-align: center;
+  padding: 0.5rem 0;
+  text-decoration: none;
+  color: var(--light-text);
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  transition: var(--transition);
 }
+
+/* Style for the active link */
 .bottom-nav a.active {
-    color: var(--primary-color);
-    border-top: 3px solid var(--primary-color);
+  color: var(--primary-color);
+  font-weight: 600;
+}
+
+/* Underline effect for active link */
+.bottom-nav a.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 40px;
+  height: 4px;
+  background-color: var(--primary-color);
+  border-radius: 2px;
 }

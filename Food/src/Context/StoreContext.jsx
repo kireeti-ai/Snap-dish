@@ -1,7 +1,7 @@
 import { createContext, useState, useEffect } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
-
+import io from "socket.io-client";
 export const StoreContext = createContext(null);
 
 const StoreContextProvider = (props) => {
@@ -15,6 +15,7 @@ const StoreContextProvider = (props) => {
   const [userRole, setUserRole] = useState("customer");
   const [orders, setOrders] = useState([]);
   const [savedAddresses, setSavedAddresses] = useState([]);
+  const [socket, setSocket] = useState(null);
 
   // --- UI STATE ---
   const [searchQuery, setSearchQuery] = useState("");
@@ -27,7 +28,7 @@ const StoreContextProvider = (props) => {
     longitude: 76.9038,
   });
 
-  const url = "https://snap-dish.onrender.com";
+  const url = "http://localhost:4000";
 
   // --- CORE API FUNCTIONS ---
 
@@ -186,22 +187,54 @@ const StoreContextProvider = (props) => {
     }
   };
 
+  // In StoreContext.jsx
+
   const placeNewOrder = async (orderData) => {
     if (!token) {
       toast.error("Please log in to place an order.");
       return { success: false };
     }
     try {
-      const orderPayload = { items: orderData.items, amount: orderData.total, address: orderData.deliveryInfo };
+      // --- ROBUST FIX STARTS HERE ---
+      
+      // 1. Get the list of item IDs from the cart
+      const cartItemIds = Object.keys(cartItems);
+      if (cartItemIds.length === 0) {
+          toast.error("Your cart is empty.");
+          return { success: false };
+      }
+
+      // 2. Find the first item in the food_list to get the restaurantId
+      const firstItemInCart = food_list.find(item => item._id === cartItemIds[0]);
+      if (!firstItemInCart) {
+          toast.error("Could not find restaurant information for the items in your cart.");
+          return { success: false };
+      }
+      const restaurantId = firstItemInCart.restaurant_id;
+
+      // 3. Construct the payload with the derived restaurantId
+      const orderPayload = { 
+        items: orderData.items, 
+        amount: orderData.total, 
+        address: orderData.deliveryInfo,
+        restaurantId: restaurantId // <-- Use the ID found from the cart items
+      };
+      
+      // --- ROBUST FIX ENDS HERE ---
+      
       const response = await axios.post(`${url}/api/order/place`, orderPayload, { headers: { Authorization: `Bearer ${token}` } });
+      
       if (response.data.success) {
         setCartItems({});
+        setCartRestaurant(null); // Also clear the cart restaurant state
         await updateCartInDb({});
         await fetchUserOrders();
         return { success: true };
       }
+      
       toast.error(response.data.message || "Failed to place order.");
       return { success: false };
+
     } catch (error) {
       toast.error("An error occurred while placing your order.");
       return { success: false };
@@ -218,8 +251,40 @@ const StoreContextProvider = (props) => {
     setSavedAddresses([]);
     setOrders([]);
   };
+  
 
   // --- EFFECTS ---
+  // --- NEW: WebSocket Connection Effect ---
+  useEffect(() => {
+    // Establish connection when the component mounts
+    const newSocket = io(url); // Use your backend URL
+    setSocket(newSocket);
+
+    // Clean up the connection when the component unmounts
+    return () => newSocket.close();
+  }, []);
+
+  // --- NEW: WebSocket Event Listener Effect ---
+  useEffect(() => {
+    if (!socket) return; // Don't do anything if the socket is not connected yet
+
+    // Set up the listener for order status updates
+    socket.on('orderStatusUpdated', (updatedOrder) => {
+      toast.info(`Order #${updatedOrder._id.slice(-6)} is now ${updatedOrder.status}!`);
+      
+      // Update the orders state with the new data from the server
+      setOrders(prevOrders => 
+        prevOrders.map(order => 
+          order._id === updatedOrder._id ? updatedOrder : order
+        )
+      );
+    });
+
+    // Clean up the listener to prevent memory leaks
+    return () => {
+      socket.off('orderStatusUpdated');
+    };
+  }, [socket]); // This effect re-runs if the socket instance changes
 
   useEffect(() => {
     async function loadInitialData() {
@@ -243,7 +308,8 @@ const StoreContextProvider = (props) => {
     searchQuery, location, showRestaurantPrompt, pendingItem, cartRestaurant, url,
     setSearchQuery, setLocation, setToken, setUserName, setUserRole, setShowRestaurantPrompt,
     addToCart, removeFromCart, getTotalCartAmount, clearCartAndAddToCart,
-    addToWishlist, removeFromWishlist,
+    addToWishlist, removeFromWishlist,socket, // <-- Expose the socket instance to other components
+    setOrders,
     placeNewOrder, logout, fetchAddresses, addAddress,
   };
 
