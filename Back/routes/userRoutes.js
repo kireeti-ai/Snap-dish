@@ -45,7 +45,7 @@ userRouter.post('/upload-avatar',
 
 // Account deletion
 userRouter.delete('/profile', protect, deleteUser);
-
+userRouter.post('/update-profile', protect, updateUserProfile);
 
 // --- ADMIN ROUTES ---
 const adminOnly = [protect, restrictTo('admin')];

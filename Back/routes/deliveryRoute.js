@@ -3,13 +3,18 @@ import {
     getAvailableOrders,
     acceptOrder,
     updateOrderStatus,
-    getActiveOrder 
+    getActiveOrder, 
+    getOrderHistory,
+    getEarnings
 } from "../controllers/deliveryController.js";
 import { protect, restrictTo } from "../middleware/authMiddleware.js";
 
 const deliveryRouter = express.Router();
 const deliveryOnly = [protect, restrictTo('delivery_agent')];
+deliveryRouter.get("/order-history", deliveryOnly, getOrderHistory);
 
+// Get the agent's earnings statistics
+deliveryRouter.get("/earnings", deliveryOnly, getEarnings);
 // Get a list of all orders awaiting a delivery agent
 deliveryRouter.get("/available-orders", deliveryOnly, getAvailableOrders);
 

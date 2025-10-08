@@ -9,16 +9,15 @@ const ManageCreators = () => {
     const [selectedApp, setSelectedApp] = useState(null);
     const [showModal, setShowModal] = useState(false);
 
-    // API URL - update this if your backend runs on a different port
-    const API_URL = 'http://localhost:4000';
+    // ✅ FIXED: Use environment variable instead of hardcoded URL
+    const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:4000";
 
     const fetchApplications = async () => {
         try {
             setLoading(true);
-            // ✅ Changed from https to http
-            const response = await axios.get(`${API_URL}/api/creator-application`);
+            const response = await axios.get(`${API_BASE_URL}/api/creator-application`);
             setApplications(response.data);
-            console.log('Fetched applications:', response.data); // DEBUG
+            console.log('Fetched applications:', response.data);
         } catch (error) {
             const errorMessage = error.response?.data?.message || 'Failed to fetch applications.';
             toast.error(errorMessage);
@@ -34,9 +33,8 @@ const ManageCreators = () => {
 
     const handleStatusChange = async (id, newStatus) => {
         try {
-            // ✅ Changed from https to http
             const response = await axios.patch(
-                `${API_URL}/api/creator-application/${id}/status`, 
+                `${API_BASE_URL}/api/creator-application/${id}/status`, 
                 { status: newStatus },
                 {
                     headers: {
@@ -45,7 +43,7 @@ const ManageCreators = () => {
                 }
             );
             toast.success(`Application status updated to ${newStatus}`);
-            console.log('Status updated:', response.data); // DEBUG
+            console.log('Status updated:', response.data);
             fetchApplications(); // Refresh the list
         } catch (error) {
             const errorMessage = error.response?.data?.message || 'Failed to update status.';

@@ -1,5 +1,4 @@
 import React, { useContext } from 'react';
-// REMOVE BrowserRouter from this import
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { AuthContext, AuthProvider } from './context/AuthContext';
 import { OrderProvider } from './context/OrderContext';
@@ -9,8 +8,8 @@ import LoginPage from './pages/LoginPage';
 import DashboardPage from './pages/DashboardPage';
 import EarningsPage from './pages/EarningsPage';
 import ProfilePage from './pages/ProfilePage';
+import OrderHistoryPage from './pages/OrderHistoryPage';
 
-// This component remains the same
 const ProtectedRoute = ({ children }) => {
     const { isLoggedIn } = useContext(AuthContext);
     return isLoggedIn ? children : <Navigate to="/login" />;
@@ -29,6 +28,7 @@ function AppRoutes() {
                                 <Route element={<Layout />}>
                                     <Route path="/" element={<DashboardPage />} />
                                     <Route path="/earnings" element={<EarningsPage />} />
+                                    <Route path="/history" element={<OrderHistoryPage />} />
                                     <Route path="/profile" element={<ProfilePage />} />
                                 </Route>
                             </Routes>

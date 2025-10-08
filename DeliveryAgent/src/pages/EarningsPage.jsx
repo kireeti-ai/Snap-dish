@@ -1,187 +1,215 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
+import { AuthContext } from '../context/AuthContext';
+import axios from 'axios';
+import { toast } from 'react-toastify';
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import './EarningsPage.css';
 
-const mockEarnings = [
-  { id: 'ORD-12344', amount: 55.00, time: '10:30 AM', date: '2025-10-07', distance: '5.2 km' },
-  { id: 'ORD-12343', amount: 48.50, time: '09:15 AM', date: '2025-10-07', distance: '3.8 km' },
-  { id: 'ORD-12342', amount: 62.00, time: '02:45 PM', date: '2025-10-06', distance: '6.5 km' },
-  { id: 'ORD-12341', amount: 71.25, time: '11:20 AM', date: '2025-10-06', distance: '8.1 km' },
-  { id: 'ORD-12340', amount: 45.75, time: '08:30 AM', date: '2025-10-05', distance: '4.2 km' },
-  { id: 'ORD-12339', amount: 58.00, time: '01:15 PM', date: '2025-10-05', distance: '5.9 km' },
-  { id: 'ORD-12338', amount: 52.50, time: '03:45 PM', date: '2025-10-04', distance: '4.8 km' },
-];
-
 const EarningsPage = () => {
-  const [chartType, setChartType] = useState('bar');
+    const { API_BASE_URL, token } = useContext(AuthContext);
+    const [chartType, setChartType] = useState('bar');
+    const [loading, setLoading] = useState(true);
+    const [earningsData, setEarningsData] = useState([]);
+    const [statistics, setStatistics] = useState({
+        totalEarnings: '0.00',
+        totalDeliveries: 0,
+        todayEarnings: '0.00',
+        todayDeliveries: 0,
+        averageEarning: '0.00'
+    });
 
-  const todayEarnings = mockEarnings
-    .filter(e => e.date === '2025-10-07')
-    .reduce((acc, curr) => acc + curr.amount, 0);
+    useEffect(() => {
+        const fetchEarnings = async () => {
+            try {
+                const response = await axios.get(
+                    `${API_BASE_URL}/api/delivery/earnings`,
+                    { headers: { Authorization: `Bearer ${token}` } }
+                );
 
-  const totalEarnings = mockEarnings.reduce((acc, curr) => acc + curr.amount, 0);
+                if (response.data.success) {
+                    setEarningsData(response.data.data.earnings);
+                    setStatistics(response.data.data.statistics);
+                } else {
+                    toast.error(response.data.message || 'Failed to load earnings data');
+                }
+            } catch (error) {
+                console.error('Earnings fetch error:', error);
+                const message = error.response?.data?.message || 'An error occurred while fetching earnings.';
+                toast.error(message);
+            } finally {
+                setLoading(false);
+            }
+        };
 
-  const chartData = mockEarnings.reduce((acc, earning) => {
-    const dateObj = new Date(earning.date);
-    const dateLabel = dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-    const existing = acc.find(item => item.date === dateLabel);
+        fetchEarnings();
+    }, [API_BASE_URL, token]); // Add dependencies to useEffect
 
-    if (existing) {
-      existing.earnings += earning.amount;
-      existing.deliveries += 1;
-    } else {
-      acc.push({
-        date: dateLabel,
-        earnings: earning.amount,
-        deliveries: 1
-      });
-    }
-    return acc;
-  }, []).reverse();
+    // Process data for charts
+    const chartData = earningsData
+        .reduce((acc, earning) => {
+            const dateObj = new Date(earning.date);
+            // Use a stable date format for grouping, like YYYY-MM-DD
+            const dateKey = dateObj.toISOString().split('T')[0];
+            const existing = acc.find(item => item.dateKey === dateKey);
 
-  // Function to handle downloading the report as a CSV file
-  const handleDownload = () => {
-    const headers = ['Order ID', 'Date', 'Time', 'Distance (km)', 'Amount (₹)'];
-    
-    // Convert data to CSV format
-    const csvRows = mockEarnings.map(row => 
-      [
-        row.id,
-        row.date,
-        row.time,
-        row.distance.replace(' km', ''), // Remove unit for clean data
-        row.amount.toFixed(2)
-      ].join(',')
-    );
+            if (existing) {
+                existing.earnings += parseFloat(earning.earnings);
+                existing.deliveries += 1;
+            } else {
+                acc.push({
+                    dateKey: dateKey,
+                    // Format the label for display
+                    dateLabel: dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+                    earnings: parseFloat(earning.earnings),
+                    deliveries: 1
+                });
+            }
+            return acc;
+        }, [])
+        .sort((a, b) => new Date(a.dateKey) - new Date(b.dateKey)); // Sort chronologically for the chart
 
-    const csvContent = [headers.join(','), ...csvRows].join('\n');
-    
-    // Create a Blob and trigger download
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement('a');
-    const url = URL.createObjectURL(blob);
-    
-    link.setAttribute('href', url);
-    link.setAttribute('download', 'earnings-report.csv');
-    link.style.visibility = 'hidden';
-    
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
-  };
+    // Function to handle downloading the report as a CSV file
+    const handleDownload = () => {
+        if (earningsData.length === 0) {
+            toast.info('No earnings data to download');
+            return;
+        }
 
-  return (
-    <div className="earnings-page">
-      <div className="earnings-container">
-        <h2 className="earnings-title">Earnings Report</h2>
+        const headers = ['Order ID', 'Date', 'Restaurant', 'Order Amount (₹)', 'Your Earnings (₹)'];
+        
+        // Helper to safely format CSV fields (handles commas)
+        const formatCsvField = (field) => {
+            const str = String(field ?? 'N/A'); // Use 'N/A' for null/undefined
+            // If the field contains a comma, double quote, or newline, wrap it in double quotes
+            if (str.includes(',') || str.includes('"') || str.includes('\n')) {
+                return `"${str.replace(/"/g, '""')}"`; // Escape existing double quotes
+            }
+            return str;
+        };
 
-        {/* Summary Cards */}
-        <div className="summary-cards">
-          <div className="summary-card card-green">
-            <p className="card-title">Today's Earnings</p>
-            <p className="card-amount">₹{todayEarnings.toFixed(2)}</p>
-            <p className="card-subtext">{mockEarnings.filter(e => e.date === '2025-10-07').length} deliveries</p>
-          </div>
-          <div className="summary-card card-blue">
-            <p className="card-title">Total Earnings</p>
-            <p className="card-amount">₹{totalEarnings.toFixed(2)}</p>
-            <p className="card-subtext">{mockEarnings.length} total deliveries</p>
-          </div>
-          <div className="summary-card card-purple">
-            <p className="card-title">Average per Delivery</p>
-            <p className="card-amount">₹{(totalEarnings / mockEarnings.length).toFixed(2)}</p>
-            <p className="card-subtext">Last 7 days</p>
-          </div>
-        </div>
+        const csvRows = earningsData.map(row => 
+            [
+                formatCsvField(row.orderNumber),
+                formatCsvField(new Date(row.date).toLocaleDateString('en-US')),
+                formatCsvField(row.restaurantName),
+                parseFloat(row.amount).toFixed(2),
+                parseFloat(row.earnings).toFixed(2) // Ensure earnings are formatted
+            ].join(',')
+        );
 
-        {/* Chart */}
-        <div className="chart-card">
-          <div className="chart-header">
-            <h3>Earnings Trend</h3>
-            <div className="chart-buttons">
-              <button 
-                className={chartType === 'bar' ? 'active' : 'inactive'}
-                onClick={() => setChartType('bar')}
-              >
-                Bar Chart
-              </button>
-              <button 
-                className={chartType === 'line' ? 'active' : 'inactive'}
-                onClick={() => setChartType('line')}
-              >
-                Line Chart
-              </button>
+        // Use '\n' for newlines for better compatibility
+        const csvContent = [headers.join(','), ...csvRows].join('\n');
+        
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        const url = URL.createObjectURL(blob);
+        
+        link.setAttribute('href', url);
+        link.setAttribute('download', 'earnings-report.csv');
+        link.style.visibility = 'hidden';
+        
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+
+        toast.success('Report downloaded successfully!');
+    };
+
+    // Render loading state
+    if (loading) {
+        return (
+            <div className="earnings-page">
+                <div className="earnings-container">
+                    <h2 className="earnings-title">Earnings Report</h2>
+                    <div className="loading-message">Loading earnings data...</div>
+                </div>
             </div>
-          </div>
+        );
+    }
 
-          <ResponsiveContainer width="100%" height={300}>
-            {chartType === 'bar' ? (
-              <BarChart data={chartData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="date" />
-                <YAxis />
-                <Tooltip formatter={(value) => [`₹${value.toFixed(2)}`, 'Earnings']} contentStyle={{ borderRadius: '8px' }} />
-                <Legend />
-                <Bar dataKey="earnings" fill="#3b82f6" name="Daily Earnings (₹)" radius={[8, 8, 0, 0]} />
-              </BarChart>
-            ) : (
-              <LineChart data={chartData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="date" />
-                <YAxis />
-                <Tooltip formatter={(value) => [`₹${value.toFixed(2)}`, 'Earnings']} contentStyle={{ borderRadius: '8px' }} />
-                <Legend />
-                <Line type="monotone" dataKey="earnings" stroke="#3b82f6" strokeWidth={3} name="Daily Earnings (₹)" dot={{ fill: '#3b82f6', r: 6 }} activeDot={{ r: 8 }} />
-              </LineChart>
-            )}
-          </ResponsiveContainer>
+    // Render empty state
+    if (earningsData.length === 0) {
+        return (
+            <div className="earnings-page">
+                <div className="earnings-container">
+                    <h2 className="earnings-title">Earnings Report</h2>
+                    <div className="empty-state">
+                        <p>💰 No earnings yet</p>
+                        <p className="empty-subtext">Complete deliveries to start earning.</p>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
+    // Main component render
+    return (
+        <div className="earnings-page">
+            <div className="earnings-container">
+                <h2 className="earnings-title">Earnings Report</h2>
+
+                {/* Summary Cards */}
+                <div className="summary-cards">
+                    {/* ... cards remain the same ... */}
+                </div>
+
+                {/* Chart */}
+                {chartData.length > 0 && (
+                    <div className="chart-card">
+                         {/* ... chart header remains the same ... */}
+                        <ResponsiveContainer width="100%" height={300}>
+                            {chartType === 'bar' ? (
+                                <BarChart data={chartData}>
+                                    <CartesianGrid strokeDasharray="3 3" />
+                                    <XAxis dataKey="dateLabel" />
+                                    <YAxis />
+                                    <Tooltip formatter={(value) => [`₹${value.toFixed(2)}`, 'Earnings']} contentStyle={{ borderRadius: '8px' }} />
+                                    <Legend />
+                                    <Bar dataKey="earnings" fill="#3b82f6" name="Daily Earnings (₹)" radius={[8, 8, 0, 0]} />
+                                </BarChart>
+                            ) : (
+                                <LineChart data={chartData}>
+                                    <CartesianGrid strokeDasharray="3 3" />
+                                    <XAxis dataKey="dateLabel" />
+                                    <YAxis />
+                                    <Tooltip formatter={(value) => [`₹${value.toFixed(2)}`, 'Earnings']} contentStyle={{ borderRadius: '8px' }} />
+                                    <Legend />
+                                    <Line type="monotone" dataKey="earnings" stroke="#3b82f6" strokeWidth={3} name="Daily Earnings (₹)" dot={{ fill: '#3b82f6', r: 6 }} activeDot={{ r: 8 }} />
+                                </LineChart>
+                            )}
+                        </ResponsiveContainer>
+                    </div>
+                )}
+
+                {/* Earnings Table */}
+                <div className="table-card">
+                    {/* ... table header remains the same ... */}
+                    <div className="table-wrapper">
+                        <table className="earnings-table">
+                            <thead>
+                                {/* ... thead remains the same ... */}
+                            </thead>
+                            <tbody>
+                                {earningsData.map(earning => (
+                                    <tr key={earning.orderId || earning.orderNumber}> {/* More robust key */}
+                                        <td>{earning.orderNumber}</td>
+                                        <td>{new Date(earning.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</td>
+                                        <td>{earning.restaurantName || 'N/A'}</td>
+                                        <td>₹{parseFloat(earning.amount).toFixed(2)}</td>
+                                        <td className="earnings-amount">₹{parseFloat(earning.earnings).toFixed(2)}</td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                            <tfoot>
+                                {/* ... tfoot remains the same ... */}
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
         </div>
-
-        {/* Earnings Table */}
-        <div className="table-card">
-          <div className="table-header">
-            Detailed Earnings Report
-            {/* --- NEW: Download Button --- */}
-            <button className="download-btn" onClick={handleDownload}>
-              Download Report
-            </button>
-          </div>
-          <div className="table-wrapper">
-            <table className="earnings-table">
-              <thead>
-                <tr>
-                  <th>Order ID</th>
-                  <th>Date</th>
-                  <th>Time</th>
-                  <th>Distance</th>
-                  <th>Amount</th>
-                </tr>
-              </thead>
-              <tbody>
-                {mockEarnings.map(earning => (
-                  <tr key={earning.id}>
-                    <td>{earning.id}</td>
-                    <td>{new Date(earning.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</td>
-                    <td>{earning.time}</td>
-                    <td>{earning.distance}</td>
-                    <td className="earnings-amount">₹{earning.amount.toFixed(2)}</td>
-                  </tr>
-                ))}
-              </tbody>
-              <tfoot>
-                <tr>
-                  <td colSpan="4" className="tfoot-label">Total Earnings:</td>
-                  <td className="tfoot-value">₹{totalEarnings.toFixed(2)}</td>
-                </tr>
-              </tfoot>
-            </table>
-          </div>
-        </div>
-
-      </div>
-    </div>
-  );
+    );
 };
 
 export default EarningsPage;

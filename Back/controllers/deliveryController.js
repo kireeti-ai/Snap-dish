@@ -167,3 +167,79 @@ export const updateOrderStatus = async (req, res) => {
         res.status(500).json({ success: false, message: "Server Error" });
     }
 };
+
+
+// @desc    Get delivery agent's order history
+export const getOrderHistory = async (req, res) => {
+    try {
+        const orders = await orderModel.find({ 
+            deliveryAgentId: req.user.id,
+            status: "Delivered"
+        })
+        .populate('restaurantId', 'name address')
+        .populate('userId', 'firstName lastName')
+        .sort({ date: -1 })
+        .limit(100); // Limit to last 100 orders
+        
+        res.json({ success: true, data: orders });
+    } catch (error) {
+        console.error("Get Order History Error:", error);
+        res.status(500).json({ success: false, message: "Server Error" });
+    }
+};
+
+// @desc    Get delivery agent's earnings statistics
+export const getEarnings = async (req, res) => {
+    try {
+        const agentId = req.user.id;
+        
+        // Get all delivered orders for this agent
+        const deliveredOrders = await orderModel.find({
+            deliveryAgentId: agentId,
+            status: "Delivered"
+        })
+        .populate('restaurantId', 'name') // Populate restaurant name
+        .sort({ date: -1 });
+
+        // Calculate earnings (15% of order amount)
+        const earningsData = deliveredOrders.map(order => ({
+            orderId: order._id,
+            orderNumber: `ORD-${order._id.toString().slice(-6)}`,
+            amount: order.amount,
+            earnings: parseFloat((order.amount * 0.15).toFixed(2)), // 15% commission
+            date: order.date,
+            restaurantName: order.restaurantId?.name || 'Unknown',
+        }));
+
+        // Calculate statistics
+        const totalEarnings = earningsData.reduce((sum, item) => sum + item.earnings, 0);
+        const totalDeliveries = deliveredOrders.length;
+        
+        // Today's earnings
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const todayOrders = deliveredOrders.filter(order => {
+            const orderDate = new Date(order.date);
+            orderDate.setHours(0, 0, 0, 0);
+            return orderDate.getTime() === today.getTime();
+        });
+        const todayEarnings = todayOrders.reduce((sum, order) => sum + (order.amount * 0.15), 0);
+
+        res.json({
+            success: true,
+            data: {
+                earnings: earningsData,
+                statistics: {
+                    totalEarnings: totalEarnings.toFixed(2),
+                    totalDeliveries,
+                    todayEarnings: todayEarnings.toFixed(2),
+                    todayDeliveries: todayOrders.length,
+                    averageEarning: totalDeliveries > 0 ? (totalEarnings / totalDeliveries).toFixed(2) : '0.00'
+                }
+            }
+        });
+    } catch (error) {
+        console.error("Get Earnings Error:", error);
+        res.status(500).json({ success: false, message: "Server Error" });
+    }
+};

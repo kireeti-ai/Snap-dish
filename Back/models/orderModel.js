@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 
 const orderSchema = new mongoose.Schema({
     userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
-    restaurantId: { type: mongoose.Schema.Types.ObjectId, ref: 'Restaurant', required: true },
+    restaurantId: { type: mongoose.Schema.Types.ObjectId, ref: 'restaurant', required: true },
     deliveryAgentId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null },
     items: [{
         name: { type: String, required: true },
@@ -19,7 +19,9 @@ const orderSchema = new mongoose.Schema({
             "Awaiting Delivery Agent", // Food is ready for pickup
             "Out for Delivery",     // Delivery agent accepts
             "Delivered",            // Order complete
-            "Cancelled"             // Order cancelled by any party
+            "Cancelled",
+            "Reached Restaurant",  // <--- Add this
+        "Picked Up"             // Order cancelled by any party
         ],
         default: "Pending Confirmation" 
     },

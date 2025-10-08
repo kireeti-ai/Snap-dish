@@ -1,40 +1,40 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { toast } from 'react-toastify';
+
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:4000";
 
 function ManageRestaurants() {
   const [restaurants, setRestaurants] = useState([]);
-  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(true);
   
-  const API_URL = 'https://snap-dish.onrender.com/api/users';
   const token = localStorage.getItem("token");
 
   useEffect(() => {
-    const fetchRestaurants = async () => {
-      try {
-        const response = await axios.get(`${API_URL}/admin/restaurants`, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-        if (response.data.success) {
-          setRestaurants(response.data.data);
-        } else {
-          setError('Failed to fetch restaurants.');
-        }
-      } catch (err) {
-        setError('An error occurred while fetching restaurants.');
-        console.error(err);
-      }
-    };
+    fetchRestaurants();
+  }, []);
 
-    if (token) {
-      fetchRestaurants();
-    } else {
-      setError("Not authorized. Please log in as admin.");
+  const fetchRestaurants = async () => {
+    try {
+      const response = await axios.get(`${API_BASE_URL}/api/users/admin/restaurants`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (response.data.success) {
+        setRestaurants(response.data.data);
+      } else {
+        toast.error('Failed to fetch restaurants.');
+      }
+    } catch (err) {
+      toast.error('An error occurred while fetching restaurants.');
+      console.error(err);
+    } finally {
+      setLoading(false);
     }
-  }, [token]);
+  };
   
   const handleUpdateStatus = async (id, newStatus) => {
     try {
-      const response = await axios.put(`${API_URL}/admin/restaurants/${id}/status`, 
+      const response = await axios.put(`${API_BASE_URL}/api/users/admin/restaurants/${id}/status`, 
         { status: newStatus },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -42,11 +42,12 @@ function ManageRestaurants() {
         setRestaurants(restaurants.map(r => 
           r._id === id ? { ...r, status: newStatus } : r
         ));
+        toast.success('Status updated successfully!');
       } else {
-        alert('Failed to update status.');
+        toast.error('Failed to update status.');
       }
     } catch (err) {
-      alert('An error occurred.');
+      toast.error('An error occurred.');
       console.error(err);
     }
   };
@@ -54,25 +55,34 @@ function ManageRestaurants() {
   const handleDelete = async (id) => {
     if (window.confirm("Are you sure you want to delete this restaurant?")) {
       try {
-        const response = await axios.delete(`${API_URL}/admin/restaurants/${id}`, {
+        const response = await axios.delete(`${API_BASE_URL}/api/users/admin/restaurants/${id}`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         if (response.data.success) {
           setRestaurants(restaurants.filter(r => r._id !== id));
+          toast.success('Restaurant deleted successfully!');
         } else {
-          alert('Failed to delete restaurant.');
+          toast.error('Failed to delete restaurant.');
         }
       } catch (err) {
-        alert('An error occurred during deletion.');
+        toast.error('An error occurred during deletion.');
         console.error(err);
       }
     }
   };
 
+  if (loading) {
+    return (
+      <div className="page">
+        <h2>Manage Restaurants</h2>
+        <p>Loading restaurants...</p>
+      </div>
+    );
+  }
+
   return (
     <div className="page">
       <h2>Manage Restaurants</h2>
-      {error && <p className="error-message">{error}</p>}
       <table>
         <thead>
           <tr>

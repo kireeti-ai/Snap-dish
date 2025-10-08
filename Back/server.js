@@ -15,7 +15,7 @@ import orderRouter from './routes/orderRoute.js';
 import addressRoutes from "./routes/addressRoutes.js";
 import creatorApplicationRoutes from './routes/creatorApplicationRoutes.js';
 import deliveryRouter from './routes/deliveryRoute.js';
-
+import adminRouter from './routes/adminRoutes.js';
 dotenv.config();
 
 const __filename = fileURLToPath(import.meta.url);
@@ -51,7 +51,7 @@ app.use(express.json());
 
 // CORS setup
 const allowedOrigins = [
-  "http://localhost:5174", "http://localhost:5173",
+  "http://localhost:5174", "http://localhost:5173","http://localhost:5175",
   "https://snap-dish-xi.vercel.app", "https://snap-dish-qulq.vercel.app", "https://snap-dish-d5y5.vercel.app",
   process.env.FRONTEND_URL
 ].filter(Boolean);
@@ -93,6 +93,7 @@ app.use("/api/menu", menuItemRouter);
 app.use("/api/order", orderRouter);
 app.use('/api/creator-application', creatorApplicationRoutes);
 app.use("/api/delivery", deliveryRouter);
+app.use("/api/admin", adminRouter);
 
 // Socket.io setup
 io.on('connection', (socket) => {

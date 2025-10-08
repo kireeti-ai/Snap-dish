@@ -2,17 +2,16 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:4000";
 
 const ManageUsers = () => {
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);
-    const url = 'https://snap-dish.onrender.com';
 
-    // Fetch all users
     const fetchUsers = async () => {
         try {
             const token = localStorage.getItem('token');
-            const response = await axios.get(`${url}/api/users/admin/users`, {
+            const response = await axios.get(`${API_BASE_URL}/api/users/admin/users`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             if (response.data.success) {
@@ -29,32 +28,32 @@ const ManageUsers = () => {
         fetchUsers();
     }, []);
 
-    // Handler to update a user's role
     const handleRoleChange = async (userId, newRole) => {
         try {
             const token = localStorage.getItem('token');
-            const response = await axios.put(`${url}/api/users/admin/users/${userId}`, { role: newRole }, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
+            const response = await axios.put(`${API_BASE_URL}/api/users/admin/users/${userId}`, 
+                { role: newRole }, 
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
             if (response.data.success) {
                 toast.success("User role updated successfully!");
-                fetchUsers(); // Re-fetch to show the change
+                fetchUsers();
             }
         } catch (error) {
             toast.error("Failed to update user role.");
         }
     };
     
-    // Handler to update a user's status
     const handleStatusChange = async (userId, newStatus) => {
         try {
             const token = localStorage.getItem('token');
-            const response = await axios.put(`${url}/api/users/admin/users/${userId}/status`, { status: newStatus }, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
+            const response = await axios.put(`${API_BASE_URL}/api/users/admin/users/${userId}/status`, 
+                { status: newStatus }, 
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
             if (response.data.success) {
                 toast.success("User status updated successfully!");
-                fetchUsers(); // Re-fetch to show the change
+                fetchUsers();
             }
         } catch (error) {
             toast.error("Failed to update user status.");

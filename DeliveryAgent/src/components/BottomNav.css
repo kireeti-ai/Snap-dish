@@ -5,42 +5,50 @@
   right: 0;
   display: flex;
   justify-content: space-around;
-  background-color: var(--card-bg);
-  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
-  border-top: 1px solid var(--border-color);
-  z-index: 1000;
-  height: 65px;
+  background: white;
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+  padding: 8px 0;
+  z-index: 100;
 }
 
 .bottom-nav a {
-  flex-grow: 1;
-  text-align: center;
-  padding: 0.5rem 0;
-  text-decoration: none;
-  color: var(--light-text);
-  font-weight: 500;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  position: relative;
-  transition: var(--transition);
+  text-decoration: none;
+  color: #6b7280;
+  padding: 8px 12px;
+  border-radius: 8px;
+  transition: all 0.3s;
+  min-width: 70px;
 }
 
-/* Style for the active link */
+.nav-icon {
+  font-size: 20px;
+  margin-bottom: 4px;
+}
+
+.nav-label {
+  font-size: 11px;
+  font-weight: 500;
+}
+
 .bottom-nav a.active {
-  color: var(--primary-color);
-  font-weight: 600;
+  color: #3b82f6;
+  background: #eff6ff;
 }
 
-/* Underline effect for active link */
-.bottom-nav a.active::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 40px;
-  height: 4px;
-  background-color: var(--primary-color);
-  border-radius: 2px;
+.bottom-nav a:hover {
+  color: #3b82f6;
+}
+
+@media (min-width: 768px) {
+  .nav-label {
+    font-size: 12px;
+  }
+  
+  .nav-icon {
+    font-size: 22px;
+  }
 }
