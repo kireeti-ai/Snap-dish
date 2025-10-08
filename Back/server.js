@@ -16,6 +16,7 @@ import addressRoutes from "./routes/addressRoutes.js";
 import creatorApplicationRoutes from './routes/creatorApplicationRoutes.js';
 import deliveryRouter from './routes/deliveryRoute.js';
 import adminRouter from './routes/adminRoutes.js';
+import restaurantDashboardRouter from './routes/restaurantDashboardRoutes.js';
 dotenv.config();
 
 const __filename = fileURLToPath(import.meta.url);
@@ -95,6 +96,7 @@ app.use('/api/creator-application', creatorApplicationRoutes);
 app.use("/api/delivery", deliveryRouter);
 app.use("/api/admin", adminRouter);
 
+app.use("/api/restaurant/dashboard", restaurantDashboardRouter);
 // Socket.io setup
 io.on('connection', (socket) => {
   console.log(`User Connected: ${socket.id}`);
