@@ -1,6 +1,196 @@
-.earnings-summary { text-align: center; background: var(--primary-color); color: white; }
-.earnings-summary h3 { font-weight: 500; }
-.earnings-summary p { font-size: 2.5rem; font-weight: 700; }
-.earnings-list { list-style: none; }
-.earnings-list li { display: flex; justify-content: space-between; padding: 1rem 0; border-bottom: 1px solid #eee; }
-.earnings-list li:last-child { border-bottom: none; }
+/* EarningsPage.css */
+
+/* Page container */
+.earnings-page {
+  min-height: 100vh;
+  background-color: #f9fafb; /* Tailwind bg-gray-50 */
+  padding: 1rem;
+  font-family: 'Inter', sans-serif;
+}
+
+/* Center content */
+.earnings-container {
+  max-width: 96rem; /* Tailwind max-w-6xl */
+  margin: 0 auto;
+}
+
+/* Headings */
+.earnings-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1f2937; /* Tailwind gray-800 */
+  margin-bottom: 1.5rem;
+}
+
+/* Summary cards */
+.summary-cards {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+@media (min-width: 768px) {
+  .summary-cards {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.summary-card {
+  border-radius: 1rem;
+  padding: 1.25rem;
+  color: white;
+  box-shadow: 0 10px 15px rgba(0,0,0,0.1);
+}
+
+.summary-card p {
+  margin: 0.25rem 0;
+}
+
+.summary-card .title {
+  font-size: 0.875rem;
+  opacity: 0.9;
+  margin-bottom: 0.25rem;
+}
+
+.summary-card .amount {
+  font-size: 1.875rem;
+  font-weight: 700;
+}
+
+.summary-card .subtext {
+  font-size: 0.75rem;
+  opacity: 0.8;
+  margin-top: 0.5rem;
+}
+
+/* Gradient backgrounds for cards */
+.card-green { background: linear-gradient(to bottom right, #22c55e, #16a34a); }
+.card-blue { background: linear-gradient(to bottom right, #3b82f6, #2563eb); }
+.card-purple { background: linear-gradient(to bottom right, #8b5cf6, #7c3aed); }
+
+/* Chart container */
+.chart-card {
+  background-color: white;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+}
+
+.chart-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.chart-buttons button {
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: all 0.2s;
+  border: none;
+  cursor: pointer;
+}
+
+.chart-buttons .active {
+  background-color: #3b82f6;
+  color: white;
+}
+
+.chart-buttons .inactive {
+  background-color: #f3f4f6;
+  color: #4b5563;
+}
+
+.chart-buttons .inactive:hover {
+  background-color: #e5e7eb;
+}
+
+/* Table styling */
+.table-card {
+  background-color: white;
+  border-radius: 1rem;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+  overflow: hidden;
+}
+
+.table-header {
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid #e5e7eb;
+  background-color: #f9fafb;
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.earnings-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.earnings-table th,
+.earnings-table td {
+  padding: 0.75rem 1.5rem;
+  text-align: left;
+  font-size: 0.875rem;
+  color: #4b5563;
+}
+
+.earnings-table th {
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.earnings-table tbody tr:hover {
+  background-color: #f9fafb;
+}
+
+.earnings-table tfoot {
+  background-color: #f9fafb;
+  border-top: 2px solid #e5e7eb;
+}
+
+.earnings-amount {
+  text-align: right;
+  font-weight: 600;
+  color: #16a34a;
+}
+
+.earnings-total {
+  text-align: right;
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #16a34a;
+}
+/* Add these styles to your existing CSS file */
+
+/* Style for the table header to accommodate the button */
+.table-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 24px;
+  font-size: 1.2rem;
+  font-weight: 600;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+/* Style for the new download button */
+.download-btn {
+  background-color: #3b82f6; /* Blue background */
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.download-btn:hover {
+  background-color: #2563eb; /* Darker blue on hover */
+}

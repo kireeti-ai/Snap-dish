@@ -1,25 +1,26 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
-import './LoginPage.css'; // Assuming you have a corresponding CSS file
-
-
+import './LoginPage.css';
 
 const LoginPage = () => {
-    // The login function and loading state are now destructured from AuthContext.
-    // Note: The 'loading' from AuthContext is for the initial session check.
-    // We will use a local 'isSubmitting' for the login button action itself.
-    const { login } = useContext(AuthContext);
+    const { login, isLoggedIn } = useContext(AuthContext);
+    const navigate = useNavigate();
 
-    // Unified state for form data for easier management
     const [formData, setFormData] = useState({
         email: '',
         password: '',
     });
 
-    // Local state to manage the submission status of the form
     const [isSubmitting, setIsSubmitting] = useState(false);
 
-    // A single handler to update the form data state
+    // Redirect if already logged in
+    useEffect(() => {
+        if (isLoggedIn) {
+            navigate('/', { replace: true });
+        }
+    }, [isLoggedIn, navigate]);
+
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData(prevData => ({
@@ -28,22 +29,28 @@ const LoginPage = () => {
         }));
     };
     
-    // Handles the form submission asynchronously
-const handleLogin = async (e) => {
-    e.preventDefault();
-    console.log("Login button clicked. Attempting to log in with:", formData.email); // <-- ADD THIS LINE
+    const handleLogin = async (e) => {
+        e.preventDefault();
 
-    if (isSubmitting) return;
+        if (isSubmitting) return;
 
-    setIsSubmitting(true);
-    try {
-        await login(formData.email, formData.password);
-    } catch (error) {
-        console.error("Login failed:", error);
-    } finally {
-        setIsSubmitting(false);
-    }
-};
+        setIsSubmitting(true);
+        try {
+            const success = await login(formData.email, formData.password);
+            
+            // If login successful, navigate to dashboard
+            if (success) {
+                // Small delay to ensure state updates propagate
+                setTimeout(() => {
+                    navigate('/', { replace: true });
+                }, 100);
+            }
+        } catch (error) {
+            console.error("Login failed:", error);
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
 
     return (
         <div className="login-page-container">
@@ -56,25 +63,25 @@ const handleLogin = async (e) => {
                         <input 
                             id="email"
                             type="email"
-                            name="email" // 'name' attribute is crucial for the generic handler
+                            name="email"
                             placeholder="email@example.com" 
                             value={formData.email}
                             onChange={handleChange}
                             required 
-                            disabled={isSubmitting} // Disable input during submission
+                            disabled={isSubmitting}
                         />
                     </div>
                     <div className="form-group">
-                        <label htmlFor="password"  className="sr-only">Password</label>
+                        <label htmlFor="password" className="sr-only">Password</label>
                         <input 
                             id="password"
                             type="password"
-                            name="password" // 'name' attribute is crucial for the generic handler
+                            name="password"
                             placeholder="Password" 
                             value={formData.password}
                             onChange={handleChange}
                             required 
-                            disabled={isSubmitting} // Disable input during submission
+                            disabled={isSubmitting}
                         />
                     </div>
                     <button type="submit" className="btn btn-primary" disabled={isSubmitting}>

@@ -4,9 +4,9 @@ import { toast } from 'react-toastify';
 
 // Create the context
 export const AuthContext = createContext(null);
-
+//https://snap-dish.onrender.com"
 // Define the backend API URL
-const API_BASE_URL = "https://snap-dish.onrender.com";
+const API_BASE_URL ="http://localhost:4000";
 
 // --- Axios Helper ---
 const setAuthHeader = (token) => {
