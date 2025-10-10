@@ -8,14 +8,11 @@ import {
 import { protect, restrictTo } from "../middleware/authMiddleware.js";
 
 const adminRouter = express.Router();
-const adminOnly = [protect, restrictTo('admin')];
 
-// Admin statistics
-adminRouter.get("/statistics", ...adminOnly, getAdminStatistics);
-adminRouter.get("/user-statistics", ...adminOnly, getUserStatistics);
-
-// Platform settings
-adminRouter.get("/settings", ...adminOnly, getSettings);
-adminRouter.put("/settings", ...adminOnly, updateSettings);
+// Fix: Remove spread operator and use middleware directly
+adminRouter.get("/statistics", protect, restrictTo('admin'), getAdminStatistics);
+adminRouter.get("/user-statistics", protect, restrictTo('admin'), getUserStatistics);
+adminRouter.get("/settings", protect, restrictTo('admin'), getSettings);
+adminRouter.put("/settings", protect, restrictTo('admin'), updateSettings);
 
 export default adminRouter;

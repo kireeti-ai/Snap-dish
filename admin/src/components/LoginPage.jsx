@@ -1,36 +1,45 @@
-// src/components/LoginPage.jsx
-
 import React, { useState } from 'react';
 import axios from 'axios';
+import { toast } from 'react-toastify';
 
-// The 'onLoginSuccess' prop is a function passed from App.jsx 
-// to update the state once the admin is successfully logged in.
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:4000';
+
 function LoginPage({ onLoginSuccess }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const handleLogin = async (e) => {
-    e.preventDefault(); // Prevent the form from reloading the page
-    setError(''); // Clear previous errors
+    e.preventDefault();
+    setLoading(true);
 
     try {
-      const response = await axios.post('https://snap-dish.onrender.com/api/users/login', {
-        email,
-        password,
-      });
+      const response = await axios.post(`${API_BASE_URL}/api/users/login`, 
+        {
+          email,
+          password,
+        },
+        {
+          withCredentials: true, // Important for CORS
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      );
 
-      // Check if the login was successful AND the user is an admin
       if (response.data.success && response.data.role === 'admin') {
-        // Store the token in localStorage to keep the user logged in
         localStorage.setItem('token', response.data.token);
-        onLoginSuccess(); // Tell the App component that login was successful
+        axios.defaults.headers.common['Authorization'] = `Bearer ${response.data.token}`;
+        toast.success('Login successful!');
+        onLoginSuccess();
       } else {
-        setError('Login failed. Please check your credentials or role.');
+        toast.error('Access denied. Admin privileges required.');
       }
     } catch (err) {
-      setError('An error occurred. Please try again.');
-      console.error(err);
+      console.error('Login error:', err);
+      toast.error(err.response?.data?.message || 'Login failed. Please try again.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -47,6 +56,7 @@ function LoginPage({ onLoginSuccess }) {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
+              disabled={loading}
             />
           </div>
           <div className="input-group">
@@ -57,10 +67,12 @@ function LoginPage({ onLoginSuccess }) {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
+              disabled={loading}
             />
           </div>
-          {error && <p className="error-message">{error}</p>}
-          <button type="submit" className="login-button">Login</button>
+          <button type="submit" className="login-button" disabled={loading}>
+            {loading ? 'Logging in...' : 'Login'}
+          </button>
         </form>
       </div>
     </div>

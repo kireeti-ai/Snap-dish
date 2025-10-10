@@ -1,10 +1,6 @@
-// ============================================
-// restaurantDashboardController.js
-// ============================================
 import orderModel from "../models/orderModel.js";
 import restaurantModel from "../models/restaurantModel.js";
 import menuItemModel from "../models/menuItemModel.js";
-import userModel from "../models/userModel.js";
 
 /**
  * @route   GET /api/restaurant/dashboard/stats
@@ -13,8 +9,11 @@ import userModel from "../models/userModel.js";
  */
 export const getRestaurantDashboardStats = async (req, res) => {
     try {
+        // Get user ID - handle both req.user._id and req.user.id
+        const userId = req.user._id || req.user.id;
+        
         // Find the restaurant owned by the logged-in user
-        const restaurant = await restaurantModel.findOne({ owner_id: req.user._id });
+        const restaurant = await restaurantModel.findOne({ owner_id: userId });
         
         if (!restaurant) {
             return res.status(404).json({ 
@@ -144,7 +143,8 @@ export const getRestaurantDashboardStats = async (req, res) => {
  */
 export const getRestaurantSalesChartData = async (req, res) => {
     try {
-        const restaurant = await restaurantModel.findOne({ owner_id: req.user._id });
+        const userId = req.user._id || req.user.id;
+        const restaurant = await restaurantModel.findOne({ owner_id: userId });
         
         if (!restaurant) {
             return res.status(404).json({ 
@@ -205,7 +205,8 @@ export const getRestaurantSalesChartData = async (req, res) => {
  */
 export const getRestaurantRecentOrders = async (req, res) => {
     try {
-        const restaurant = await restaurantModel.findOne({ owner_id: req.user._id });
+        const userId = req.user._id || req.user.id;
+        const restaurant = await restaurantModel.findOne({ owner_id: userId });
         
         if (!restaurant) {
             return res.status(404).json({ 
@@ -259,7 +260,8 @@ export const getRestaurantRecentOrders = async (req, res) => {
  */
 export const getRestaurantTopDishes = async (req, res) => {
     try {
-        const restaurant = await restaurantModel.findOne({ owner_id: req.user._id });
+        const userId = req.user._id || req.user.id;
+        const restaurant = await restaurantModel.findOne({ owner_id: userId });
         
         if (!restaurant) {
             return res.status(404).json({ 
@@ -305,6 +307,3 @@ export const getRestaurantTopDishes = async (req, res) => {
         });
     }
 };
-
-// ============================================
-// restaurantDashboardRoutes.js

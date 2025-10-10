@@ -9,22 +9,59 @@ import uploadToCloudinary from '../utils/cloudinary.js';
 const createToken = (id) => {
     return jwt.sign({ id }, process.env.JWT_SECRET);
 };
+export const validateToken = async (req, res) => {
+    try {
+        res.json({
+            success: true,
+            role: req.user.role,
+            userId: req.user._id
+        });
+    } catch (error) {
+        res.status(401).json({
+            success: false,
+            message: 'Token validation failed'
+        });
+    }
+};
 
 // Login user
 export const loginUser = async (req, res) => {
-    const { email, password } = req.body;
     try {
+        const { email, password } = req.body;
+
+        if (!email || !password) {
+            return res.status(400).json({
+                success: false,
+                message: "Please provide email and password"
+            });
+        }
+
         const user = await userModel.findOne({ email });
         if (!user) {
-            return res.json({ success: false, message: "User does not exist" });
+            return res.status(401).json({
+                success: false,
+                message: "Invalid credentials"
+            });
         }
 
         const isMatch = await user.comparePassword(password);
         if (!isMatch) {
-            return res.json({ success: false, message: "Invalid credentials" });
+            return res.status(401).json({
+                success: false,
+                message: "Invalid credentials"
+            });
+        }
+
+        // Check if user is active
+        if (user.status !== 'active') {
+            return res.status(401).json({
+                success: false,
+                message: "Account is inactive"
+            });
         }
 
         const token = createToken(user._id);
+
         res.json({ 
             success: true, 
             token, 
@@ -40,8 +77,11 @@ export const loginUser = async (req, res) => {
             }
         });
     } catch (error) {
-        console.log(error);
-        res.json({ success: false, message: "Error" });
+        console.error("Login error:", error);
+        res.status(500).json({ 
+            success: false, 
+            message: "An error occurred during login" 
+        });
     }
 };
 export const getWishlist = async (req, res) => {

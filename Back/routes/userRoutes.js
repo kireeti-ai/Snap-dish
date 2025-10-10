@@ -13,7 +13,7 @@ import {
     getCart,      // <-- Import getCart
   updateCart,
     getWishlist,    // <-- Import getWishlist
-  updateWishlist 
+  updateWishlist,validateToken
 } from '../controllers/userController.js';
 import {
     getAllRestaurantsForAdmin,
@@ -62,5 +62,5 @@ userRouter.put('/admin/restaurants/:restaurantId/status', adminOnly, updateResta
 userRouter.delete('/admin/restaurants/:restaurantId', adminOnly, deleteRestaurantByAdmin);
 userRouter.put('/admin/restaurants/:restaurantId', adminOnly, upload.single('image'), updateRestaurantByAdmin);
 
-
+userRouter.get('/validate-token', protect, validateToken);
 export default userRouter;
