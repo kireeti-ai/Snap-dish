@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // API Base URL - using the production URL from other components
-const API_BASE_URL = "https://snap-dish.onrender.com";
+const API_BASE_URL = "http://localhost:4000";
 
 // Create axios instance with default configuration
 const api = axios.create({

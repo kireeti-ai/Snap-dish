@@ -4,6 +4,7 @@ import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 import StatsCard from "../components/StatsCard";
 import ChartCard from "../components/ChartCard";
+import RevenueOrdersChart from "../components/RevenueOrdersChart";
 import DataTable from "../components/DataTable";
 import { 
   FaShoppingCart, 
@@ -16,11 +17,12 @@ import {
   FaChartLine
 } from 'react-icons/fa';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:4000";
+const API_BASE_URL =  "http://localhost:4000";
 
-const   Dashboard = () => {
+const Dashboard = () => {
   const [stats, setStats] = useState(null);
   const [chartData, setChartData] = useState([]);
+  const [revenueOrdersData, setRevenueOrdersData] = useState([]);
   const [recentOrders, setRecentOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -50,11 +52,12 @@ const   Dashboard = () => {
         }
       };
 
-      // Fetch all dashboard data
-      const [statsRes, chartRes, ordersRes] = await Promise.all([
+      // Fetch all dashboard data including new revenue-orders comparison
+      const [statsRes, chartRes, ordersRes, revenueOrdersRes] = await Promise.all([
         axios.get(`${API_BASE_URL}/api/restaurant/dashboard/stats`, axiosConfig),
         axios.get(`${API_BASE_URL}/api/restaurant/dashboard/sales-chart?days=7`, axiosConfig),
-        axios.get(`${API_BASE_URL}/api/restaurant/dashboard/recent-orders?limit=10`, axiosConfig)
+        axios.get(`${API_BASE_URL}/api/restaurant/dashboard/recent-orders?limit=10`, axiosConfig),
+        axios.get(`${API_BASE_URL}/api/restaurant/dashboard/revenue-orders-comparison?days=7`, axiosConfig)
       ]);
 
       if (statsRes.data.success) {
@@ -69,6 +72,10 @@ const   Dashboard = () => {
 
       if (ordersRes.data.success) {
         setRecentOrders(ordersRes.data.data);
+      }
+
+      if (revenueOrdersRes.data.success) {
+        setRevenueOrdersData(revenueOrdersRes.data.data);
       }
 
     } catch (error) {
@@ -214,6 +221,12 @@ const   Dashboard = () => {
           bgColor="bg-pink-500"
         />
       </div>
+
+      {/* Revenue vs Orders Comparison Chart - NEW */}
+      <RevenueOrdersChart 
+        data={revenueOrdersData} 
+        title="Revenue vs Orders Comparison (Last 7 Days)" 
+      />
 
       {/* Sales Chart */}
       <ChartCard 

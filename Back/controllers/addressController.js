@@ -63,3 +63,32 @@ export const deleteAddress = async (req, res) => {
     res.status(500).json({ success: false, message: "Server error" });
   }
 };
+
+// ===== ADD THIS NEW FUNCTION =====
+// PATCH set default address
+export const setDefaultAddress = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Check if address exists and belongs to user
+    const address = await Address.findOne({ _id: id, userId: req.user.id });
+    if (!address) {
+      return res.status(404).json({ success: false, message: "Address not found" });
+    }
+
+    // Reset all addresses to not default
+    await Address.updateMany(
+      { userId: req.user.id },
+      { $set: { isDefault: false } }
+    );
+
+    // Set this address as default
+    address.isDefault = true;
+    await address.save();
+
+    res.json({ success: true, data: address, message: "Default address updated" });
+  } catch (error) {
+    console.error("Error setting default address:", error);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+};

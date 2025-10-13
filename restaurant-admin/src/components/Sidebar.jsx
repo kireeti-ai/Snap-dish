@@ -27,7 +27,6 @@ const Sidebar = () => {
           </>
         )}
         
-        <Link to="/settings" className="hover:text-blue-600 p-2 rounded hover:bg-blue-50">Settings</Link>
       </nav>
     </aside>
   );

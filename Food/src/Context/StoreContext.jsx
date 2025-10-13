@@ -42,9 +42,69 @@ const StoreContextProvider = (props) => {
     }
   };
 
+// UPDATE ADDRESS
+const updateAddress = async (addressData) => {
+  if (!token) return;
+  try {
+    const res = await axios.put(
+      `${url}/api/address/${addressData._id}`, 
+      addressData, 
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+    if (res.data.success) {
+      setSavedAddresses((prev) => 
+        prev.map(addr => addr._id === addressData._id ? res.data.data : addr)
+      );
+      toast.success("Address updated");
+    }
+  } catch (error) {
+    toast.error("Failed to update address");
+  }
+};
+
+// DELETE ADDRESS
+const deleteAddress = async (addressId) => {
+  if (!token) return;
+  try {
+    const res = await axios.delete(
+      `${url}/api/address/${addressId}`, 
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+    if (res.data.success) {
+      setSavedAddresses((prev) => prev.filter(addr => addr._id !== addressId));
+      toast.success("Address deleted");
+    }
+  } catch (error) {
+    toast.error("Failed to delete address");
+  }
+};
+
+// SET DEFAULT ADDRESS
+const setDefaultAddress = async (addressId) => {
+  if (!token) return;
+  try {
+    const res = await axios.patch(
+      `${url}/api/address/${addressId}/default`, 
+      {}, 
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+    if (res.data.success) {
+      setSavedAddresses((prev) => 
+        prev.map(addr => ({
+          ...addr,
+          isDefault: addr._id === addressId
+        }))
+      );
+      toast.success("Default address updated");
+    }
+  } catch (error) {
+    toast.error("Failed to set default address");
+  }
+};
+
   const fetchRestaurantList = async () => {
     try {
-      const response = await axios.get(`${url}/api/restaurants`);
+      const response = await axios.get(`${url}/api/restaurants/list`);
       const sortedRestaurants = (response.data.data || []).sort((a, b) => (b.rating || 0) - (a.rating || 0));
       setRestaurantList(sortedRestaurants);
     } catch (error) {
@@ -310,7 +370,9 @@ const StoreContextProvider = (props) => {
     addToCart, removeFromCart, getTotalCartAmount, clearCartAndAddToCart,
     addToWishlist, removeFromWishlist,socket, // <-- Expose the socket instance to other components
     setOrders,
-    placeNewOrder, logout, fetchAddresses, addAddress,
+    placeNewOrder, logout, fetchAddresses, addAddress, updateAddress,
+  deleteAddress,
+  setDefaultAddress,
   };
 
   return (

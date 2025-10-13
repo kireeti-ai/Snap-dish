@@ -3,7 +3,8 @@ import {
     getRestaurantDashboardStats,
     getRestaurantSalesChartData,
     getRestaurantRecentOrders,
-    getRestaurantTopDishes
+    getRestaurantTopDishes,
+    getRevenueOrdersComparison
 } from "../controllers/restaurantDashboardController.js";
 import { protect, restrictTo } from "../middleware/authMiddleware.js";
 
@@ -18,5 +19,6 @@ restaurantDashboardRouter.get("/stats", getRestaurantDashboardStats);
 restaurantDashboardRouter.get("/sales-chart", getRestaurantSalesChartData);
 restaurantDashboardRouter.get("/recent-orders", getRestaurantRecentOrders);
 restaurantDashboardRouter.get("/top-dishes", getRestaurantTopDishes);
+restaurantDashboardRouter.get("/revenue-orders-comparison", getRevenueOrdersComparison); // NEW ROUTE
 
 export default restaurantDashboardRouter;

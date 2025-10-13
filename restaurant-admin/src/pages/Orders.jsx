@@ -1,11 +1,13 @@
 import { useState, useEffect } from "react";
 import { toast } from "react-toastify";
 import api from "../utils/api";
+import { FaDownload, FaFilter } from "react-icons/fa";
 
 const Orders = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [updatingOrders, setUpdatingOrders] = useState(new Set());
+  const [filterStatus, setFilterStatus] = useState("all");
 
   const fetchOrders = async () => {
     try {
@@ -35,7 +37,7 @@ const Orders = () => {
       
       if (response.data.success) {
         toast.success("Order status updated!");
-        fetchOrders(); // Refresh orders after update
+        fetchOrders();
       } else {
         toast.error(response.data.message || "Failed to update status.");
       }
@@ -48,6 +50,81 @@ const Orders = () => {
         newSet.delete(orderId);
         return newSet;
       });
+    }
+  };
+
+  // CSV Download Function
+  const downloadCSV = () => {
+    try {
+      // Filter orders based on current filter
+      const ordersToExport = filterStatus === "all" 
+        ? orders 
+        : orders.filter(order => {
+            if (filterStatus === "pending") return order.status === "Pending Confirmation";
+            if (filterStatus === "active") return ["Preparing", "Awaiting Delivery Agent", "Out for Delivery"].includes(order.status);
+            if (filterStatus === "completed") return ["Delivered", "Cancelled"].includes(order.status);
+            return true;
+          });
+
+      // CSV Headers
+      const headers = [
+        "Order ID",
+        "Customer Name",
+        "Customer Phone",
+        "Items",
+        "Amount (₹)",
+        "Status",
+        "Date",
+        "Delivery Address"
+      ];
+
+      // Convert orders to CSV rows
+      const csvRows = ordersToExport.map(order => {
+        const items = order.items 
+          ? order.items.map(item => `${item.quantity}x ${item.name}`).join('; ')
+          : 'N/A';
+        
+        const address = typeof order.address === 'string' 
+          ? order.address 
+          : `${order.address?.street || ''}, ${order.address?.city || ''}, ${order.address?.state || ''} ${order.address?.zipcode || ''}`;
+
+        return [
+          `#${order._id.slice(-6)}`,
+          order.userId ? `${order.userId.firstName} ${order.userId.lastName}` : 'N/A',
+          order.userId?.phone_number || 'N/A',
+          items,
+          order.amount.toFixed(2),
+          order.status,
+          new Date(order.date).toLocaleString(),
+          address.replace(/,/g, ';') // Replace commas in address with semicolons
+        ];
+      });
+
+      // Combine headers and rows
+      const csvContent = [
+        headers.join(","),
+        ...csvRows.map(row => 
+          row.map(cell => `"${cell}"`).join(",")
+        )
+      ].join("\n");
+
+      // Create blob and download
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement("a");
+      const url = URL.createObjectURL(blob);
+      
+      link.setAttribute("href", url);
+      link.setAttribute("download", `orders_${new Date().toISOString().split('T')[0]}.csv`);
+      link.style.visibility = 'hidden';
+      
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      toast.success(`Exported ${ordersToExport.length} orders to CSV`);
+    } catch (error) {
+      console.error("Error downloading CSV:", error);
+      toast.error("Failed to download CSV");
     }
   };
 
@@ -183,9 +260,18 @@ const Orders = () => {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Order Management</h1>
-        <p className="text-gray-600">Manage incoming orders and track their progress</p>
+      <div className="mb-8 flex justify-between items-center">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Order Management</h1>
+          <p className="text-gray-600">Manage incoming orders and track their progress</p>
+        </div>
+        <button
+          onClick={downloadCSV}
+          className="flex items-center gap-2 bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors shadow-md"
+        >
+          <FaDownload />
+          Download CSV
+        </button>
       </div>
 
       {/* Summary Cards */}

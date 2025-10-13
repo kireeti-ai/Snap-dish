@@ -37,24 +37,21 @@ const PlaceOrder = () => {
     setSelectedAddressId(null);
   };
 
-  // --- FIX IS HERE ---
   const selectAddress = (address) => {
-    // Merge the selected address with the existing data
-    setDeliveryData(prevData => ({
-      ...prevData, // Keep existing data (like email/phone if already entered)
+    // Handle both old and new field names
+    setDeliveryData({
       firstName: address.firstName || '',
       lastName: address.lastName || '',
+      email: address.email || '',
       street: address.street || '',
       city: address.city || '',
       state: address.state || '',
-      zipCode: address.zipCode || '',
-      country: address.country || '',
-      // Note: We intentionally don't pull email/phone from the address object
-      // unless you have them stored there.
-    }));
+      zipCode: address.zipCode || address.zip || '',
+      country: address.country || 'India',
+      phone: address.phone || address.num || '',
+    });
     setSelectedAddressId(address._id);
   };
-  // --- END OF FIX ---
 
   const handleOrderSubmit = async (event) => {
     event.preventDefault();
@@ -81,7 +78,6 @@ const PlaceOrder = () => {
     const result = await placeNewOrder(orderDetails);
     if (result && result.success) {
       navigate('/orderSuccess');
-      // Success toast is better on the success page itself
     }
   };
 
@@ -115,8 +111,12 @@ const PlaceOrder = () => {
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.97 }}
                 >
-                  <p className="card-name">{address.firstName} {address.lastName}</p>
+                  <p className="card-type"><strong>{address.type}</strong></p>
+                  {(address.firstName || address.lastName) && (
+                    <p className="card-name">{address.firstName} {address.lastName}</p>
+                  )}
                   <p>{address.street}, {address.city}</p>
+                  <p>{address.state} - {address.zipCode || address.zip}</p>
                 </motion.div>
               ))}
             </div>
@@ -141,7 +141,7 @@ const PlaceOrder = () => {
         <input type="text" name="phone" placeholder='Phone' value={deliveryData.phone} onChange={handleInputChange} required />
       </motion.div>
 
-      {/* RIGHT SIDE - CART (No Changes) */}
+      {/* RIGHT SIDE - CART */}
       <motion.div 
         className="place-order-right"
         initial={{ x: 60, opacity: 0 }}

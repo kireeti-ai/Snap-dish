@@ -68,7 +68,7 @@ app.use(cookieParser());
 const allowedOrigins = [
   "http://localhost:5174", 
   "http://localhost:5173",
-  "http://localhost:5175",
+  "http://localhost:5175","http://localhost:5176",
   "https://snap-dish-xi.vercel.app", 
   "https://snap-dish-qulq.vercel.app", 
   "https://snap-dish-d5y5.vercel.app",

@@ -22,7 +22,21 @@ function AddressManager() {
   };
 
   const handleAddNew = () => {
-    setEditingAddress({ type: "Home", street: "", city: "", state: "", zip: "", num: "", isDefault: false });
+    setEditingAddress({ 
+      type: "Home", 
+      firstName: "",
+      lastName: "",
+      email: "",
+      street: "", 
+      city: "", 
+      state: "", 
+      zipCode: "", 
+      zip: "",
+      country: "India",
+      phone: "", 
+      num: "",
+      isDefault: false 
+    });
   };
 
   const cardVariants = {
@@ -79,11 +93,17 @@ function AddressManager() {
                   <FaMapMarkerAlt className="location-icon" />
                   <h3>{addr.type}</h3>
                 </div>
+                {/* Handle both old and new field names */}
+                {(addr.firstName || addr.lastName) && (
+                  <p><strong>{addr.firstName} {addr.lastName}</strong></p>
+                )}
                 <p>{addr.street}</p>
                 <p>
-                  {addr.city}, {addr.state} - {addr.zip}
+                  {addr.city}, {addr.state} - {addr.zipCode || addr.zip}
                 </p>
-                <p>Phone: {addr.num}</p>
+                {addr.country && <p>{addr.country}</p>}
+                {addr.email && <p>Email: {addr.email}</p>}
+                <p>Phone: {addr.phone || addr.num}</p>
                 <div className="card-actions">
                   <button className="btn-action" onClick={() => setEditingAddress(addr)}>Edit</button>
                   <button className="btn-action btn-delete" onClick={() => deleteAddress(addr._id)}>Delete</button>

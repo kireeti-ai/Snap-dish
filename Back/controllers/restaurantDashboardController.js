@@ -307,3 +307,109 @@ export const getRestaurantTopDishes = async (req, res) => {
         });
     }
 };
+
+/**
+ * @route   GET /api/restaurant/dashboard/revenue-orders-comparison
+ * @desc    Get revenue vs orders comparison data for visualization
+ * @access  Private (Restaurant Owner)
+ */
+export const getRevenueOrdersComparison = async (req, res) => {
+    try {
+        const userId = req.user._id || req.user.id;
+        const restaurant = await restaurantModel.findOne({ owner_id: userId });
+        
+        if (!restaurant) {
+            return res.status(404).json({ 
+                success: false, 
+                message: "Restaurant not found" 
+            });
+        }
+
+        const days = parseInt(req.query.days) || 7;
+        const startDate = new Date();
+        startDate.setDate(startDate.getDate() - days);
+        startDate.setHours(0, 0, 0, 0);
+
+        // Aggregate data for revenue and orders
+        const comparisonData = await orderModel.aggregate([
+            {
+                $match: {
+                    restaurantId: restaurant._id,
+                    date: { $gte: startDate }
+                }
+            },
+            {
+                $group: {
+                    _id: { 
+                        $dateToString: { format: "%Y-%m-%d", date: "$date" } 
+                    },
+                    totalOrders: { $sum: 1 },
+                    deliveredOrders: {
+                        $sum: {
+                            $cond: [{ $eq: ["$status", "Delivered"] }, 1, 0]
+                        }
+                    },
+                    revenue: {
+                        $sum: {
+                            $cond: [{ $eq: ["$status", "Delivered"] }, "$amount", 0]
+                        }
+                    },
+                    totalAmount: { $sum: "$amount" }
+                }
+            },
+            { $sort: { _id: 1 } }
+        ]);
+
+        // Format data for chart
+        const chartData = comparisonData.map(item => {
+            const avgOrderValue = item.deliveredOrders > 0 
+                ? item.revenue / item.deliveredOrders 
+                : 0;
+
+            return {
+                day: new Date(item._id).toLocaleDateString('en-US', { weekday: 'short' }),
+                date: item._id,
+                orders: item.totalOrders,
+                revenue: parseFloat(item.revenue.toFixed(2)),
+                deliveredOrders: item.deliveredOrders,
+                avgOrderValue: parseFloat(avgOrderValue.toFixed(2))
+            };
+        });
+
+        // Fill in missing days with zero values
+        const filledData = [];
+        for (let i = 0; i < days; i++) {
+            const date = new Date();
+            date.setDate(date.getDate() - (days - 1 - i));
+            date.setHours(0, 0, 0, 0);
+            
+            const dateString = date.toISOString().split('T')[0];
+            const existingData = chartData.find(d => d.date === dateString);
+            
+            if (existingData) {
+                filledData.push(existingData);
+            } else {
+                filledData.push({
+                    day: date.toLocaleDateString('en-US', { weekday: 'short' }),
+                    date: dateString,
+                    orders: 0,
+                    revenue: 0,
+                    deliveredOrders: 0,
+                    avgOrderValue: 0
+                });
+            }
+        }
+
+        res.json({
+            success: true,
+            data: filledData
+        });
+    } catch (error) {
+        console.error("Get Revenue Orders Comparison Error:", error);
+        res.status(500).json({ 
+            success: false, 
+            message: "Error fetching revenue orders comparison data",
+            error: process.env.NODE_ENV === 'development' ? error.message : undefined
+        });
+    }
+};
