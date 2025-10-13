@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 
 // --- API Configuration ---
-const API_BASE_URL = "http://localhost:4000";
+const API_BASE_URL = "https://snap-dish.onrender.com";
 
 const api = axios.create({ baseURL: API_BASE_URL });
 

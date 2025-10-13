@@ -17,7 +17,7 @@ import {
   FaChartLine
 } from 'react-icons/fa';
 
-const API_BASE_URL =  "http://localhost:4000";
+const API_BASE_URL =  "https://snap-dish.onrender.com";
 
 const Dashboard = () => {
   const [stats, setStats] = useState(null);
