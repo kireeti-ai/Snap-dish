@@ -9,8 +9,6 @@ import http from 'http';
 import { Server } from 'socket.io';
 import cookieParser from 'cookie-parser';
 import { connectDB } from "./config/db.js";
-
-// Import routes
 import menuItemRouter from "./routes/menuItemRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
 import restaurantRouter from "./routes/restaurantRoutes.js";
@@ -21,19 +19,16 @@ import deliveryRouter from './routes/deliveryRoute.js';
 import restaurantDashboardRouter from './routes/restaurantDashboardRoutes.js';
 import adminRouter from './routes/adminRoutes.js';
 
-// Load environment variables
-dotenv.config();
 
-// Setup __dirname equivalent for ES modules
+dotenv.config();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Initialize express app and create HTTP server
 const app = express();
 const server = http.createServer(app);
 const port = process.env.PORT || 4000;
 
-// Socket.io setup with security configurations
+
 const io = new Server(server, {
   cors: {
     origin: process.env.NODE_ENV === 'production' 
@@ -44,7 +39,7 @@ const io = new Server(server, {
   }
 });
 
-// Directory creation utility
+
 const createUploadDirs = () => {
   const dirs = [
     'uploads/avatars',
@@ -60,11 +55,11 @@ const createUploadDirs = () => {
 };
 createUploadDirs();
 
-// Middleware setup
+
 app.use(express.json());
 app.use(cookieParser());
 
-// CORS configuration
+
 const allowedOrigins = [
   "http://localhost:5174", 
   "http://localhost:5173",
@@ -105,12 +100,11 @@ app.use((req, res, next) => {
 // Rate limiting
 import rateLimit from 'express-rate-limit';
 const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100 // limit each IP to 100 requests per windowMs
+  windowMs: 15 * 60 * 1000,
+  max: 100 
 });
 app.use('/api/', limiter);
 
-// Error handling middleware
 app.use((error, req, res, next) => {
   if (error instanceof multer.MulterError && error.code === 'LIMIT_FILE_SIZE') {
     return res.status(400).json({ 

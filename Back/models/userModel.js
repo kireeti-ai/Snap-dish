@@ -59,7 +59,7 @@ const userSchema = new mongoose.Schema(
       default: {} 
     },
     wishlist: {
-      type: [String], // An array of item IDs (as strings)
+      type: [String], 
       default: []
     }
   },
@@ -68,7 +68,6 @@ const userSchema = new mongoose.Schema(
   }
 );
 
-// Pre-save middleware to hash password
 userSchema.pre("save", async function (next) {
   if (!this.isModified("password")) return next();
   
@@ -81,19 +80,17 @@ userSchema.pre("save", async function (next) {
   }
 });
 
-// Method to compare password
+
 userSchema.methods.comparePassword = async function (enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
 };
 
-// Transform method to control JSON output
 userSchema.methods.toJSON = function() {
   const userObject = this.toObject();
   delete userObject.password;
   return userObject;
 };
 
-// Virtual for full name
 userSchema.virtual('fullName').get(function() {
   if (this.lastName) {
     return `${this.firstName} ${this.lastName}`;

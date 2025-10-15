@@ -20,7 +20,7 @@ const orderSchema = new mongoose.Schema({
             "Out for Delivery",     // Delivery agent accepts
             "Delivered",            // Order complete
             "Cancelled",
-            "Reached Restaurant",  // <--- Add this
+            "Reached Restaurant",  
         "Picked Up"             // Order cancelled by any party
         ],
         default: "Pending Confirmation" 

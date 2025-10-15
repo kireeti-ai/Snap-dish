@@ -1,6 +1,6 @@
 import orderModel from "../models/orderModel.js";
 
-// Helper to emit updates for a specific order
+
 const emitOrderStatusUpdate = async (io, orderId) => {
     try {
         const order = await orderModel.findById(orderId)
@@ -9,7 +9,7 @@ const emitOrderStatusUpdate = async (io, orderId) => {
             .populate('deliveryAgentId', 'firstName lastName phone_number');
         
         if (order) {
-            // Emit to the order-specific room
+           
             io.to(orderId.toString()).emit('orderStatusUpdated', order);
             console.log(`Emitted orderStatusUpdated for order ${orderId}`);
         }
@@ -18,7 +18,7 @@ const emitOrderStatusUpdate = async (io, orderId) => {
     }
 };
 
-// @desc    Get orders available for pickup
+
 export const getAvailableOrders = async (req, res) => {
     try {
         const orders = await orderModel.find({ 
@@ -35,7 +35,7 @@ export const getAvailableOrders = async (req, res) => {
     }
 };
 
-// @desc    Get the agent's current active order
+
 export const getActiveOrder = async (req, res) => {
     try {
         const activeOrder = await orderModel.findOne({
@@ -52,13 +52,13 @@ export const getActiveOrder = async (req, res) => {
     }
 };
 
-// @desc    Accept an available order
+
 export const acceptOrder = async (req, res) => {
     try {
         const { orderId } = req.body;
-        const io = req.io; // Access io from request object
+        const io = req.io;
 
-        // Check if order exists and is still available
+       
         const order = await orderModel.findById(orderId);
         if (!order) {
             return res.status(404).json({ success: false, message: "Order not found" });
@@ -71,7 +71,7 @@ export const acceptOrder = async (req, res) => {
             });
         }
 
-        // Check if agent already has an active order
+   
         const existingActiveOrder = await orderModel.findOne({
             deliveryAgentId: req.user.id,
             status: { $in: ["Out for Delivery", "Reached Restaurant", "Picked Up"] }
@@ -84,7 +84,7 @@ export const acceptOrder = async (req, res) => {
             });
         }
 
-        // Update order
+  
         const updatedOrder = await orderModel.findByIdAndUpdate(
             orderId, 
             {
@@ -106,13 +106,12 @@ export const acceptOrder = async (req, res) => {
     }
 };
 
-// @desc    Update status of an ongoing delivery
+
 export const updateOrderStatus = async (req, res) => {
     try {
         const { orderId, status } = req.body;
-        const io = req.io; // Access io from request object
+        const io = req.io;
 
-        // Validate status
         const validStatuses = ["Reached Restaurant", "Picked Up", "Delivered"];
         if (!validStatuses.includes(status)) {
             return res.status(400).json({ 
@@ -120,8 +119,6 @@ export const updateOrderStatus = async (req, res) => {
                 message: "Invalid status value" 
             });
         }
-
-        // Security check: Ensure the order belongs to this agent
         const order = await orderModel.findOne({ 
             _id: orderId, 
             deliveryAgentId: req.user.id 
@@ -133,8 +130,6 @@ export const updateOrderStatus = async (req, res) => {
                 message: "Not authorized to update this order" 
             });
         }
-
-        // Validate status progression
         const currentStatus = order.status;
         const statusProgression = {
             "Out for Delivery": ["Reached Restaurant"],
@@ -149,15 +144,11 @@ export const updateOrderStatus = async (req, res) => {
             });
         }
 
-        // Update order
         order.status = status;
         await order.save();
-
-        // Populate for response
         await order.populate('restaurantId', 'name address phone_number');
         await order.populate('userId', 'firstName lastName phone_number address');
-        
-        // Emit socket update
+    
         await emitOrderStatusUpdate(io, orderId);
         
         res.json({ success: true, data: order });
@@ -168,8 +159,6 @@ export const updateOrderStatus = async (req, res) => {
     }
 };
 
-
-// @desc    Get delivery agent's order history
 export const getOrderHistory = async (req, res) => {
     try {
         const orders = await orderModel.find({ 
@@ -179,7 +168,7 @@ export const getOrderHistory = async (req, res) => {
         .populate('restaurantId', 'name address')
         .populate('userId', 'firstName lastName')
         .sort({ date: -1 })
-        .limit(100); // Limit to last 100 orders
+        .limit(100); 
         
         res.json({ success: true, data: orders });
     } catch (error) {
@@ -188,34 +177,30 @@ export const getOrderHistory = async (req, res) => {
     }
 };
 
-// @desc    Get delivery agent's earnings statistics
 export const getEarnings = async (req, res) => {
     try {
         const agentId = req.user.id;
-        
-        // Get all delivered orders for this agent
+    
         const deliveredOrders = await orderModel.find({
             deliveryAgentId: agentId,
             status: "Delivered"
         })
-        .populate('restaurantId', 'name') // Populate restaurant name
+        .populate('restaurantId', 'name')
         .sort({ date: -1 });
 
-        // Calculate earnings (15% of order amount)
+     
         const earningsData = deliveredOrders.map(order => ({
             orderId: order._id,
             orderNumber: `ORD-${order._id.toString().slice(-6)}`,
             amount: order.amount,
-            earnings: parseFloat((order.amount * 0.15).toFixed(2)), // 15% commission
+            earnings: parseFloat((order.amount * 0.15).toFixed(2)), 
             date: order.date,
             restaurantName: order.restaurantId?.name || 'Unknown',
         }));
 
-        // Calculate statistics
+       
         const totalEarnings = earningsData.reduce((sum, item) => sum + item.earnings, 0);
         const totalDeliveries = deliveredOrders.length;
-        
-        // Today's earnings
         const today = new Date();
         today.setHours(0, 0, 0, 0);
         const todayOrders = deliveredOrders.filter(order => {

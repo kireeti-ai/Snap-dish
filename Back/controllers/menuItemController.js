@@ -2,7 +2,7 @@ import menuItemModel from "../models/menuItemModel.js";
 import restaurantModel from "../models/restaurantModel.js";
 import uploadToCloudinary from "../utils/cloudinary.js";
 
-// ADD MENU ITEM
+
 export const addMenuItem = async (req, res) => {
   try {
     const { restaurantId, name, description, price, category, is_veg } = req.body;
@@ -22,8 +22,6 @@ export const addMenuItem = async (req, res) => {
         message: "Restaurant not found or unauthorized",
       });
     }
-
-    // --- FIX: Use req.file.path instead of req.file.buffer ---
     const imageUrl = await uploadToCloudinary(req.file.path, "foods");
     if (!imageUrl) {
         return res.json({ success: false, message: "Error uploading image to cloud" });
@@ -35,7 +33,7 @@ export const addMenuItem = async (req, res) => {
       description,
       price: Number(price),
       category,
-      image: imageUrl, // Save the full Cloudinary URL
+      image: imageUrl,
       is_veg: is_veg === "true" || is_veg === true,
     });
 
@@ -47,7 +45,6 @@ export const addMenuItem = async (req, res) => {
   }
 };
 
-// LIST ALL MENU ITEMS (No changes)
 export const listAllMenuItems = async (req, res) => {
   try {
     const menuItems = await menuItemModel
@@ -60,7 +57,6 @@ export const listAllMenuItems = async (req, res) => {
   }
 };
 
-// LIST BY RESTAURANT (No changes)
 export const listMenuItemsByRestaurant = async (req, res) => {
   try {
     const menuItems = await menuItemModel.find({
@@ -74,7 +70,6 @@ export const listMenuItemsByRestaurant = async (req, res) => {
   }
 };
 
-// REMOVE MENU ITEM (No changes to logic, just the route)
 export const removeMenuItem = async (req, res) => {
   try {
     const menuItem = await menuItemModel.findById(req.params.id);
@@ -119,7 +114,7 @@ export const updateMenuItem = async (req, res) => {
     }
 
     if (req.file) {
-      // --- FIX: Use req.file.path here as well ---
+    
       const imageUrl = await uploadToCloudinary(req.file.path, "foods");
       if (imageUrl) {
         menuItem.image = imageUrl;

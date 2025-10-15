@@ -10,7 +10,7 @@ import { protect, restrictTo } from "../middleware/authMiddleware.js";
 const restaurantDashboardRouter = express.Router();
 const restaurantOnly = [protect, restrictTo('restaurant_owner', 'admin')];
 
-// Restaurant Dashboard routes
+
 restaurantDashboardRouter.get("/stats", restaurantOnly, getRestaurantDashboardStats);
 restaurantDashboardRouter.get("/sales-chart", restaurantOnly, getRestaurantSalesChartData);
 restaurantDashboardRouter.get("/recent-orders", restaurantOnly, getRestaurantRecentOrders);

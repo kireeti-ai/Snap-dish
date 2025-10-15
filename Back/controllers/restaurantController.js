@@ -2,7 +2,7 @@ import restaurantModel from "../models/restaurantModel.js";
 import userModel from "../models/userModel.js";
 import uploadToCloudinary from '../utils/cloudinary.js';
 
-// --- Get all active restaurants (No changes) ---
+
 export const getAllRestaurants = async (req, res) => {
   try {
     const restaurants = await restaurantModel.find({ status: "active" }).select("-owner_id");
@@ -13,7 +13,7 @@ export const getAllRestaurants = async (req, res) => {
   }
 };
 
-// --- Get my restaurant (No changes) ---
+
 export const getMyRestaurant = async (req, res) => {
   try {
     const restaurant = await restaurantModel.findOne({ owner_id: req.user._id });
@@ -28,7 +28,7 @@ export const getMyRestaurant = async (req, res) => {
   }
 };
 
-// --- Create restaurant ---
+
 export const createRestaurant = async (req, res) => {
   const { name, address, cuisine, price_for_two, status, timing } = req.body;
   try {
@@ -65,7 +65,7 @@ export const createRestaurant = async (req, res) => {
   }
 };
 
-// --- Update restaurant ---
+
 export const updateRestaurant = async (req, res) => {
   try {
     const restaurant = await restaurantModel.findOne({ owner_id: req.user._id });
@@ -113,9 +113,6 @@ export const deleteRestaurant = async (req, res) => {
 };
 
 
-// --- ADMIN FUNCTIONS ---
-
-// [ADMIN] Get all restaurants regardless of status
 export const getAllRestaurantsForAdmin = async (req, res) => {
     try {
         const restaurants = await restaurantModel.find({}).populate('owner_id', 'firstName lastName email');
@@ -126,7 +123,6 @@ export const getAllRestaurantsForAdmin = async (req, res) => {
     }
 };
 
-// [ADMIN] Update any restaurant's status
 export const updateRestaurantStatusByAdmin = async (req, res) => {
     try {
         const { status } = req.body;
@@ -153,7 +149,6 @@ export const updateRestaurantStatusByAdmin = async (req, res) => {
     }
 };
 
-// [ADMIN] Delete any restaurant
 export const deleteRestaurantByAdmin = async (req, res) => {
     try {
         const restaurant = await restaurantModel.findById(req.params.restaurantId);
@@ -168,13 +163,12 @@ export const deleteRestaurantByAdmin = async (req, res) => {
     }
 };
 
-// [ADMIN] Update any restaurant's details
+
 export const updateRestaurantByAdmin = async (req, res) => {
     try {
         const restaurantId = req.params.restaurantId;
         const updateData = req.body;
         
-        // Handle image upload if a new one is provided
         if (req.file) {
             const imageUrl = await uploadToCloudinary(req.file.path, 'restaurants');
             if (imageUrl) {

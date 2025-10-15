@@ -10,7 +10,7 @@ const emitOrderStatusUpdate = async (io, orderId) => {
     try {
         const order = await orderModel.findById(orderId);
         if (order) {
-            // Emits to the room that is named after the order's ID
+            
             io.to(orderId.toString()).emit('orderStatusUpdated', order);
         }
     } catch (error) {
@@ -21,11 +21,11 @@ const placeOrder = async (req, res) => {
     try {
         const newOrder = new orderModel({
             userId: req.user.id, 
-            restaurantId: req.body.restaurantId, // Frontend must now send this
+            restaurantId: req.body.restaurantId, 
             items: req.body.items,
             amount: req.body.amount,
             address: req.body.address,
-            status: "Pending Confirmation" // New initial status
+            status: "Pending Confirmation" 
         });
         await newOrder.save();
         await userModel.findByIdAndUpdate(req.user.id, { cartData: {} });
@@ -50,20 +50,16 @@ export const acceptDelivery = async (req, res) => {
     }
 };
 export const updateOrderByRestaurant = async (req, res) => {
-    const { io } = req; // <-- Access the io instance
+    const { io } = req;
     try {
         const { orderId, status } = req.body;
         await orderModel.findByIdAndUpdate(orderId, { status });
         const updatedOrder = await orderModel.findByIdAndUpdate(orderId, { status }, { new: true });
-
-        // --- ADDED ---
-        // Emit the update to all clients in the orderId room
         if (status === "Awaiting Delivery Agent") {
-            // Emits to a general room that all online agents will join
+            
             io.to('delivery_agents').emit('newDeliveryAvailable', updatedOrder);
         }
         await emitOrderStatusUpdate(io, orderId);
-        // --- END ---
 
         res.json({ success: true, message: "Order updated by restaurant" });
     } catch (error) {
@@ -78,7 +74,6 @@ export const updateOrderByRestaurant = async (req, res) => {
  */
 const getUserOrders = async (req, res) => {
     try {
-        // Find orders belonging to the logged-in user
         const orders = await orderModel.find({ userId: req.user.id }).sort({ date: -1 });
         res.json({ success: true, data: orders });
     } catch (error) {
@@ -119,13 +114,11 @@ export const updateOrderStatus = async (req, res) => {
 };
 export const getRestaurantOrders = async (req, res) => {
     try {
-        // Find the restaurant managed by the logged-in user
+        
         const restaurant = await restaurantModel.findOne({ owner_id: req.user.id });
         if (!restaurant) {
             return res.status(404).json({ success: false, message: "Restaurant not found for this user." });
         }
-        
-        // Find all orders for that restaurant and sort by date
         const orders = await orderModel.find({ restaurantId: restaurant._id }).sort({ date: -1 });
         res.json({ success: true, data: orders });
     } catch (error) {

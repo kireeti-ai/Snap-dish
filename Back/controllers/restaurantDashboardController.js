@@ -9,10 +9,8 @@ import menuItemModel from "../models/menuItemModel.js";
  */
 export const getRestaurantDashboardStats = async (req, res) => {
     try {
-        // Get user ID - handle both req.user._id and req.user.id
         const userId = req.user._id || req.user.id;
         
-        // Find the restaurant owned by the logged-in user
         const restaurant = await restaurantModel.findOne({ owner_id: userId });
         
         if (!restaurant) {
@@ -21,13 +19,9 @@ export const getRestaurantDashboardStats = async (req, res) => {
                 message: "Restaurant not found for this user" 
             });
         }
-
-        // 1. Total Orders for this restaurant
         const totalOrders = await orderModel.countDocuments({ 
             restaurantId: restaurant._id 
         });
-
-        // 2. Total Revenue (from delivered orders)
         const revenueData = await orderModel.aggregate([
             { 
                 $match: { 
@@ -39,30 +33,23 @@ export const getRestaurantDashboardStats = async (req, res) => {
         ]);
         const totalRevenue = revenueData.length > 0 ? revenueData[0].total : 0;
 
-        // 3. Pending Orders (need attention)
         const pendingOrders = await orderModel.countDocuments({ 
             restaurantId: restaurant._id,
             status: { $in: ["Pending Confirmation", "Preparing"] } 
         });
-
-        // 4. Completed Orders
         const completedOrders = await orderModel.countDocuments({ 
             restaurantId: restaurant._id,
             status: "Delivered" 
         });
 
-        // 5. Total Menu Items
         const totalMenuItems = await menuItemModel.countDocuments({ 
             restaurant_id: restaurant._id 
         });
 
-        // 6. Active Menu Items
         const activeMenuItems = await menuItemModel.countDocuments({ 
             restaurant_id: restaurant._id,
             is_available: true 
         });
-
-        // 7. Top Selling Dish for this restaurant
         const topDish = await orderModel.aggregate([
             { $match: { restaurantId: restaurant._id } },
             { $unwind: "$items" },

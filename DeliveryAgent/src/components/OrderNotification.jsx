@@ -7,7 +7,6 @@ const OrderNotification = ({ order }) => {
 
     if (!order) return null;
 
-    // Helper to get restaurant info
     const getRestaurantInfo = () => {
         if (order.restaurantId) {
             if (typeof order.restaurantId === 'object') {
@@ -23,15 +22,13 @@ const OrderNotification = ({ order }) => {
         };
     };
 
-    // Helper to format address
+
     const formatAddress = (address) => {
         if (typeof address === 'object' && address !== null) {
             return `${address.street || ''}, ${address.city || ''}`.trim() || 'Address not available';
         }
         return 'Address not available';
     };
-
-    // Helper to get delivery address
     const getDeliveryAddress = () => {
         if (order.address) {
             return formatAddress(order.address);
@@ -39,7 +36,6 @@ const OrderNotification = ({ order }) => {
         return 'Address not available';
     };
 
-    // Calculate estimated earnings (could be enhanced with actual calculation)
     const estimatedEarnings = order.amount ? (order.amount * 0.15).toFixed(2) : '50.00';
 
     const restaurant = getRestaurantInfo();

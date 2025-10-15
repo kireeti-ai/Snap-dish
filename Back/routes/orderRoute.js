@@ -4,26 +4,19 @@ import {
     getUserOrders, 
     listAllOrders,
     updateOrderStatus,
-    updateOrderByRestaurant, // <-- Import new function
-    acceptDelivery,getRestaurantOrders           // <-- Import new function
+    updateOrderByRestaurant,
+    acceptDelivery,getRestaurantOrders         
 } from "../controllers/orderController.js";
 import { protect, restrictTo } from "../middleware/authMiddleware.js";
 
 const orderRouter = express.Router();
 
-// -- User Route --
 orderRouter.post("/place", protect, placeOrder);
 orderRouter.get("/myorders", protect, getUserOrders);
-
-// -- Restaurant Route --
 orderRouter.get("/restaurant", protect, restrictTo('restaurant_owner', 'admin'), getRestaurantOrders);
 orderRouter.post("/restaurant/update", protect, restrictTo('restaurant_owner', 'admin'), updateOrderByRestaurant);
-
-// -- Delivery Agent Route --
 orderRouter.post("/delivery/accept", protect, restrictTo('delivery_agent', 'admin'), acceptDelivery);
-
-// -- Admin Routes --
 orderRouter.get("/list", protect, restrictTo('admin'), listAllOrders);
-orderRouter.post("/status", protect, restrictTo('admin'), updateOrderStatus); // General admin update
+orderRouter.post("/status", protect, restrictTo('admin'), updateOrderStatus);
 
 export default orderRouter;

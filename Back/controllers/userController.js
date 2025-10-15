@@ -461,9 +461,7 @@ export const updateUserByAdmin = async (req, res) => {
         res.status(500).json({ success: false, message: "Server Error" });
     }
 };
-// [existing code in userController.js]...
 
-// Get user cart
 export const getCart = async (req, res) => {
     try {
         const user = await userModel.findById(req.user._id);
@@ -495,4 +493,3 @@ export const updateCart = async (req, res) => {
     }
 };
 
-// [rest of the existing code in userController.js]...

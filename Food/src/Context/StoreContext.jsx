@@ -5,7 +5,6 @@ import io from "socket.io-client";
 export const StoreContext = createContext(null);
 
 const StoreContextProvider = (props) => {
-  // --- STATE MANAGEMENT ---
   const [food_list, setFoodList] = useState([]);
   const [restaurant_list, setRestaurantList] = useState([]);
   const [cartItems, setCartItems] = useState({});
@@ -16,8 +15,6 @@ const StoreContextProvider = (props) => {
   const [orders, setOrders] = useState([]);
   const [savedAddresses, setSavedAddresses] = useState([]);
   const [socket, setSocket] = useState(null);
-
-  // --- UI STATE ---
   const [searchQuery, setSearchQuery] = useState("");
   const [cartRestaurant, setCartRestaurant] = useState(null);
   const [showRestaurantPrompt, setShowRestaurantPrompt] = useState(false);
@@ -30,7 +27,6 @@ const StoreContextProvider = (props) => {
 
   const url = "https://snap-dish.onrender.com";
 
-  // --- CORE API FUNCTIONS ---
 
   const fetchFoodList = async () => {
     try {
@@ -313,8 +309,7 @@ const setDefaultAddress = async (addressId) => {
   };
   
 
-  // --- EFFECTS ---
-  // --- NEW: WebSocket Connection Effect ---
+  
   useEffect(() => {
     // Establish connection when the component mounts
     const newSocket = io(url); // Use your backend URL
@@ -324,15 +319,11 @@ const setDefaultAddress = async (addressId) => {
     return () => newSocket.close();
   }, []);
 
-  // --- NEW: WebSocket Event Listener Effect ---
-  useEffect(() => {
-    if (!socket) return; // Don't do anything if the socket is not connected yet
 
-    // Set up the listener for order status updates
+  useEffect(() => {
+    if (!socket) return;
     socket.on('orderStatusUpdated', (updatedOrder) => {
       toast.info(`Order #${updatedOrder._id.slice(-6)} is now ${updatedOrder.status}!`);
-      
-      // Update the orders state with the new data from the server
       setOrders(prevOrders => 
         prevOrders.map(order => 
           order._id === updatedOrder._id ? updatedOrder : order
@@ -340,11 +331,10 @@ const setDefaultAddress = async (addressId) => {
       );
     });
 
-    // Clean up the listener to prevent memory leaks
     return () => {
       socket.off('orderStatusUpdated');
     };
-  }, [socket]); // This effect re-runs if the socket instance changes
+  }, [socket]); 
 
   useEffect(() => {
     async function loadInitialData() {
@@ -362,7 +352,7 @@ const setDefaultAddress = async (addressId) => {
     loadInitialData();
   }, []);
 
-  // --- CONTEXT VALUE ---
+
   const contextValue = {
     food_list, restaurant_list, cartItems, wishlistItems, token, userName, userRole, orders, savedAddresses,
     searchQuery, location, showRestaurantPrompt, pendingItem, cartRestaurant, url,

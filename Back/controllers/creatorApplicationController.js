@@ -1,17 +1,16 @@
 import CreatorApplication from '../models/creatorApplicationModel.js';
 
-// Submit a new creator application
+
 export const submitApplication = async (req, res) => {
     try {
         const { email } = req.body;
 
-        // Check if an application with this email already exists
         const existingApplication = await CreatorApplication.findOne({ email });
         if (existingApplication) {
             return res.status(400).json({ message: 'An application with this email already exists.' });
         }
 
-        // Create and save the new application
+      
         const newApplication = new CreatorApplication(req.body);
         await newApplication.save();
 
@@ -22,7 +21,7 @@ export const submitApplication = async (req, res) => {
     }
 };
 
-// Fetch all applications for the admin panel
+
 export const getAllApplications = async (req, res) => {
     try {
         const applications = await CreatorApplication.find({});
@@ -33,7 +32,7 @@ export const getAllApplications = async (req, res) => {
     }
 };
 
-// Update the status of an application (e.g., Approve/Reject)
+
 export const updateApplicationStatus = async (req, res) => {
     try {
         const { id } = req.params;
@@ -46,7 +45,7 @@ export const updateApplicationStatus = async (req, res) => {
         }
 
         res.status(200).json({ message: 'Application status updated successfully.', application });
-    } catch (error) { // <-- The missing '{' was here
+    } catch (error) {
         console.error('Error updating status:', error);
         res.status(500).json({ message: 'Error updating application status.' });
     }

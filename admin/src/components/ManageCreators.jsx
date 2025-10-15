@@ -9,7 +9,7 @@ const ManageCreators = () => {
     const [selectedApp, setSelectedApp] = useState(null);
     const [showModal, setShowModal] = useState(false);
 
-    // ✅ FIXED: Use environment variable instead of hardcoded URL
+   
     const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:4000";
 
     const fetchApplications = async () => {

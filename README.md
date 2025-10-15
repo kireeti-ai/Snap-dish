@@ -1,104 +1,149 @@
-# SnapDish
 
-# SnapDish - A Full-Stack AI-Powered Food Delivery Platform
+-----
 
-<p align="center">
-  <img src="/logo-snapdish.png" width="200px" alt="SnapDish Logo">
-  <br>
-  <i>Snap it. Eat it. Love it.</i>
-</p>
+# Snap-dish: A Full Stack Food Delivery Platform
 
----
+Snap-dish is a comprehensive, multi-faceted food delivery application built on the MERN stack. It provides a seamless and integrated ecosystem for four key user roles: customers, restaurant administrators, delivery agents, and platform administrators. Each role has its own dedicated frontend application for a tailored user experience, all powered by a single, robust backend.
 
-## Abstract
+## Features
 
-The SnapDish Food Delivery Website is an online platform developed to help users easily browse restaurants, explore menus, place orders, make payments, and track deliveries in real time. The product offers key features such as personalized recommendations, live order tracking, secure payment gateways, and a comprehensive admin dashboard to manage restaurants, menus, users, and delivery operations.
+###  1. Customer App (`Food`)
 
-While it resembles popular services like Zomato and Swiggy, it stands out by offering lower commissions for small businesses, IoT-based delivery monitoring, and advanced customization options. The application is fully responsive, using a mobile-first design to ensure smooth performance across smartphones, tablets, and desktops.
+  - **Browse & Discover:** Search for restaurants and explore their menus.
+  - **Shopping Cart:** Add, remove, and manage items in a persistent cart.
+  - **Seamless Checkout:** Place orders with an easy-to-use checkout form.
+  - **Order Tracking:** View the status of current and past orders.
+  - **Personalization:** Manage saved addresses and a personal wishlist.
+  - **Community:** Apply to the Creator Program to partner with the platform.
 
----
+###  2. Restaurant Admin Panel (`restaurant-admin`)
 
-## Key Features
+  - **Dashboard:** A visual overview of total revenue, orders, and sales trends.
+  - **Menu Management:** Full CRUD (Create, Read, Update, Delete) functionality for menu items, including image uploads.
+  - **Order Management:** View and manage incoming orders from customers.
+  - **Reporting:** Access detailed reports on sales and performance.
 
-- **AI-Powered Personalization**: The platform uses AI to analyze user history and preferences, suggesting dishes, restaurants, and offers in real time.
-- **Smart Search & Voice Ordering**: Voice commands and image-based search make ordering easier and faster for all users.
-- **Live Order Tracking**: Users can track the status of their delivery from the restaurant to their doorstep.
-- **Dynamic Pricing & Cancellation Management**: A unique advantage where canceled orders are only charged a 10% fee. The food is then resold to other nearby users at a discounted rate, reducing waste and improving affordability.
-- **Fraud Detection**: AI algorithms detect suspicious activities and ensure all transactions are secure.
-- **Predictive Analytics**: The system forecasts peak hours and popular dishes to help restaurants optimize resources and delivery logistics.
-- **Comprehensive Admin & Vendor Dashboards**: Separate interfaces for administrators, restaurant owners, and delivery agents to manage their specific roles effectively.
+###  3. Delivery Agent App (`DeliveryAgent`)
 
----
+  - **Order Notifications:** Receive and accept new delivery assignments.
+  - **Active Order Management:** View customer details and update order statuses (e.g., "Out for delivery," "Delivered").
+  - **Earnings Tracker:** A dashboard to view total earnings and delivery history.
+  - **Profile Management:** Update personal information.
+
+###  4. Main Admin Panel (`admin`)
+
+  - **Central Dashboard:** Platform-wide statistics on users, orders, and restaurants.
+  - **User & Partner Management:** View and manage all users, restaurants, and delivery partners.
+  - **Request Approval:** Approve or deny applications from new restaurants and creators.
+  - **Order Oversight:** View and manage every order placed on the platform.
+  - **Platform Settings:** Configure global settings like delivery fees and commission rates.
 
 ## Technology Stack
 
-- **Frontend**: React.js, HTML5, CSS3
-- **Backend**: Node.js, Express.js
-- **Database**: MongoDB (Planned)
-- **AI & Machine Learning**: Python
-- **Routing**: React Router DOM
-- **State Management**: React Context API
-- **Testing**: Jest
-- **Deployment**: AWS EC2 (Planned)
-- **Editor**: Visual Studio Code
-
----
-
-## Team & Contributions
-
-This project was developed by a collaborative team.
-
-| Name      | Role & Contributions                                                                                                                                                             |
-| :-------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **VASISHTA** | **Frontend Lead & Backend Dev**: Built the Home and Menu pages, developed the Navigation Bar and Footer, and implemented the Search Bar. On the backend, developed User Authentication and Order Management APIs. |
-| **KIREETI** | **Frontend & Backend Lead**: Designed the Restaurant Listing and Item Details pages, developed the Cart and Checkout components, and implemented the Order Confirmation page. On the backend, developed Restaurant/Menu APIs and integrated Payment Processing. |
-| **Tarak** | **Frontend & Backend Dev**: Built the Order Tracking and User Profile pages, ensured mobile responsiveness and accessibility. On the backend, set up Admin APIs and handled logic for discounts, refunds, and cancellations. |
-
----
+  - **Backend:** Node.js, Express.js
+  - **Frontend:** React.js (Vite)
+  - **Database:** MongoDB (with Mongoose)
+  - **Authentication:** JSON Web Tokens (JWT)
+  - **Image Management:** Cloudinary for cloud-based media storage
+  - **API Architecture:** RESTful API
 
 ## Getting Started
 
-To get a local copy up and running, follow these simple steps.
-
 ### Prerequisites
 
-You need to have Node.js and npm (or yarn) installed on your machine.
-- [Node.js](https://nodejs.org/)
+  - Node.js (v18.x or higher)
+  - npm (v9.x or higher)
+  - MongoDB (local or Atlas connection string)
 
-### Installation
+### Backend Setup (`Back`)
 
-1.  **Clone the repository:**
-    ```sh
-    git clone [https://github.com/kireeti-ai/SnapDish.git](https://github.com/kireeti-ai/SnapDish.git)
+1.  **Navigate to the backend directory:**
+    ```bash
+    cd Back
     ```
-2.  **Navigate to the project directory:**
-    ```sh
-    cd SnapDish
-    ```
-3.  **Install Frontend NPM packages:**
-    ```sh
+2.  **Install dependencies:**
+    ```bash
     npm install
     ```
-4.  **Install Backend NPM packages (if applicable):**
-    ```sh
-    cd backend 
-    npm install
+3.  **Set up environment variables:**
+    Create a `.env` file in the `Back` directory and add the following, replacing the placeholder values:
+    ```env
+    PORT=4000
+    MONGO_URI=your_mongodb_connection_string
+    JWT_SECRET=your_jwt_secret_key
+    CLOUDINARY_CLOUD_NAME=your_cloudinary_cloud_name
+    CLOUDINARY_API_KEY=your_cloudinary_api_key
+    CLOUDINARY_API_SECRET=your_cloudinary_api_secret
     ```
-5.  **Run the development server:**
-    ```sh
-    # From the root directory
-    npm run dev
+4.  **Start the server:**
+    ```bash
+    npm start
     ```
-The application will be available at `http://localhost:5173` (or another port if specified).
+    The backend server will be running on `http://localhost:4000`.
 
----
+### Frontend Setup (For each frontend app)
 
-## Future Roadmap
+You need to run each of the four frontend applications in a separate terminal.
 
-- **Full Backend Implementation**: Complete the development of all backend APIs for orders, payments, and user management.
-- **Database Integration**: Connect the backend to a MongoDB database to persist all application data.
-- **Dedicated Dashboards**: Build out the full UIs for the Restaurant Owner, Delivery Agent, and Administrator roles.
-- **Payment Gateway**: Integrate a payment provider like Stripe or Razorpay to handle real transactions.
-- **AI Module Integration**: Connect the Python-based AI modules to the Node.js backend to enable live recommendations and analytics.
+**1. Customer App (`Food`)**
 
-</markdown>
+```bash
+cd Food
+npm install
+npm run dev
+```
+
+The app will be available at `http://localhost:5173` (or the next available port).
+
+**2. Main Admin Panel (`admin`)**
+
+```bash
+cd admin
+npm install
+npm run dev
+```
+
+The app will be available at a new port (e.g., `http://localhost:5174`).
+
+**3. Restaurant Admin Panel (`restaurant-admin`)**
+
+```bash
+cd restaurant-admin
+npm install
+npm run dev
+```
+
+The app will be available at a new port (e.g., `http://localhost:5175`).
+
+**4. Delivery Agent App (`DeliveryAgent`)**
+
+```bash
+cd DeliveryAgent
+npm install
+npm run dev
+```
+
+The app will be available at a new port (e.g., `http://localhost:5176`).
+
+{
+  "admin": {
+    "email": "admin@snapdish.com",
+    "password": "Admin@123456",
+    "role": "admin"
+  },
+  "restaurantOwner": {
+    "email": "ravi4@example.com",
+    "password": "agentpassword123",
+    "role": "restaurant_owner"
+  },
+  "deliveryAgent": {
+    "email": "delivery@snapdish.com",
+    "password": "Delivery@123456",
+    "role": "delivery_agent"
+  },
+  "customer": {
+    "email": "customer@snap.com",
+    "password": "Customer@123456",
+    "role": "customer"
+  }
+}

@@ -34,17 +34,14 @@ const settingsSchema = new mongoose.Schema({
     timestamps: true
 });
 
-// Index for faster queries (since we only have one settings document)
 settingsSchema.index({ createdAt: 1 });
 
-// Virtual for checking if settings are default
 settingsSchema.virtual('isDefault').get(function() {
     return this.commissionRate === 15 && 
            this.deliveryFee === 5 && 
            this.platformName === 'SnapDish';
 });
 
-// Pre-save hook to ensure values are within valid ranges
 settingsSchema.pre('save', function(next) {
     if (this.commissionRate < 0) this.commissionRate = 0;
     if (this.commissionRate > 100) this.commissionRate = 100;

@@ -164,9 +164,9 @@ import { toast } from 'react-toastify';
 
 // Create the context
 export const AuthContext = createContext(null);
-
+//  import.meta.env.VITE_API_BASE_URL || 
 // Define the backend API URL from environment variable
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:4000";
+const API_BASE_URL ="http://localhost:4000";
 
 // --- Axios Helper ---
 const setAuthHeader = (token) => {
@@ -259,13 +259,10 @@ export const AuthProvider = ({ children }) => {
         }
     }, []);
 
-    // --- Update User Function ---
     const updateUser = useCallback((updatedUserData) => {
         setUser(prev => ({ ...prev, ...updatedUserData }));
         localStorage.setItem("user", JSON.stringify({ ...user, ...updatedUserData }));
     }, [user]);
-
-    // --- Logout Function ---
     const logout = useCallback(() => {
         localStorage.removeItem("token");
         localStorage.removeItem("user");
