@@ -7,7 +7,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import ErrorBoundary from './components/ErrorBoundary';
 import Sidebar from './components/Sidebar';
 import Dashboard from './components/Dashboard';
-import ManageRequests from './components/ManageRequests';
+
 import ManageRestaurants from './components/ManageRestaurants';
 import ManageUsers from './components/ManageUsers';
 import AdminOrdersDashboard from './components/ViewOrders';
@@ -78,7 +78,7 @@ useEffect(() => {
           <main className="main-content">
             <Routes>
               <Route path="/" element={<Dashboard />} />
-              <Route path="/requests" element={<ManageRequests />} />
+              
               <Route path="/restaurants" element={<ManageRestaurants />} />
               <Route path="/users" element={<ManageUsers />} />
               <Route path="/orders" element={<AdminOrdersDashboard/>} />
