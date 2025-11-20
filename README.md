@@ -1,3 +1,4 @@
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 # Snap-dish: A Full Stack Food Delivery Platform
 
 Snap-dish is a comprehensive, multi-faceted food delivery application built on the MERN stack. It provides a seamless and integrated ecosystem for four key user roles: customers, restaurant administrators, delivery agents, and platform administrators. Each role has its own dedicated frontend application for a tailored user experience, all powered by a single, robust backend.
