@@ -97,7 +97,6 @@ export const updateRestaurant = async (req, res) => {
   }
 };
 
-// --- Delete restaurant (No changes needed) ---
 export const deleteRestaurant = async (req, res) => {
   try {
     const restaurant = await restaurantModel.findOne({ owner_id: req.user._id });

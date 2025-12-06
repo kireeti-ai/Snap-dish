@@ -2,7 +2,6 @@ import menuItemModel from "../models/menuItemModel.js";
 import restaurantModel from "../models/restaurantModel.js";
 import uploadToCloudinary from "../utils/cloudinary.js";
 
-
 export const addMenuItem = async (req, res) => {
   try {
     const { restaurantId, name, description, price, category, is_veg } = req.body;
@@ -94,7 +93,7 @@ export const removeMenuItem = async (req, res) => {
   }
 };
 
-// UPDATE MENU ITEM
+
 export const updateMenuItem = async (req, res) => {
   try {
     const { id, name, description, price, category, is_veg } = req.body;

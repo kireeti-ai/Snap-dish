@@ -317,7 +317,7 @@ export const getRevenueOrdersComparison = async (req, res) => {
         startDate.setDate(startDate.getDate() - days);
         startDate.setHours(0, 0, 0, 0);
 
-        // Aggregate data for revenue and orders
+
         const comparisonData = await orderModel.aggregate([
             {
                 $match: {
