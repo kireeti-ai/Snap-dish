@@ -1,19 +1,19 @@
 import express from 'express';
-import { 
-  loginUser, 
-  registerUser, 
-  deleteUser, 
-  getUserProfile, 
-  updateUserProfile, 
+import {
+  loginUser,
+  registerUser,
+  deleteUser,
+  getUserProfile,
+  updateUserProfile,
   uploadAvatar,
   getAllUsers,
   updateUserStatusByAdmin,
   deleteUserByAdmin,
   updateUserByAdmin,
-    getCart,      // <-- Import getCart
+    getCart,
   updateCart,
-    getWishlist,    // <-- Import getWishlist
-  updateWishlist,validateToken
+    getWishlist,
+  updateWishlist,validateToken,verifyLoginOTP
 } from '../controllers/userController.js';
 import {
     getAllRestaurantsForAdmin,
@@ -31,15 +31,17 @@ userRouter.post('/register', registerUser);
 userRouter.post('/login', loginUser);
 userRouter.get('/cart', protect, getCart);
 userRouter.post('/cart', protect, updateCart);
+userRouter.post('/verify-otp', verifyLoginOTP);
+
 // Protected routes - Profile management
 userRouter.get('/profile', protect, getUserProfile);
 userRouter.put('/profile', protect, updateUserProfile);
 userRouter.get('/wishlist', protect, getWishlist);
 userRouter.post('/wishlist', protect, updateWishlist);
 // Avatar upload route
-userRouter.post('/upload-avatar', 
-  protect, 
-  upload.single('avatar'), 
+userRouter.post('/upload-avatar',
+  protect,
+  upload.single('avatar'),
   uploadAvatar
 );
 

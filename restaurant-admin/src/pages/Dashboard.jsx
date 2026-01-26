@@ -141,7 +141,6 @@ const Dashboard = () => {
 
   return (
     <div className="space-y-6 p-6 bg-gray-50 min-h-screen">
-      {/* Header */}
       <div className="mb-6">
         <h1 className="text-3xl font-bold text-gray-800">{stats?.restaurantName} Dashboard</h1>
         <div className="flex items-center gap-3 mt-2">
@@ -156,7 +155,6 @@ const Dashboard = () => {
         </div>
       </div>
 
-      {/* Today's Stats */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <StatsCard 
           title="Today's Orders" 
@@ -171,8 +169,6 @@ const Dashboard = () => {
           bgColor="bg-green-500"
         />
       </div>
-
-      {/* Main Stats */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatsCard 
           title="Total Orders" 
@@ -200,7 +196,6 @@ const Dashboard = () => {
         />
       </div>
 
-      {/* Menu Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <StatsCard 
           title="Total Menu Items" 
@@ -222,19 +217,18 @@ const Dashboard = () => {
         />
       </div>
 
-      {/* Revenue vs Orders Comparison Chart - NEW */}
       <RevenueOrdersChart 
         data={revenueOrdersData} 
         title="Revenue vs Orders Comparison (Last 7 Days)" 
       />
 
-      {/* Sales Chart */}
+
       <ChartCard 
         data={chartData} 
         title="Weekly Sales Overview" 
       />
 
-      {/* Recent Orders Table */}
+
       <div>
         <div className="flex justify-between items-center mb-3">
           <h3 className="text-lg font-semibold text-gray-800">Recent Orders</h3>
@@ -257,7 +251,6 @@ const Dashboard = () => {
         )}
       </div>
 
-      {/* Order Status Breakdown */}
       {stats?.ordersByStatus && stats.ordersByStatus.length > 0 && (
         <div className="bg-white rounded-lg shadow-md p-6">
           <h3 className="text-lg font-semibold mb-4 text-gray-800">Order Status Breakdown</h3>

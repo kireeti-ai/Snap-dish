@@ -1,15 +1,10 @@
 import axios from 'axios';
-
-// API Base URL - using the production URL from other components
 const API_BASE_URL = "https://snap-dish.onrender.com";
-
-// Create axios instance with default configuration
 const api = axios.create({
   baseURL: API_BASE_URL,
   timeout: 10000,
 });
 
-// Request interceptor to add auth token
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("token");
@@ -23,14 +18,13 @@ api.interceptors.request.use(
   }
 );
 
-// Response interceptor for error handling
+
 api.interceptors.response.use(
   (response) => {
     return response;
   },
   (error) => {
     if (error.response?.status === 401) {
-      // Token expired or invalid, redirect to login
       localStorage.removeItem("token");
       localStorage.removeItem("user");
       window.location.href = "/login";

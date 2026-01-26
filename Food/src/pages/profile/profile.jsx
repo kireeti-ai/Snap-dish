@@ -329,8 +329,8 @@ export default function PersonalInfoEdit() {
                 <img src={imagePreview} alt="Preview" className="avatar" />
               ) : profileData.avatar ? (
                 <img
-                  src={profileData.avatar.startsWith('http') 
-                    ? profileData.avatar 
+                  src={profileData.avatar.startsWith('http')
+                    ? profileData.avatar
                     : `${url}/${profileData.avatar}`
                   }
                   alt="Profile"
@@ -341,7 +341,7 @@ export default function PersonalInfoEdit() {
                   }}
                 />
               ) : null}
-              
+
               {(!profileData.avatar || profileData.avatar === null) && !imagePreview && (
                 <div className="avatar-placeholder">
                   <User size={40} />
@@ -375,7 +375,26 @@ export default function PersonalInfoEdit() {
             Member since{" "}
             {new Date(profileData.createdAt).toLocaleDateString()}
           </p>
-          
+
+          {/* --- NEW QR CODE SECTION (Security Requirement) --- */}
+          {profileData.qrCode && (
+            <div style={{ marginTop: '20px', textAlign: 'center', borderTop: '1px solid #eee', paddingTop: '15px' }}>
+                <p style={{ fontSize: '14px', color: '#666', marginBottom: '10px' }}>Secure Identity</p>
+                <img
+                    src={profileData.qrCode}
+                    alt="Identity QR"
+                    style={{
+                        width: '120px',
+                        height: '120px',
+                        border: '1px solid #ddd',
+                        padding: '5px',
+                        borderRadius: '8px',
+                        margin: '0 auto'
+                    }}
+                />
+            </div>
+          )}
+
           <div className="button-group">
             {!isEditing ? (
               <button

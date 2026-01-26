@@ -3,9 +3,7 @@ import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-// --- CHANGE: Using an environment variable for the API URL ---
-// You should create a .env file in your project's root folder and add:
-// VITE_API_URL="https://snap-dish.onrender.com"
+
 const API_URL ="https://snap-dish.onrender.com";
 
 

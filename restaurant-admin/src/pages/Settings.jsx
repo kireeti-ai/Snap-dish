@@ -10,7 +10,7 @@ const Settings = () => {
     platformName: 'SnapDish',
     supportEmail: 'support@snapdish.com'
   });
-  
+
   const [originalSettings, setOriginalSettings] = useState({});
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -19,7 +19,7 @@ const Settings = () => {
   const fetchSettings = async () => {
     try {
       const response = await api.get("/api/admin/settings");
-      
+
       if (response.data.success) {
         const settingsData = response.data.data;
         setSettings(settingsData);
@@ -36,10 +36,10 @@ const Settings = () => {
 
   const updateSettings = async (settingsData) => {
     setSaving(true);
-    
+
     try {
       const response = await api.put("/api/admin/settings", settingsData);
-      
+
       if (response.data.success) {
         toast.success("Settings updated successfully!");
         setOriginalSettings(settingsData);
@@ -58,7 +58,7 @@ const Settings = () => {
   const handleInputChange = (field, value) => {
     const newSettings = { ...settings, [field]: value };
     setSettings(newSettings);
-    
+
     // Check if there are unsaved changes
     const hasChanges = Object.keys(newSettings).some(
       key => newSettings[key] !== originalSettings[key]
@@ -68,35 +68,35 @@ const Settings = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    
+
     // Validation
     if (settings.commissionRate < 0 || settings.commissionRate > 100) {
       toast.error("Commission rate must be between 0 and 100");
       return;
     }
-    
+
     if (settings.deliveryFee < 0) {
       toast.error("Delivery fee must be a positive number");
       return;
     }
-    
+
     if (!settings.platformName.trim()) {
       toast.error("Platform name is required");
       return;
     }
-    
+
     if (!settings.supportEmail.trim()) {
       toast.error("Support email is required");
       return;
     }
-    
+
     // Email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(settings.supportEmail)) {
       toast.error("Please enter a valid email address");
       return;
     }
-    
+
     updateSettings(settings);
   };
 
@@ -139,7 +139,7 @@ const Settings = () => {
         <p className="text-gray-600">Configure your platform settings and preferences</p>
       </div>
 
-      {/* Unsaved Changes Warning */}
+
       {hasUnsavedChanges && (
         <div className="mb-6 bg-yellow-50 border border-yellow-200 rounded-lg p-4 flex items-center">
           <AlertCircle className="w-5 h-5 text-yellow-600 mr-3" />
@@ -157,7 +157,7 @@ const Settings = () => {
             <SettingsIcon className="w-5 h-5 text-gray-600 mr-2" />
             <h2 className="text-lg font-semibold text-gray-900">Platform Configuration</h2>
           </div>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label htmlFor="platformName" className="block text-sm font-medium text-gray-700 mb-2">
@@ -175,7 +175,7 @@ const Settings = () => {
               />
               <p className="text-xs text-gray-500 mt-1">This name will appear throughout the platform</p>
             </div>
-            
+
             <div>
               <label htmlFor="supportEmail" className="block text-sm font-medium text-gray-700 mb-2">
                 Support Email
@@ -195,10 +195,10 @@ const Settings = () => {
           </div>
         </div>
 
-        {/* Financial Settings */}
+    
         <div className="bg-white rounded-lg shadow border border-gray-200 p-6">
           <h2 className="text-lg font-semibold text-gray-900 mb-4">Financial Settings</h2>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label htmlFor="commissionRate" className="block text-sm font-medium text-gray-700 mb-2">
@@ -221,7 +221,7 @@ const Settings = () => {
                 <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm">%</span>
               </div>
               <p className="text-xs text-gray-500 mt-1">Commission charged to restaurants per order</p>
-              
+
               {/* Commission Preview */}
               <div className="mt-3 p-3 bg-blue-50 rounded-lg">
                 <p className="text-sm text-blue-700">
@@ -229,7 +229,7 @@ const Settings = () => {
                 </p>
               </div>
             </div>
-            
+
             <div>
               <label htmlFor="deliveryFee" className="block text-sm font-medium text-gray-700 mb-2">
                 Base Delivery Fee (₹)
@@ -250,8 +250,8 @@ const Settings = () => {
                 />
               </div>
               <p className="text-xs text-gray-500 mt-1">Standard delivery fee for orders</p>
-              
-              {/* Delivery Fee Preview */}
+
+
               <div className="mt-3 p-3 bg-green-50 rounded-lg">
                 <p className="text-sm text-green-700">
                   <strong>Current Fee:</strong> ₹{settings.deliveryFee} per delivery
@@ -261,18 +261,17 @@ const Settings = () => {
           </div>
         </div>
 
-        {/* Revenue Calculator */}
         <div className="bg-white rounded-lg shadow border border-gray-200 p-6">
           <h2 className="text-lg font-semibold text-gray-900 mb-4">Revenue Calculator</h2>
           <p className="text-sm text-gray-600 mb-4">Calculate potential platform revenue based on current settings</p>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="p-4 bg-blue-50 rounded-lg text-center">
               <p className="text-sm text-blue-600 font-medium">Daily Orders</p>
               <p className="text-2xl font-bold text-blue-900">100</p>
               <p className="text-xs text-blue-600">Average order value: ₹500</p>
             </div>
-            
+
             <div className="p-4 bg-green-50 rounded-lg text-center">
               <p className="text-sm text-green-600 font-medium">Commission Revenue</p>
               <p className="text-2xl font-bold text-green-900">
@@ -280,7 +279,7 @@ const Settings = () => {
               </p>
               <p className="text-xs text-green-600">Per day from commissions</p>
             </div>
-            
+
             <div className="p-4 bg-purple-50 rounded-lg text-center">
               <p className="text-sm text-purple-600 font-medium">Delivery Revenue</p>
               <p className="text-2xl font-bold text-purple-900">
@@ -289,10 +288,10 @@ const Settings = () => {
               <p className="text-xs text-purple-600">Per day from delivery fees</p>
             </div>
           </div>
-          
+
           <div className="mt-4 p-4 bg-gray-50 rounded-lg">
             <p className="text-sm font-medium text-gray-700">
-              Total Daily Revenue: 
+              Total Daily Revenue:
               <span className="text-lg font-bold text-gray-900 ml-2">
                 ₹{(((100 * 500 * settings.commissionRate) / 100) + (100 * settings.deliveryFee)).toFixed(0)}
               </span>
@@ -313,7 +312,7 @@ const Settings = () => {
             <RefreshCw className="w-4 h-4 inline mr-2" />
             Reset Changes
           </button>
-          
+
           <button
             type="submit"
             disabled={!hasUnsavedChanges || saving}
@@ -347,8 +346,7 @@ const Settings = () => {
           </div>
         </div>
       )}
-      
-      {/* Help Text */}
+
       <div className="mt-8 bg-blue-50 rounded-lg p-4 border border-blue-200">
         <h3 className="text-sm font-medium text-blue-900 mb-2">Configuration Tips</h3>
         <ul className="text-sm text-blue-800 space-y-1">

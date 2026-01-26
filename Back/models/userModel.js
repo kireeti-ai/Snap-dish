@@ -3,74 +3,82 @@ import bcrypt from "bcryptjs";
 
 const userSchema = new mongoose.Schema(
   {
-    firstName: { 
-      type: String, 
-      required: true,
-      trim: true 
-    },
-    lastName: { 
+    firstName: {
       type: String,
-      trim: true 
+      required: true,
+      trim: true
     },
-    email: { 
-      type: String, 
-      required: true, 
+    lastName: {
+      type: String,
+      trim: true
+    },
+    email: {
+      type: String,
+      required: true,
       unique: true,
       lowercase: true,
-      trim: true 
+      trim: true
     },
-    phone_number: { 
+    phone_number: {
       type: String,
-      trim: true 
+      trim: true
     },
-    password: { 
-      type: String, 
+    password: {
+      type: String,
       required: true,
-      minlength: 8 
+      minlength: 8
     },
     role: {
       type: String,
       enum: ["customer", "restaurant_owner", "delivery_agent", "admin"],
       default: "customer",
+    },// --- ADD THESE NEW FIELDS ---
+    otp: {
+        type: String,
+        select: false // Hides this field from normal queries for security
     },
-    avatar: { 
+    otpExpires: {
+        type: Date,
+        select: false
+    },
+    avatar: {
       type: String,
-      default: null 
+      default: null
     },
-    address: { 
+    address: {
       type: String,
-      trim: true 
+      trim: true
     },
-    dob: { 
-      type: Date 
+    dob: {
+      type: Date
     },
-    gender: { 
-      type: String, 
+    gender: {
+      type: String,
       enum: ["Male", "Female", "Other"],
-      trim: true 
+      trim: true
     },
-    status: { 
-      type: String, 
+    status: {
+      type: String,
       enum: ["active", "inactive", "suspended"],
-      default: "active" 
+      default: "active"
     },
-    cartData: { 
-      type: Object, 
-      default: {} 
+    cartData: {
+      type: Object,
+      default: {}
     },
     wishlist: {
-      type: [String], 
+      type: [String],
       default: []
     }
   },
-  { 
+  {
     timestamps: true
   }
 );
 
 userSchema.pre("save", async function (next) {
   if (!this.isModified("password")) return next();
-  
+
   try {
     const salt = await bcrypt.genSalt(12);
     this.password = await bcrypt.hash(this.password, salt);
@@ -85,6 +93,10 @@ userSchema.methods.comparePassword = async function (enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
 };
 
+// Helper to verify OTP
+userSchema.methods.verifyOTP = function(enteredOTP) {
+    return this.otp === enteredOTP && this.otpExpires > Date.now();
+};
 userSchema.methods.toJSON = function() {
   const userObject = this.toObject();
   delete userObject.password;

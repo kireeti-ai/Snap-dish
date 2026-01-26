@@ -4,11 +4,14 @@ import validator from "validator";
 import fs from "fs";
 import path from "path";
 import uploadToCloudinary from '../utils/cloudinary.js';
+import { encryptData, decryptData, generateQRCode } from "../utils/security.js"; // Security Utils
+import sendEmail from "../utils/sendEmail.js"; // Email Utils
 
 // Helper function to create a token
 const createToken = (id) => {
     return jwt.sign({ id }, process.env.JWT_SECRET);
 };
+
 export const validateToken = async (req, res) => {
     try {
         res.json({
@@ -24,7 +27,7 @@ export const validateToken = async (req, res) => {
     }
 };
 
-// Login user
+// --- LOGIN STEP 1: VERIFY CREDENTIALS & SEND OTP (MFA) ---
 export const loginUser = async (req, res) => {
     try {
         const { email, password } = req.body;
@@ -60,11 +63,86 @@ export const loginUser = async (req, res) => {
             });
         }
 
+        // --- MFA IMPLEMENTATION ---
+        // 1. Generate 6-digit OTP
+        const otp = Math.floor(100000 + Math.random() * 900000).toString();
+
+        // 2. Save OTP to DB (Valid for 10 mins)
+        user.otp = otp;
+        user.otpExpires = Date.now() + 10 * 60 * 1000;
+        await user.save();
+
+        // 3. Send Email
+        const message = `
+            <div style="font-family: Arial, sans-serif; padding: 20px;">
+                <h2>SnapDish Login Verification</h2>
+                <p>Your One-Time Password (OTP) is:</p>
+                <h1 style="color: #4CAF50; letter-spacing: 5px;">${otp}</h1>
+                <p>This code expires in 10 minutes.</p>
+                <p>If you did not request this, please ignore this email.</p>
+            </div>
+        `;
+
+        try {
+            await sendEmail({
+                email: user.email,
+                subject: 'SnapDish: Your Login OTP',
+                message: message
+            });
+
+            // Return success but NO TOKEN yet
+            res.json({
+                success: true,
+                message: `OTP sent to ${user.email}`,
+                mfaRequired: true,
+                userId: user._id
+            });
+        } catch (emailError) {
+            console.error("Email send failed:", emailError);
+            user.otp = undefined;
+            user.otpExpires = undefined;
+            await user.save();
+            return res.status(500).json({
+                success: false,
+                message: "Email could not be sent. Please try again."
+            });
+        }
+
+    } catch (error) {
+        console.error("Login error:", error);
+        res.status(500).json({
+            success: false,
+            message: "An error occurred during login"
+        });
+    }
+};
+
+// --- LOGIN STEP 2: VERIFY OTP & ISSUE TOKEN ---
+export const verifyLoginOTP = async (req, res) => {
+    try {
+        const { userId, otp } = req.body;
+
+        // We must select the hidden fields +otp and +otpExpires
+        const user = await userModel.findById(userId).select('+otp +otpExpires');
+
+        if (!user) {
+            return res.status(404).json({ success: false, message: "User not found" });
+        }
+
+        if (!user.verifyOTP(otp)) {
+            return res.status(400).json({ success: false, message: "Invalid or expired OTP" });
+        }
+
+        // Clear OTP
+        user.otp = undefined;
+        user.otpExpires = undefined;
+        await user.save();
+
         const token = createToken(user._id);
 
-        res.json({ 
-            success: true, 
-            token, 
+        res.json({
+            success: true,
+            token,
             role: user.role,
             firstName: user.firstName,
             user: {
@@ -77,13 +155,11 @@ export const loginUser = async (req, res) => {
             }
         });
     } catch (error) {
-        console.error("Login error:", error);
-        res.status(500).json({ 
-            success: false, 
-            message: "An error occurred during login" 
-        });
+        console.error("OTP Verify Error:", error);
+        res.status(500).json({ success: false, message: "Error verifying OTP" });
     }
 };
+
 export const getWishlist = async (req, res) => {
     try {
         const user = await userModel.findById(req.user._id);
@@ -106,9 +182,9 @@ export const updateWishlist = async (req, res) => {
     }
 };
 
-// Register user
+// Register user (With Encryption)
 export const registerUser = async (req, res) => {
-    const { firstName, lastName, email, password, phone_number, role } = req.body;
+    const { firstName, lastName, email, password, phone_number, role, address } = req.body;
 
     try {
         const exists = await userModel.findOne({ email });
@@ -123,13 +199,18 @@ export const registerUser = async (req, res) => {
             return res.json({ success: false, message: "Password must be at least 8 characters" });
         }
 
+        // --- ENCRYPTION IMPLEMENTATION ---
+        // Encrypt address before saving
+        const encryptedAddress = address ? encryptData(address) : "";
+
         const newUser = new userModel({
             firstName,
             lastName,
             email,
             phone_number,
             password,
-            role
+            role,
+            address: encryptedAddress // Save Encrypted
         });
 
         const user = await newUser.save();
@@ -155,13 +236,20 @@ export const registerUser = async (req, res) => {
     }
 };
 
-// Get user profile
+// Get user profile (With Decryption & Encoding)
 export const getUserProfile = async (req, res) => {
     try {
         const user = await userModel.findById(req.user._id).select("-password");
         if (!user) {
             return res.status(404).json({ success: false, message: "User not found" });
         }
+
+        // --- DECRYPTION IMPLEMENTATION ---
+        const decryptedAddress = decryptData(user.address);
+
+        // --- ENCODING IMPLEMENTATION ---
+        // Generate QR Code for User ID
+        const qrCode = await generateQRCode(user._id.toString());
 
         res.json({
             success: true,
@@ -170,14 +258,15 @@ export const getUserProfile = async (req, res) => {
                 lastName: user.lastName,
                 email: user.email,
                 phone_number: user.phone_number,
-                address: user.address,
+                address: decryptedAddress, // Send Decrypted
                 dob: user.dob,
                 gender: user.gender,
                 role: user.role,
                 status: user.status,
                 avatar: user.avatar,
                 createdAt: user.createdAt,
-                updatedAt: user.updatedAt
+                updatedAt: user.updatedAt,
+                qrCode: qrCode // Send QR Data
             },
         });
     } catch (error) {
@@ -186,20 +275,20 @@ export const getUserProfile = async (req, res) => {
     }
 };
 
-// Update user profile
+// Update user profile (With Encryption)
 export const updateUserProfile = async (req, res) => {
     try {
-        const { 
-            firstName, 
-            lastName, 
-            email, 
-            phone_number, 
-            address, 
-            dob, 
+        const {
+            firstName,
+            lastName,
+            email,
+            phone_number,
+            address,
+            dob,
             gender,
-            avatar 
+            avatar
         } = req.body;
-        
+
         const userId = req.user._id;
 
         // Validate email if it's being updated
@@ -215,15 +304,22 @@ export const updateUserProfile = async (req, res) => {
             }
         }
 
+        // --- ENCRYPTION IMPLEMENTATION ---
+        // If address is being updated, encrypt it
+        const encryptedAddress = address ? encryptData(address) : undefined;
+
         const updateData = {
             firstName,
             lastName,
             email,
             phone_number,
-            address,
             dob,
             gender
         };
+
+        if (encryptedAddress) {
+            updateData.address = encryptedAddress;
+        }
 
         // Only update avatar if provided
         if (avatar) {
@@ -247,6 +343,9 @@ export const updateUserProfile = async (req, res) => {
             return res.status(404).json({ success: false, message: "User not found" });
         }
 
+        // Decrypt address for response
+        const decryptedAddressResponse = decryptData(updatedUser.address);
+
         res.json({
             success: true,
             message: "Profile updated successfully",
@@ -255,7 +354,7 @@ export const updateUserProfile = async (req, res) => {
                 lastName: updatedUser.lastName,
                 email: updatedUser.email,
                 phone_number: updatedUser.phone_number,
-                address: updatedUser.address,
+                address: decryptedAddressResponse, // Return Readable Address
                 dob: updatedUser.dob,
                 gender: updatedUser.gender,
                 role: updatedUser.role,
@@ -276,7 +375,7 @@ export const uploadAvatar = async (req, res) => {
     try {
         const userId = req.user._id;
         const user = await userModel.findById(userId);
-        
+
         if (!user) {
             return res.status(404).json({ success: false, message: 'User not found' });
         }
@@ -291,7 +390,7 @@ export const uploadAvatar = async (req, res) => {
         try {
             const localFilePath = req.file.path;
             avatarPath = await uploadToCloudinary(localFilePath, 'avatars');
-            
+
             if (!avatarPath) {
                 throw new Error('Cloudinary upload failed');
             }
@@ -326,7 +425,7 @@ export const uploadAvatar = async (req, res) => {
                 lastName: user.lastName,
                 email: user.email,
                 phone_number: user.phone_number,
-                address: user.address,
+                address: decryptData(user.address), // Decrypt for response
                 dob: user.dob,
                 gender: user.gender,
                 role: user.role,
@@ -338,10 +437,10 @@ export const uploadAvatar = async (req, res) => {
         });
     } catch (error) {
         console.error('Error uploading avatar:', error);
-        res.status(500).json({ 
-            success: false, 
-            message: 'Error uploading avatar', 
-            error: error.message 
+        res.status(500).json({
+            success: false,
+            message: 'Error uploading avatar',
+            error: error.message
         });
     }
 };
@@ -443,7 +542,7 @@ export const updateUserByAdmin = async (req, res) => {
         const updateData = req.body;
 
         // Prevent password updates through this endpoint for security
-        delete updateData.password; 
+        delete updateData.password;
 
         const updatedUser = await userModel.findByIdAndUpdate(
             userId,
@@ -479,7 +578,7 @@ export const getCart = async (req, res) => {
 export const updateCart = async (req, res) => {
     try {
         const updatedUser = await userModel.findByIdAndUpdate(
-            req.user._id, 
+            req.user._id,
             { cartData: req.body },
             { new: true }
         );
@@ -492,4 +591,3 @@ export const updateCart = async (req, res) => {
         res.status(500).json({ success: false, message: "Error updating cart" });
     }
 };
-

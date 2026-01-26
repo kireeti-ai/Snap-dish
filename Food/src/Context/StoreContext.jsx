@@ -25,7 +25,7 @@ const StoreContextProvider = (props) => {
     longitude: 76.9038,
   });
 
-  const url = "https://snap-dish.onrender.com";
+  const url = "http://localhost:4000";//https://snap-dish.onrender.com
 
 
   const fetchFoodList = async () => {
@@ -38,17 +38,17 @@ const StoreContextProvider = (props) => {
     }
   };
 
-// UPDATE ADDRESS
+
 const updateAddress = async (addressData) => {
   if (!token) return;
   try {
     const res = await axios.put(
-      `${url}/api/address/${addressData._id}`, 
-      addressData, 
+      `${url}/api/address/${addressData._id}`,
+      addressData,
       { headers: { Authorization: `Bearer ${token}` } }
     );
     if (res.data.success) {
-      setSavedAddresses((prev) => 
+      setSavedAddresses((prev) =>
         prev.map(addr => addr._id === addressData._id ? res.data.data : addr)
       );
       toast.success("Address updated");
@@ -58,12 +58,12 @@ const updateAddress = async (addressData) => {
   }
 };
 
-// DELETE ADDRESS
+
 const deleteAddress = async (addressId) => {
   if (!token) return;
   try {
     const res = await axios.delete(
-      `${url}/api/address/${addressId}`, 
+      `${url}/api/address/${addressId}`,
       { headers: { Authorization: `Bearer ${token}` } }
     );
     if (res.data.success) {
@@ -75,17 +75,17 @@ const deleteAddress = async (addressId) => {
   }
 };
 
-// SET DEFAULT ADDRESS
+
 const setDefaultAddress = async (addressId) => {
   if (!token) return;
   try {
     const res = await axios.patch(
-      `${url}/api/address/${addressId}/default`, 
-      {}, 
+      `${url}/api/address/${addressId}/default`,
+      {},
       { headers: { Authorization: `Bearer ${token}` } }
     );
     if (res.data.success) {
-      setSavedAddresses((prev) => 
+      setSavedAddresses((prev) =>
         prev.map(addr => ({
           ...addr,
           isDefault: addr._id === addressId
@@ -109,7 +109,6 @@ const setDefaultAddress = async (addressId) => {
     }
   };
 
-  // --- PERSISTENT DATA LOGIC (CART & WISHLIST) ---
 
   const updateCartInDb = async (cartData) => {
     if (token) {
@@ -120,7 +119,7 @@ const setDefaultAddress = async (addressId) => {
       }
     }
   };
-  
+
   const updateWishlistInDb = async (wishlistData) => {
     if (token) {
         try {
@@ -157,7 +156,7 @@ const setDefaultAddress = async (addressId) => {
       return;
     }
     if (Object.keys(cartItems).length === 0) setCartRestaurant(itemRestaurantId);
-    
+
     const newCartItems = { ...cartItems, [itemId]: (cartItems[itemId] || 0) + 1 };
     setCartItems(newCartItems);
     await updateCartInDb(newCartItems);
@@ -168,11 +167,11 @@ const setDefaultAddress = async (addressId) => {
     if (newCartItems[itemId] > 1) newCartItems[itemId] -= 1;
     else delete newCartItems[itemId];
     if (Object.keys(newCartItems).length === 0) setCartRestaurant(null);
-    
+
     setCartItems(newCartItems);
     await updateCartInDb(newCartItems);
   };
-  
+
   const clearCartAndAddToCart = async () => {
     if (!pendingItem) return;
     const itemToAdd = food_list.find((p) => p._id === pendingItem);
@@ -185,7 +184,7 @@ const setDefaultAddress = async (addressId) => {
     setShowRestaurantPrompt(false);
     await updateCartInDb(newCartItems);
   };
-  
+
   const addToWishlist = async (itemId) => {
     const newWishlist = [...wishlistItems];
     if (!newWishlist.includes(itemId)) {
@@ -208,7 +207,7 @@ const setDefaultAddress = async (addressId) => {
     }, 0);
   };
 
-  // --- USER SESSION, ORDERS & ADDRESSES ---
+
 
   const fetchUserOrders = async (authToken = token) => {
     if (!authToken) return;
@@ -219,7 +218,7 @@ const setDefaultAddress = async (addressId) => {
       console.error("Error fetching orders:", error);
     }
   };
-  
+
   const fetchAddresses = async (authToken = token) => {
     if (!authToken) return;
     try {
@@ -243,7 +242,6 @@ const setDefaultAddress = async (addressId) => {
     }
   };
 
-  // In StoreContext.jsx
 
   const placeNewOrder = async (orderData) => {
     if (!token) {
@@ -251,16 +249,13 @@ const setDefaultAddress = async (addressId) => {
       return { success: false };
     }
     try {
-      // --- ROBUST FIX STARTS HERE ---
-      
-      // 1. Get the list of item IDs from the cart
+
       const cartItemIds = Object.keys(cartItems);
       if (cartItemIds.length === 0) {
           toast.error("Your cart is empty.");
           return { success: false };
       }
 
-      // 2. Find the first item in the food_list to get the restaurantId
       const firstItemInCart = food_list.find(item => item._id === cartItemIds[0]);
       if (!firstItemInCart) {
           toast.error("Could not find restaurant information for the items in your cart.");
@@ -268,26 +263,25 @@ const setDefaultAddress = async (addressId) => {
       }
       const restaurantId = firstItemInCart.restaurant_id;
 
-      // 3. Construct the payload with the derived restaurantId
-      const orderPayload = { 
-        items: orderData.items, 
-        amount: orderData.total, 
+      const orderPayload = {
+        items: orderData.items,
+        amount: orderData.total,
         address: orderData.deliveryInfo,
-        restaurantId: restaurantId // <-- Use the ID found from the cart items
+        restaurantId: restaurantId
       };
-      
-      // --- ROBUST FIX ENDS HERE ---
-      
+
+
+
       const response = await axios.post(`${url}/api/order/place`, orderPayload, { headers: { Authorization: `Bearer ${token}` } });
-      
+
       if (response.data.success) {
         setCartItems({});
-        setCartRestaurant(null); // Also clear the cart restaurant state
+        setCartRestaurant(null);
         await updateCartInDb({});
         await fetchUserOrders();
         return { success: true };
       }
-      
+
       toast.error(response.data.message || "Failed to place order.");
       return { success: false };
 
@@ -307,15 +301,15 @@ const setDefaultAddress = async (addressId) => {
     setSavedAddresses([]);
     setOrders([]);
   };
-  
 
-  
+
+
   useEffect(() => {
-    // Establish connection when the component mounts
-    const newSocket = io(url); // Use your backend URL
+
+    const newSocket = io(url);
     setSocket(newSocket);
 
-    // Clean up the connection when the component unmounts
+
     return () => newSocket.close();
   }, []);
 
@@ -324,8 +318,8 @@ const setDefaultAddress = async (addressId) => {
     if (!socket) return;
     socket.on('orderStatusUpdated', (updatedOrder) => {
       toast.info(`Order #${updatedOrder._id.slice(-6)} is now ${updatedOrder.status}!`);
-      setOrders(prevOrders => 
-        prevOrders.map(order => 
+      setOrders(prevOrders =>
+        prevOrders.map(order =>
           order._id === updatedOrder._id ? updatedOrder : order
         )
       );
@@ -334,7 +328,7 @@ const setDefaultAddress = async (addressId) => {
     return () => {
       socket.off('orderStatusUpdated');
     };
-  }, [socket]); 
+  }, [socket]);
 
   useEffect(() => {
     async function loadInitialData() {
