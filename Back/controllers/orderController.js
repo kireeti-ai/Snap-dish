@@ -1,6 +1,8 @@
 import orderModel from "../models/orderModel.js";
 import userModel from '../models/userModel.js';
 import restaurantModel from '../models/restaurantModel.js';
+import { createDigitalSignature, verifyDigitalSignature } from '../utils/security.js';
+
 /**
  * @route   POST /api/order/place
  * @desc    Place a new order
@@ -10,7 +12,7 @@ const emitOrderStatusUpdate = async (io, orderId) => {
     try {
         const order = await orderModel.findById(orderId);
         if (order) {
-            
+
             io.to(orderId.toString()).emit('orderStatusUpdated', order);
         }
     } catch (error) {
@@ -19,17 +21,30 @@ const emitOrderStatusUpdate = async (io, orderId) => {
 }
 const placeOrder = async (req, res) => {
     try {
+        // Create order data for signature (ensuring data integrity)
+        const orderData = {
+            userId: req.user.id,
+            restaurantId: req.body.restaurantId,
+            items: req.body.items,
+            amount: req.body.amount,
+            timestamp: Date.now()
+        };
+
+        // Generate digital signature for the order (data integrity)
+        const orderSignature = createDigitalSignature(orderData);
+
         const newOrder = new orderModel({
-            userId: req.user.id, 
-            restaurantId: req.body.restaurantId, 
+            userId: req.user.id,
+            restaurantId: req.body.restaurantId,
             items: req.body.items,
             amount: req.body.amount,
             address: req.body.address,
-            status: "Pending Confirmation" 
+            status: "Pending Confirmation",
+            orderSignature: orderSignature // Store signature for verification
         });
         await newOrder.save();
         await userModel.findByIdAndUpdate(req.user.id, { cartData: {} });
-        res.json({ success: true, message: "Order placed, awaiting confirmation." });
+        res.json({ success: true, message: "Order placed, awaiting confirmation.", orderId: newOrder._id });
     } catch (error) {
         console.error("Error placing order:", error);
         res.status(500).json({ success: false, message: "Error placing order" });
@@ -56,7 +71,7 @@ export const updateOrderByRestaurant = async (req, res) => {
         await orderModel.findByIdAndUpdate(orderId, { status });
         const updatedOrder = await orderModel.findByIdAndUpdate(orderId, { status }, { new: true });
         if (status === "Awaiting Delivery Agent") {
-            
+
             io.to('delivery_agents').emit('newDeliveryAvailable', updatedOrder);
         }
         await emitOrderStatusUpdate(io, orderId);
@@ -114,7 +129,7 @@ export const updateOrderStatus = async (req, res) => {
 };
 export const getRestaurantOrders = async (req, res) => {
     try {
-        
+
         const restaurant = await restaurantModel.findOne({ owner_id: req.user.id });
         if (!restaurant) {
             return res.status(404).json({ success: false, message: "Restaurant not found for this user." });
@@ -127,4 +142,4 @@ export const getRestaurantOrders = async (req, res) => {
     }
 };
 
-export { placeOrder, getUserOrders};
+export { placeOrder, getUserOrders };

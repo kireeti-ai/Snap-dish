@@ -44,3 +44,46 @@ export const generateQRCode = async (data) => {
         return null;
     }
 };
+
+// 3. DIGITAL SIGNATURE (HMAC-SHA256 based)
+// Used to ensure data integrity and authenticity
+const SIGNATURE_SECRET = process.env.JWT_SECRET || 'signature_secret_key_12345';
+
+// Create a digital signature for data (ensures integrity)
+export const createDigitalSignature = (data) => {
+    const dataString = typeof data === 'string' ? data : JSON.stringify(data);
+    const signature = crypto.createHmac('sha256', SIGNATURE_SECRET)
+        .update(dataString)
+        .digest('hex');
+    return signature;
+};
+
+// Verify the digital signature
+export const verifyDigitalSignature = (data, signature) => {
+    const expectedSignature = createDigitalSignature(data);
+    return crypto.timingSafeEqual(
+        Buffer.from(signature, 'hex'),
+        Buffer.from(expectedSignature, 'hex')
+    );
+};
+
+// Create signed data package (data + signature)
+export const signData = (data) => {
+    const signature = createDigitalSignature(data);
+    return {
+        data,
+        signature,
+        timestamp: Date.now()
+    };
+};
+
+// Verify signed data package
+export const verifySignedData = (signedPackage) => {
+    try {
+        const { data, signature } = signedPackage;
+        return verifyDigitalSignature(data, signature);
+    } catch (error) {
+        console.error("Signature verification failed:", error);
+        return false;
+    }
+};

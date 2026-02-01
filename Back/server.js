@@ -1,13 +1,10 @@
 import express from "express";
-import cors from "cors";
 import dotenv from "dotenv";
 import path from "path";
 import { fileURLToPath } from "url";
 import fs from "fs";
-import multer from "multer";
 import http from 'http';
 import { Server } from 'socket.io';
-import cookieParser from 'cookie-parser';
 import { connectDB } from "./config/db.js";
 import menuItemRouter from "./routes/menuItemRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
@@ -18,6 +15,14 @@ import creatorApplicationRoutes from './routes/creatorApplicationRoutes.js';
 import deliveryRouter from './routes/deliveryRoute.js';
 import restaurantDashboardRouter from './routes/restaurantDashboardRoutes.js';
 import adminRouter from './routes/adminRoutes.js';
+import {
+  corsMiddleware,
+  socketMiddleware,
+  securityHeadersMiddleware,
+  rateLimiter,
+  errorHandlerMiddleware,
+  cookieParser
+} from './middleware/serverMiddleware.js';
 
 
 dotenv.config();
@@ -31,7 +36,7 @@ const port = process.env.PORT || 4000;
 
 const io = new Server(server, {
   cors: {
-    origin: process.env.NODE_ENV === 'production' 
+    origin: process.env.NODE_ENV === 'production'
       ? [process.env.FRONTEND_URL].filter(Boolean)
       : ["http://localhost:5174", "http://localhost:5173", "http://localhost:5175"],
     methods: ["GET", "POST"],
@@ -55,76 +60,14 @@ const createUploadDirs = () => {
 };
 createUploadDirs();
 
-
+// Middleware
 app.use(express.json());
 app.use(cookieParser());
-
-
-const allowedOrigins = [
-  "http://localhost:5174", 
-  "http://localhost:5173",
-  "http://localhost:5175","http://localhost:5176",
-  "https://snap-dish-xi.vercel.app", 
-  "https://snap-dish-qulq.vercel.app", 
-  "https://snap-dish-d5y5.vercel.app",
-  process.env.FRONTEND_URL
-].filter(Boolean);
-
-app.use(cors({
-  origin: (origin, callback) => {
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error("Not allowed by CORS"));
-    }
-  },
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-CSRF-TOKEN']
-}));
-
-// Attach io to request object
-app.use((req, res, next) => {
-  req.io = io;
-  next();
-});
-
-// Security middleware
-app.use((req, res, next) => {
-  res.setHeader('X-Content-Type-Options', 'nosniff');
-  res.setHeader('X-Frame-Options', 'DENY');
-  res.setHeader('X-XSS-Protection', '1; mode=block');
-  next();
-});
-
-// Rate limiting
-import rateLimit from 'express-rate-limit';
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 100 
-});
-app.use('/api/', limiter);
-
-app.use((error, req, res, next) => {
-  if (error instanceof multer.MulterError && error.code === 'LIMIT_FILE_SIZE') {
-    return res.status(400).json({ 
-      success: false, 
-      message: 'File too large. Maximum size is 5MB' 
-    });
-  }
-  if (error.message === 'Only image files are allowed!') {
-    return res.status(400).json({ 
-      success: false, 
-      message: 'Only image files are allowed' 
-    });
-  }
-  console.error('Error:', error);
-  res.status(500).json({ 
-    success: false, 
-    message: 'Internal server error',
-    error: process.env.NODE_ENV === 'development' ? error.message : undefined
-  });
-});
+app.use(corsMiddleware);
+app.use(socketMiddleware(io));
+app.use(securityHeadersMiddleware);
+app.use('/api/', rateLimiter);
+app.use(errorHandlerMiddleware);
 
 // Static files
 app.use('/images', express.static(path.join(__dirname, 'uploads')));

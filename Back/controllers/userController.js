@@ -117,7 +117,7 @@ export const loginUser = async (req, res) => {
     }
 };
 
-// --- LOGIN STEP 2: VERIFY OTP & ISSUE TOKEN ---
+// --- LOGIN/REGISTRATION STEP 2: VERIFY OTP & ISSUE TOKEN ---
 export const verifyLoginOTP = async (req, res) => {
     try {
         const { userId, otp } = req.body;
@@ -133,9 +133,10 @@ export const verifyLoginOTP = async (req, res) => {
             return res.status(400).json({ success: false, message: "Invalid or expired OTP" });
         }
 
-        // Clear OTP
+        // Clear OTP and activate user (for registration flow)
         user.otp = undefined;
         user.otpExpires = undefined;
+        user.status = 'active'; // Activate user after OTP verification
         await user.save();
 
         const token = createToken(user._id);
@@ -182,7 +183,7 @@ export const updateWishlist = async (req, res) => {
     }
 };
 
-// Register user (With Encryption)
+// Register user (With Encryption & OTP Verification)
 export const registerUser = async (req, res) => {
     const { firstName, lastName, email, password, phone_number, role, address } = req.body;
 
@@ -203,6 +204,7 @@ export const registerUser = async (req, res) => {
         // Encrypt address before saving
         const encryptedAddress = address ? encryptData(address) : "";
 
+        // Create user with 'pending' status (not active until OTP verified)
         const newUser = new userModel({
             firstName,
             lastName,
@@ -210,26 +212,52 @@ export const registerUser = async (req, res) => {
             phone_number,
             password,
             role,
-            address: encryptedAddress // Save Encrypted
+            address: encryptedAddress,
+            status: 'inactive' // User starts inactive until OTP verification
         });
+
+        // Generate 6-digit OTP for registration verification
+        const otp = Math.floor(100000 + Math.random() * 900000).toString();
+        newUser.otp = otp;
+        newUser.otpExpires = Date.now() + 10 * 60 * 1000; // Valid for 10 mins
 
         const user = await newUser.save();
-        const token = createToken(user._id);
 
-        res.json({
-            success: true,
-            token,
-            role: user.role,
-            firstName: user.firstName,
-            user: {
-                firstName: user.firstName,
-                lastName: user.lastName,
+        // Send OTP Email
+        const message = `
+            <div style="font-family: Arial, sans-serif; padding: 20px;">
+                <h2>Welcome to SnapDish!</h2>
+                <p>Thank you for registering. Please verify your email with this OTP:</p>
+                <h1 style="color: #4CAF50; letter-spacing: 5px;">${otp}</h1>
+                <p>This code expires in 10 minutes.</p>
+                <p>If you did not create this account, please ignore this email.</p>
+            </div>
+        `;
+
+        try {
+            await sendEmail({
                 email: user.email,
-                phone_number: user.phone_number,
-                role: user.role,
-                avatar: user.avatar
-            }
-        });
+                subject: 'SnapDish: Verify Your Email',
+                message: message
+            });
+
+            // Return success but require OTP verification
+            res.json({
+                success: true,
+                message: `OTP sent to ${user.email}`,
+                mfaRequired: true,
+                userId: user._id,
+                isRegistration: true
+            });
+        } catch (emailError) {
+            console.error("Email send failed:", emailError);
+            // Delete the user if email fails
+            await userModel.findByIdAndDelete(user._id);
+            return res.status(500).json({
+                success: false,
+                message: "Email could not be sent. Please try again."
+            });
+        }
     } catch (error) {
         console.log(error);
         res.json({ success: false, message: "Error registering user" });
@@ -582,7 +610,7 @@ export const updateCart = async (req, res) => {
             { cartData: req.body },
             { new: true }
         );
-         if (!updatedUser) {
+        if (!updatedUser) {
             return res.status(404).json({ success: false, message: "User not found" });
         }
         res.json({ success: true, message: "Cart updated" });

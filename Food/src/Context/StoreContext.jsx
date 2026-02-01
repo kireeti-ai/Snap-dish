@@ -39,64 +39,64 @@ const StoreContextProvider = (props) => {
   };
 
 
-const updateAddress = async (addressData) => {
-  if (!token) return;
-  try {
-    const res = await axios.put(
-      `${url}/api/address/${addressData._id}`,
-      addressData,
-      { headers: { Authorization: `Bearer ${token}` } }
-    );
-    if (res.data.success) {
-      setSavedAddresses((prev) =>
-        prev.map(addr => addr._id === addressData._id ? res.data.data : addr)
+  const updateAddress = async (addressData) => {
+    if (!token) return;
+    try {
+      const res = await axios.put(
+        `${url}/api/address/${addressData._id}`,
+        addressData,
+        { headers: { Authorization: `Bearer ${token}` } }
       );
-      toast.success("Address updated");
+      if (res.data.success) {
+        setSavedAddresses((prev) =>
+          prev.map(addr => addr._id === addressData._id ? res.data.data : addr)
+        );
+        toast.success("Address updated");
+      }
+    } catch (error) {
+      toast.error("Failed to update address");
     }
-  } catch (error) {
-    toast.error("Failed to update address");
-  }
-};
+  };
 
 
-const deleteAddress = async (addressId) => {
-  if (!token) return;
-  try {
-    const res = await axios.delete(
-      `${url}/api/address/${addressId}`,
-      { headers: { Authorization: `Bearer ${token}` } }
-    );
-    if (res.data.success) {
-      setSavedAddresses((prev) => prev.filter(addr => addr._id !== addressId));
-      toast.success("Address deleted");
-    }
-  } catch (error) {
-    toast.error("Failed to delete address");
-  }
-};
-
-
-const setDefaultAddress = async (addressId) => {
-  if (!token) return;
-  try {
-    const res = await axios.patch(
-      `${url}/api/address/${addressId}/default`,
-      {},
-      { headers: { Authorization: `Bearer ${token}` } }
-    );
-    if (res.data.success) {
-      setSavedAddresses((prev) =>
-        prev.map(addr => ({
-          ...addr,
-          isDefault: addr._id === addressId
-        }))
+  const deleteAddress = async (addressId) => {
+    if (!token) return;
+    try {
+      const res = await axios.delete(
+        `${url}/api/address/${addressId}`,
+        { headers: { Authorization: `Bearer ${token}` } }
       );
-      toast.success("Default address updated");
+      if (res.data.success) {
+        setSavedAddresses((prev) => prev.filter(addr => addr._id !== addressId));
+        toast.success("Address deleted");
+      }
+    } catch (error) {
+      toast.error("Failed to delete address");
     }
-  } catch (error) {
-    toast.error("Failed to set default address");
-  }
-};
+  };
+
+
+  const setDefaultAddress = async (addressId) => {
+    if (!token) return;
+    try {
+      const res = await axios.patch(
+        `${url}/api/address/${addressId}/default`,
+        {},
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      if (res.data.success) {
+        setSavedAddresses((prev) =>
+          prev.map(addr => ({
+            ...addr,
+            isDefault: addr._id === addressId
+          }))
+        );
+        toast.success("Default address updated");
+      }
+    } catch (error) {
+      toast.error("Failed to set default address");
+    }
+  };
 
   const fetchRestaurantList = async () => {
     try {
@@ -122,26 +122,26 @@ const setDefaultAddress = async (addressId) => {
 
   const updateWishlistInDb = async (wishlistData) => {
     if (token) {
-        try {
-            await axios.post(`${url}/api/users/wishlist`, { wishlist: wishlistData }, { headers: { Authorization: `Bearer ${token}` } });
-        } catch (error) {
-            toast.error("Could not save wishlist changes.");
-        }
+      try {
+        await axios.post(`${url}/api/users/wishlist`, { wishlist: wishlistData }, { headers: { Authorization: `Bearer ${token}` } });
+      } catch (error) {
+        toast.error("Could not save wishlist changes.");
+      }
     }
   };
 
   const loadUserData = async (authToken) => {
     try {
-        const cartResponse = await axios.get(`${url}/api/users/cart`, { headers: { Authorization: `Bearer ${authToken}` } });
-        if (cartResponse.data.success) {
-            setCartItems(cartResponse.data.cartData || {});
-        }
-        const wishlistResponse = await axios.get(`${url}/api/users/wishlist`, { headers: { Authorization: `Bearer ${authToken}` } });
-        if (wishlistResponse.data.success) {
-            setWishlistItems(wishlistResponse.data.wishlist || []);
-        }
+      const cartResponse = await axios.get(`${url}/api/users/cart`, { headers: { Authorization: `Bearer ${authToken}` } });
+      if (cartResponse.data.success) {
+        setCartItems(cartResponse.data.cartData || {});
+      }
+      const wishlistResponse = await axios.get(`${url}/api/users/wishlist`, { headers: { Authorization: `Bearer ${authToken}` } });
+      if (wishlistResponse.data.success) {
+        setWishlistItems(wishlistResponse.data.wishlist || []);
+      }
     } catch (error) {
-        console.error("Error loading user data:", error);
+      console.error("Error loading user data:", error);
     }
   };
 
@@ -252,14 +252,14 @@ const setDefaultAddress = async (addressId) => {
 
       const cartItemIds = Object.keys(cartItems);
       if (cartItemIds.length === 0) {
-          toast.error("Your cart is empty.");
-          return { success: false };
+        toast.error("Your cart is empty.");
+        return { success: false };
       }
 
       const firstItemInCart = food_list.find(item => item._id === cartItemIds[0]);
       if (!firstItemInCart) {
-          toast.error("Could not find restaurant information for the items in your cart.");
-          return { success: false };
+        toast.error("Could not find restaurant information for the items in your cart.");
+        return { success: false };
       }
       const restaurantId = firstItemInCart.restaurant_id;
 
@@ -339,8 +339,8 @@ const setDefaultAddress = async (addressId) => {
         await loadUserData(storedToken);
         await fetchAddresses(storedToken);
         await fetchUserOrders(storedToken);
-        setUserName(localStorage.getItem("userName"));
-        setUserRole(localStorage.getItem("role"));
+        setUserName(localStorage.getItem("userName") || "");
+        setUserRole(localStorage.getItem("role") || "customer");
       }
     }
     loadInitialData();
@@ -352,11 +352,11 @@ const setDefaultAddress = async (addressId) => {
     searchQuery, location, showRestaurantPrompt, pendingItem, cartRestaurant, url,
     setSearchQuery, setLocation, setToken, setUserName, setUserRole, setShowRestaurantPrompt,
     addToCart, removeFromCart, getTotalCartAmount, clearCartAndAddToCart,
-    addToWishlist, removeFromWishlist,socket, // <-- Expose the socket instance to other components
+    addToWishlist, removeFromWishlist, socket, // <-- Expose the socket instance to other components
     setOrders,
     placeNewOrder, logout, fetchAddresses, addAddress, updateAddress,
-  deleteAddress,
-  setDefaultAddress,
+    deleteAddress,
+    setDefaultAddress,
   };
 
   return (

@@ -11,8 +11,8 @@ const orderSchema = new mongoose.Schema({
     }],
     amount: { type: Number, required: true },
     address: { type: Object, required: true },
-    status: { 
-        type: String, 
+    status: {
+        type: String,
         enum: [
             "Pending Confirmation", // Customer places order
             "Preparing",            // Restaurant accepts order
@@ -20,13 +20,15 @@ const orderSchema = new mongoose.Schema({
             "Out for Delivery",     // Delivery agent accepts
             "Delivered",            // Order complete
             "Cancelled",
-            "Reached Restaurant",  
-        "Picked Up"             // Order cancelled by any party
+            "Reached Restaurant",
+            "Picked Up"             // Order cancelled by any party
         ],
-        default: "Pending Confirmation" 
+        default: "Pending Confirmation"
     },
     date: { type: Date, default: Date.now },
-    payment: { type: Boolean, default: false }
+    payment: { type: Boolean, default: false },
+    // Digital signature for data integrity verification
+    orderSignature: { type: String, default: null }
 });
 
 const orderModel = mongoose.models.order || mongoose.model("order", orderSchema);

@@ -11,10 +11,11 @@ const LoginPopup = ({ setShowLogin }) => {
   const { url, setToken, setUserName, setUserRole } = useContext(StoreContext);
   const [currState, setCurrState] = useState("Login");
 
-  // --- NEW STATE FOR MFA ---
+  // --- STATE FOR MFA ---
   const [showOtpUI, setShowOtpUI] = useState(false);
   const [otp, setOtp] = useState("");
   const [tempUserId, setTempUserId] = useState(null);
+  const [isRegistration, setIsRegistration] = useState(false);
   // -------------------------
 
   const [data, setData] = useState({
@@ -47,6 +48,7 @@ const LoginPopup = ({ setShowLogin }) => {
       });
 
       if (response.data.success) {
+        toast.success(isRegistration ? "Account verified successfully!" : "Login successful!");
         handleLoginSuccess(response.data);
       } else {
         setError(response.data.message);
@@ -54,8 +56,8 @@ const LoginPopup = ({ setShowLogin }) => {
       }
     } catch (err) {
       console.error('OTP Error:', err);
-      setError("Invalid OTP");
-      toast.error("Invalid OTP");
+      setError("Invalid or expired OTP");
+      toast.error("Invalid or expired OTP");
     } finally {
       setIsLoading(false);
     }
@@ -93,19 +95,19 @@ const LoginPopup = ({ setShowLogin }) => {
     setIsLoading(true);
 
     if (currState === "Login") {
-       // Validation
-       if (!data.email || !data.password) {
-         setError("Please fill in all required fields");
-         setIsLoading(false);
-         return;
-       }
+      // Validation
+      if (!data.email || !data.password) {
+        setError("Please fill in all required fields");
+        setIsLoading(false);
+        return;
+      }
     } else {
-       // Registration Validation
-       if (!data.firstName || !data.email || !data.password) {
-         setError("Required fields missing");
-         setIsLoading(false);
-         return;
-       }
+      // Registration Validation
+      if (!data.firstName || !data.email || !data.password) {
+        setError("Required fields missing");
+        setIsLoading(false);
+        return;
+      }
     }
 
     const endpoint = currState === 'Login' ? '/api/users/login' : '/api/users/register';
@@ -113,20 +115,21 @@ const LoginPopup = ({ setShowLogin }) => {
     // For registration, we send the full data.
     // For login, we send email/password.
     const payload = currState === 'Login'
-        ? { email: data.email, password: data.password }
-        : data;
+      ? { email: data.email, password: data.password }
+      : data;
 
     try {
       const response = await axios.post(`${url}${endpoint}`, payload);
 
       if (response.data.success) {
-        // CHECK FOR MFA REQUIREMENT
+        // CHECK FOR MFA REQUIREMENT (both login and registration)
         if (response.data.mfaRequired) {
-            setTempUserId(response.data.userId);
-            setShowOtpUI(true);
-            toast.info("OTP sent to your email!");
-            setIsLoading(false);
-            return;
+          setTempUserId(response.data.userId);
+          setIsRegistration(response.data.isRegistration || false);
+          setShowOtpUI(true);
+          toast.info(isRegistration ? "Verify your email to complete registration!" : "OTP sent to your email!");
+          setIsLoading(false);
+          return;
         }
 
         // If regular login/register (no MFA or after register)
@@ -160,7 +163,7 @@ const LoginPopup = ({ setShowLogin }) => {
           initial={{ scale: 0.95 }} animate={{ scale: 1 }}
         >
           <div className="login-popup-title">
-            <h2>{showOtpUI ? "Enter OTP" : currState}</h2>
+            <h2>{showOtpUI ? (isRegistration ? "Verify Email" : "Enter OTP") : currState}</h2>
             <img onClick={() => setShowLogin(false)} src={assets.cross_icon} alt="Close" style={{ cursor: 'pointer' }} />
           </div>
 
@@ -168,42 +171,42 @@ const LoginPopup = ({ setShowLogin }) => {
             {error && <p className="error-message">{error}</p>}
 
             {showOtpUI ? (
-                // --- OTP UI ---
-                <div style={{textAlign: 'center'}}>
-                    <p>Please enter the 6-digit code sent to {data.email}</p>
-                    <input
-                        type="text"
-                        value={otp}
-                        onChange={(e) => setOtp(e.target.value)}
-                  
-                        maxLength={6}
-                        style={{textAlign: 'center', letterSpacing: '5px', fontSize: '1.2rem'}}
-                        required
-                    />
-                </div>
+              // --- OTP UI ---
+              <div style={{ textAlign: 'center' }}>
+                <p>{isRegistration ? "Please verify your email with the 6-digit code sent to" : "Please enter the 6-digit code sent to"} {data.email}</p>
+                <input
+                  type="text"
+                  value={otp}
+                  onChange={(e) => setOtp(e.target.value)}
+
+                  maxLength={6}
+                  style={{ textAlign: 'center', letterSpacing: '5px', fontSize: '1.2rem' }}
+                  required
+                />
+              </div>
             ) : (
-                // --- NORMAL LOGIN/REGISTER UI ---
-                <>
-                    {currState === "Login" ? (
-                        <>
-                            <input name='email' type="email" value={data.email} onChange={onChangeHandler} placeholder='Your email' required />
-                            <input name='password' type="password" value={data.password} onChange={onChangeHandler} placeholder='Password' required />
-                        </>
-                    ) : (
-                        <>
-                            <select name="role" value={data.role} onChange={onChangeHandler} className="role-select">
-                                <option value="customer">Customer</option>
-                                <option value="restaurant_owner">Restaurant Partner</option>
-                                <option value="delivery_agent">Delivery Partner</option>
-                            </select>
-                            <input name='firstName' type="text" value={data.firstName} onChange={onChangeHandler} placeholder='First Name' required />
-                            <input name='lastName' type="text" value={data.lastName} onChange={onChangeHandler} placeholder='Last Name' />
-                            <input name='phone_number' type="tel" value={data.phone_number} onChange={onChangeHandler} placeholder='Phone' />
-                            <input name='email' type="email" value={data.email} onChange={onChangeHandler} placeholder='Your email' required />
-                            <input name='password' type="password" value={data.password} onChange={onChangeHandler} placeholder='Password (min 8 chars)' required />
-                        </>
-                    )}
-                </>
+              // --- NORMAL LOGIN/REGISTER UI ---
+              <>
+                {currState === "Login" ? (
+                  <>
+                    <input name='email' type="email" value={data.email} onChange={onChangeHandler} placeholder='Your email' required />
+                    <input name='password' type="password" value={data.password} onChange={onChangeHandler} placeholder='Password' required />
+                  </>
+                ) : (
+                  <>
+                    <select name="role" value={data.role} onChange={onChangeHandler} className="role-select">
+                      <option value="customer">Customer</option>
+                      <option value="restaurant_owner">Restaurant Partner</option>
+                      <option value="delivery_agent">Delivery Partner</option>
+                    </select>
+                    <input name='firstName' type="text" value={data.firstName} onChange={onChangeHandler} placeholder='First Name' required />
+                    <input name='lastName' type="text" value={data.lastName} onChange={onChangeHandler} placeholder='Last Name' />
+                    <input name='phone_number' type="tel" value={data.phone_number} onChange={onChangeHandler} placeholder='Phone' />
+                    <input name='email' type="email" value={data.email} onChange={onChangeHandler} placeholder='Your email' required />
+                    <input name='password' type="password" value={data.password} onChange={onChangeHandler} placeholder='Password (min 8 chars)' required />
+                  </>
+                )}
+              </>
             )}
           </div>
 
@@ -215,24 +218,24 @@ const LoginPopup = ({ setShowLogin }) => {
           </motion.button>
 
           {!showOtpUI && (
-              <>
-                {currState === "Sign Up" && (
-                    <div className="login-popup-condition">
-                    <input type="checkbox" required />
-                    <p>By continuing, I agree to the terms of use & privacy policy.</p>
-                    </div>
-                )}
-                {currState === "Login"
-                    ? <p>Create a new account? <span onClick={() => setCurrState('Sign Up')}>Click here</span></p>
-                    : <p>Already have an account? <span onClick={() => setCurrState('Login')}>Login here</span></p>
-                }
-              </>
+            <>
+              {currState === "Sign Up" && (
+                <div className="login-popup-condition">
+                  <input type="checkbox" required />
+                  <p>By continuing, I agree to the terms of use & privacy policy.</p>
+                </div>
+              )}
+              {currState === "Login"
+                ? <p>Create a new account? <span onClick={() => setCurrState('Sign Up')}>Click here</span></p>
+                : <p>Already have an account? <span onClick={() => setCurrState('Login')}>Login here</span></p>
+              }
+            </>
           )}
 
           {showOtpUI && (
-              <p style={{marginTop: '10px', cursor: 'pointer', color: 'tomato'}} onClick={() => setShowOtpUI(false)}>
-                  Back to Login
-              </p>
+            <p style={{ marginTop: '10px', cursor: 'pointer', color: 'tomato' }} onClick={() => setShowOtpUI(false)}>
+              Back to Login
+            </p>
           )}
         </motion.form>
       </motion.div>
