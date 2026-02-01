@@ -7,6 +7,20 @@ import uploadToCloudinary from '../utils/cloudinary.js';
 import { encryptData, decryptData, generateQRCode } from "../utils/security.js"; // Security Utils
 import sendEmail from "../utils/sendEmail.js"; // Email Utils
 
+// Temporary storage for pending registrations (expires after 10 mins)
+// In production, use Redis for better scalability
+const pendingRegistrations = new Map();
+
+// Cleanup expired registrations every 5 minutes
+setInterval(() => {
+    const now = Date.now();
+    for (const [key, data] of pendingRegistrations.entries()) {
+        if (data.expiresAt < now) {
+            pendingRegistrations.delete(key);
+        }
+    }
+}, 5 * 60 * 1000);
+
 // Helper function to create a token
 const createToken = (id) => {
     return jwt.sign({ id }, process.env.JWT_SECRET);
@@ -127,10 +141,78 @@ export const loginUser = async (req, res) => {
 // --- LOGIN/REGISTRATION STEP 2: VERIFY OTP & ISSUE TOKEN ---
 export const verifyLoginOTP = async (req, res) => {
     try {
-        const { userId, otp } = req.body;
+        const { userId, otp, registrationId } = req.body;
 
-        if (!userId || !otp) {
+        if (!otp) {
             return res.status(400).json({ success: false, message: "Please enter the OTP code" });
+        }
+
+        // --- REGISTRATION OTP VERIFICATION ---
+        if (registrationId) {
+            const pendingData = pendingRegistrations.get(registrationId);
+
+            if (!pendingData) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Registration session expired. Please register again."
+                });
+            }
+
+            if (pendingData.expiresAt < Date.now()) {
+                pendingRegistrations.delete(registrationId);
+                return res.status(400).json({
+                    success: false,
+                    message: "OTP has expired. Please register again."
+                });
+            }
+
+            if (pendingData.otp !== otp) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Incorrect OTP. Please check and try again."
+                });
+            }
+
+            // OTP verified! Now create the user in database
+            const encryptedAddress = pendingData.address ? encryptData(pendingData.address) : "";
+
+            const newUser = new userModel({
+                firstName: pendingData.firstName,
+                lastName: pendingData.lastName,
+                email: pendingData.email,
+                phone_number: pendingData.phone_number,
+                password: pendingData.password,
+                role: pendingData.role,
+                address: encryptedAddress,
+                status: 'active' // User is verified, so active immediately
+            });
+
+            const user = await newUser.save();
+
+            // Remove from pending registrations
+            pendingRegistrations.delete(registrationId);
+
+            const token = createToken(user._id);
+
+            return res.json({
+                success: true,
+                token,
+                role: user.role,
+                firstName: user.firstName,
+                user: {
+                    firstName: user.firstName,
+                    lastName: user.lastName,
+                    email: user.email,
+                    phone_number: user.phone_number,
+                    role: user.role,
+                    avatar: user.avatar
+                }
+            });
+        }
+
+        // --- LOGIN OTP VERIFICATION ---
+        if (!userId) {
+            return res.status(400).json({ success: false, message: "Session expired. Please try logging in again." });
         }
 
         // We must select the hidden fields +otp and +otpExpires
@@ -152,10 +234,9 @@ export const verifyLoginOTP = async (req, res) => {
             return res.status(400).json({ success: false, message: "Incorrect OTP. Please check and try again." });
         }
 
-        // Clear OTP and activate user (for registration flow)
+        // Clear OTP
         user.otp = undefined;
         user.otpExpires = undefined;
-        user.status = 'active'; // Activate user after OTP verification
         await user.save();
 
         const token = createToken(user._id);
@@ -176,6 +257,10 @@ export const verifyLoginOTP = async (req, res) => {
         });
     } catch (error) {
         console.error("OTP Verify Error:", error);
+        // Handle duplicate email error during registration
+        if (error.code === 11000) {
+            return res.status(400).json({ success: false, message: "Email already registered. Please login instead." });
+        }
         res.status(500).json({ success: false, message: "Verification failed. Please try again." });
     }
 };
@@ -203,6 +288,7 @@ export const updateWishlist = async (req, res) => {
 };
 
 // Register user (With Encryption & OTP Verification)
+// Step 1: Validate and send OTP - user is NOT created yet
 export const registerUser = async (req, res) => {
     const { firstName, lastName, email, password, phone_number, role, address } = req.body;
 
@@ -218,7 +304,9 @@ export const registerUser = async (req, res) => {
             return res.json({ success: false, message: "Password is required" });
         }
 
-        const exists = await userModel.findOne({ email: email.toLowerCase() });
+        const normalizedEmail = email.toLowerCase().trim();
+
+        const exists = await userModel.findOne({ email: normalizedEmail });
         if (exists) {
             return res.json({ success: false, message: "User already exists with this email" });
         }
@@ -230,28 +318,24 @@ export const registerUser = async (req, res) => {
             return res.json({ success: false, message: "Password must be at least 8 characters" });
         }
 
-        // --- ENCRYPTION IMPLEMENTATION ---
-        // Encrypt address before saving
-        const encryptedAddress = address ? encryptData(address) : "";
+        // Generate 6-digit OTP
+        const otp = Math.floor(100000 + Math.random() * 900000).toString();
 
-        // Create user with 'inactive' status (not active until OTP verified)
-        const newUser = new userModel({
+        // Generate a unique registration ID
+        const registrationId = `reg_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+
+        // Store registration data temporarily (NOT in database)
+        pendingRegistrations.set(registrationId, {
             firstName: firstName.trim(),
             lastName: lastName ? lastName.trim() : "",
-            email: email.toLowerCase().trim(),
+            email: normalizedEmail,
             phone_number: phone_number || "",
-            password,
+            password, // Will be hashed when user is actually created
             role: role || "customer",
-            address: encryptedAddress,
-            status: 'inactive' // User starts inactive until OTP verification
+            address: address || "",
+            otp,
+            expiresAt: Date.now() + 10 * 60 * 1000 // 10 minutes
         });
-
-        // Generate 6-digit OTP for registration verification
-        const otp = Math.floor(100000 + Math.random() * 900000).toString();
-        newUser.otp = otp;
-        newUser.otpExpires = Date.now() + 10 * 60 * 1000; // Valid for 10 mins
-
-        const user = await newUser.save();
 
         // Send OTP Email
         const message = `
@@ -266,23 +350,23 @@ export const registerUser = async (req, res) => {
 
         try {
             await sendEmail({
-                email: user.email,
+                email: normalizedEmail,
                 subject: 'SnapDish: Verify Your Email',
                 message: message
             });
 
-            // Return success but require OTP verification
+            // Return success - user NOT created yet, just pending
             res.json({
                 success: true,
-                message: `OTP sent to ${user.email}`,
+                message: `OTP sent to ${normalizedEmail}`,
                 mfaRequired: true,
-                userId: user._id,
+                registrationId, // Use registrationId instead of userId
                 isRegistration: true
             });
         } catch (emailError) {
             console.error("Email send failed:", emailError);
-            // Delete the user if email fails
-            await userModel.findByIdAndDelete(user._id);
+            // Remove from pending registrations
+            pendingRegistrations.delete(registrationId);
             return res.status(500).json({
                 success: false,
                 message: "Could not send verification email. Please check your email address and try again."
@@ -290,14 +374,6 @@ export const registerUser = async (req, res) => {
         }
     } catch (error) {
         console.error("Registration error:", error);
-        // Handle specific MongoDB errors
-        if (error.code === 11000) {
-            return res.json({ success: false, message: "Email already registered" });
-        }
-        if (error.name === 'ValidationError') {
-            const messages = Object.values(error.errors).map(e => e.message);
-            return res.json({ success: false, message: messages.join(', ') });
-        }
         res.json({ success: false, message: "Registration failed. Please try again." });
     }
 };

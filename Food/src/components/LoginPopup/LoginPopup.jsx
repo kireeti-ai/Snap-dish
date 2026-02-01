@@ -15,6 +15,7 @@ const LoginPopup = ({ setShowLogin }) => {
   const [showOtpUI, setShowOtpUI] = useState(false);
   const [otp, setOtp] = useState("");
   const [tempUserId, setTempUserId] = useState(null);
+  const [registrationId, setRegistrationId] = useState(null);
   const [isRegistration, setIsRegistration] = useState(false);
   // -------------------------
 
@@ -44,6 +45,7 @@ const LoginPopup = ({ setShowLogin }) => {
     try {
       const response = await axios.post(`${url}/api/users/verify-otp`, {
         userId: tempUserId,
+        registrationId: registrationId,
         otp: otp
       });
 
@@ -56,8 +58,9 @@ const LoginPopup = ({ setShowLogin }) => {
       }
     } catch (err) {
       console.error('OTP Error:', err);
-      setError("Invalid or expired OTP");
-      toast.error("Invalid or expired OTP");
+      const msg = err.response?.data?.message || "Invalid or expired OTP";
+      setError(msg);
+      toast.error(msg);
     } finally {
       setIsLoading(false);
     }
@@ -154,7 +157,11 @@ const LoginPopup = ({ setShowLogin }) => {
       if (response.data.success) {
         // CHECK FOR MFA REQUIREMENT (both login and registration)
         if (response.data.mfaRequired) {
-          setTempUserId(response.data.userId);
+          if (response.data.isRegistration) {
+            setRegistrationId(response.data.registrationId);
+          } else {
+            setTempUserId(response.data.userId);
+          }
           setIsRegistration(response.data.isRegistration || false);
           setShowOtpUI(true);
           toast.info(response.data.isRegistration ? "Verify your email to complete registration!" : "OTP sent to your email!");
