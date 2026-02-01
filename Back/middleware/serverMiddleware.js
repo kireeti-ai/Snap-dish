@@ -18,11 +18,15 @@ const allowedOrigins = [
 // CORS configuration
 export const corsMiddleware = cors({
     origin: (origin, callback) => {
-        if (!origin || allowedOrigins.includes(origin)) {
-            callback(null, true);
-        } else {
-            callback(new Error("Not allowed by CORS"));
+        // Allow requests with no origin (mobile apps, Postman, etc.)
+        if (!origin) return callback(null, true);
+
+        // Check if origin matches allowed origins or is a Vercel preview URL
+        if (allowedOrigins.includes(origin) || origin.match(/^https:\/\/snap-dish.*\.vercel\.app$/)) {
+            return callback(null, true);
         }
+
+        callback(new Error("Not allowed by CORS"));
     },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],

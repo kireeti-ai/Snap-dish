@@ -36,16 +36,28 @@ const port = process.env.PORT || 4000;
 
 const io = new Server(server, {
   cors: {
-    origin: [
-      "http://localhost:5173",
-      "http://localhost:5174",
-      "http://localhost:5175",
-      "http://localhost:5176",
-      "https://snap-dish-xi.vercel.app",
-      "https://snap-dish-qulq.vercel.app",
-      "https://snap-dish-d5y5.vercel.app",
-      process.env.FRONTEND_URL
-    ].filter(Boolean),
+    origin: (origin, callback) => {
+      const allowedOrigins = [
+        "http://localhost:5173",
+        "http://localhost:5174",
+        "http://localhost:5175",
+        "http://localhost:5176",
+        "https://snap-dish-xi.vercel.app",
+        "https://snap-dish-qulq.vercel.app",
+        "https://snap-dish-d5y5.vercel.app",
+        process.env.FRONTEND_URL
+      ].filter(Boolean);
+
+      // Allow requests with no origin (mobile apps, Postman, etc.)
+      if (!origin) return callback(null, true);
+
+      // Check if origin matches allowed origins or is a Vercel preview URL
+      if (allowedOrigins.includes(origin) || origin.match(/^https:\/\/snap-dish.*\.vercel\.app$/)) {
+        return callback(null, true);
+      }
+
+      callback(new Error('Not allowed by CORS'));
+    },
     methods: ["GET", "POST"],
     credentials: true
   }
