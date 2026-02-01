@@ -94,17 +94,40 @@ const LoginPopup = ({ setShowLogin }) => {
     setError("");
     setIsLoading(true);
 
+    // Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(data.email)) {
+      setError("Please enter a valid email address");
+      setIsLoading(false);
+      return;
+    }
+
     if (currState === "Login") {
-      // Validation
+      // Login Validation
       if (!data.email || !data.password) {
-        setError("Please fill in all required fields");
+        setError("Please enter both email and password");
         setIsLoading(false);
         return;
       }
     } else {
       // Registration Validation
-      if (!data.firstName || !data.email || !data.password) {
-        setError("Required fields missing");
+      if (!data.firstName || !data.firstName.trim()) {
+        setError("First name is required");
+        setIsLoading(false);
+        return;
+      }
+      if (!data.email) {
+        setError("Email is required");
+        setIsLoading(false);
+        return;
+      }
+      if (!data.password) {
+        setError("Password is required");
+        setIsLoading(false);
+        return;
+      }
+      if (data.password.length < 8) {
+        setError("Password must be at least 8 characters");
         setIsLoading(false);
         return;
       }
@@ -115,8 +138,15 @@ const LoginPopup = ({ setShowLogin }) => {
     // For registration, we send the full data.
     // For login, we send email/password.
     const payload = currState === 'Login'
-      ? { email: data.email, password: data.password }
-      : data;
+      ? { email: data.email.trim(), password: data.password }
+      : {
+        firstName: data.firstName.trim(),
+        lastName: data.lastName?.trim() || "",
+        email: data.email.trim().toLowerCase(),
+        password: data.password,
+        phone_number: data.phone_number || "",
+        role: data.role || "customer"
+      };
 
     try {
       const response = await axios.post(`${url}${endpoint}`, payload);
@@ -127,7 +157,7 @@ const LoginPopup = ({ setShowLogin }) => {
           setTempUserId(response.data.userId);
           setIsRegistration(response.data.isRegistration || false);
           setShowOtpUI(true);
-          toast.info(isRegistration ? "Verify your email to complete registration!" : "OTP sent to your email!");
+          toast.info(response.data.isRegistration ? "Verify your email to complete registration!" : "OTP sent to your email!");
           setIsLoading(false);
           return;
         }
@@ -135,12 +165,12 @@ const LoginPopup = ({ setShowLogin }) => {
         // If regular login/register (no MFA or after register)
         handleLoginSuccess(response.data);
       } else {
-        setError(response.data.message);
-        toast.error(response.data.message);
+        setError(response.data.message || "Something went wrong");
+        toast.error(response.data.message || "Something went wrong");
       }
     } catch (err) {
       console.error('Auth error:', err);
-      const msg = err.response?.data?.message || "Authentication failed";
+      const msg = err.response?.data?.message || "Connection failed. Please try again.";
       setError(msg);
       toast.error(msg);
     } finally {

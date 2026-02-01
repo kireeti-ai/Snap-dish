@@ -25,7 +25,7 @@ const StoreContextProvider = (props) => {
     longitude: 76.9038,
   });
 
-  const url = "https://snap-dish.onrender.com";//http://localhost:4000
+  const url = "http://localhost:4000";//
 
 
   const fetchFoodList = async () => {

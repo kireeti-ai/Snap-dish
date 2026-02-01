@@ -35,15 +35,15 @@ export const loginUser = async (req, res) => {
         if (!email || !password) {
             return res.status(400).json({
                 success: false,
-                message: "Please provide email and password"
+                message: "Please enter both email and password"
             });
         }
 
-        const user = await userModel.findOne({ email });
+        const user = await userModel.findOne({ email: email.toLowerCase().trim() });
         if (!user) {
             return res.status(401).json({
                 success: false,
-                message: "Invalid credentials"
+                message: "No account found with this email address"
             });
         }
 
@@ -51,15 +51,22 @@ export const loginUser = async (req, res) => {
         if (!isMatch) {
             return res.status(401).json({
                 success: false,
-                message: "Invalid credentials"
+                message: "Incorrect password. Please try again."
             });
         }
 
         // Check if user is active
-        if (user.status !== 'active') {
+        if (user.status === 'inactive') {
             return res.status(401).json({
                 success: false,
-                message: "Account is inactive"
+                message: "Please verify your email first. Check your inbox for the verification code."
+            });
+        }
+
+        if (user.status === 'suspended') {
+            return res.status(401).json({
+                success: false,
+                message: "Your account has been suspended. Contact support for help."
             });
         }
 
@@ -104,7 +111,7 @@ export const loginUser = async (req, res) => {
             await user.save();
             return res.status(500).json({
                 success: false,
-                message: "Email could not be sent. Please try again."
+                message: "Could not send OTP email. Please try again later."
             });
         }
 
@@ -112,7 +119,7 @@ export const loginUser = async (req, res) => {
         console.error("Login error:", error);
         res.status(500).json({
             success: false,
-            message: "An error occurred during login"
+            message: "Login failed. Please check your connection and try again."
         });
     }
 };
@@ -122,15 +129,27 @@ export const verifyLoginOTP = async (req, res) => {
     try {
         const { userId, otp } = req.body;
 
+        if (!userId || !otp) {
+            return res.status(400).json({ success: false, message: "Please enter the OTP code" });
+        }
+
         // We must select the hidden fields +otp and +otpExpires
         const user = await userModel.findById(userId).select('+otp +otpExpires');
 
         if (!user) {
-            return res.status(404).json({ success: false, message: "User not found" });
+            return res.status(404).json({ success: false, message: "Session expired. Please try logging in again." });
         }
 
-        if (!user.verifyOTP(otp)) {
-            return res.status(400).json({ success: false, message: "Invalid or expired OTP" });
+        if (!user.otp) {
+            return res.status(400).json({ success: false, message: "No OTP found. Please request a new one." });
+        }
+
+        if (user.otpExpires < Date.now()) {
+            return res.status(400).json({ success: false, message: "OTP has expired. Please request a new one." });
+        }
+
+        if (user.otp !== otp) {
+            return res.status(400).json({ success: false, message: "Incorrect OTP. Please check and try again." });
         }
 
         // Clear OTP and activate user (for registration flow)
@@ -157,7 +176,7 @@ export const verifyLoginOTP = async (req, res) => {
         });
     } catch (error) {
         console.error("OTP Verify Error:", error);
-        res.status(500).json({ success: false, message: "Error verifying OTP" });
+        res.status(500).json({ success: false, message: "Verification failed. Please try again." });
     }
 };
 
@@ -188,13 +207,24 @@ export const registerUser = async (req, res) => {
     const { firstName, lastName, email, password, phone_number, role, address } = req.body;
 
     try {
-        const exists = await userModel.findOne({ email });
+        // Validation checks with specific messages
+        if (!firstName || !firstName.trim()) {
+            return res.json({ success: false, message: "First name is required" });
+        }
+        if (!email || !email.trim()) {
+            return res.json({ success: false, message: "Email is required" });
+        }
+        if (!password) {
+            return res.json({ success: false, message: "Password is required" });
+        }
+
+        const exists = await userModel.findOne({ email: email.toLowerCase() });
         if (exists) {
-            return res.json({ success: false, message: "User already exists" });
+            return res.json({ success: false, message: "User already exists with this email" });
         }
 
         if (!validator.isEmail(email)) {
-            return res.json({ success: false, message: "Please enter a valid email" });
+            return res.json({ success: false, message: "Please enter a valid email address" });
         }
         if (password.length < 8) {
             return res.json({ success: false, message: "Password must be at least 8 characters" });
@@ -204,14 +234,14 @@ export const registerUser = async (req, res) => {
         // Encrypt address before saving
         const encryptedAddress = address ? encryptData(address) : "";
 
-        // Create user with 'pending' status (not active until OTP verified)
+        // Create user with 'inactive' status (not active until OTP verified)
         const newUser = new userModel({
-            firstName,
-            lastName,
-            email,
-            phone_number,
+            firstName: firstName.trim(),
+            lastName: lastName ? lastName.trim() : "",
+            email: email.toLowerCase().trim(),
+            phone_number: phone_number || "",
             password,
-            role,
+            role: role || "customer",
             address: encryptedAddress,
             status: 'inactive' // User starts inactive until OTP verification
         });
@@ -255,12 +285,20 @@ export const registerUser = async (req, res) => {
             await userModel.findByIdAndDelete(user._id);
             return res.status(500).json({
                 success: false,
-                message: "Email could not be sent. Please try again."
+                message: "Could not send verification email. Please check your email address and try again."
             });
         }
     } catch (error) {
-        console.log(error);
-        res.json({ success: false, message: "Error registering user" });
+        console.error("Registration error:", error);
+        // Handle specific MongoDB errors
+        if (error.code === 11000) {
+            return res.json({ success: false, message: "Email already registered" });
+        }
+        if (error.name === 'ValidationError') {
+            const messages = Object.values(error.errors).map(e => e.message);
+            return res.json({ success: false, message: messages.join(', ') });
+        }
+        res.json({ success: false, message: "Registration failed. Please try again." });
     }
 };
 
