@@ -4,7 +4,7 @@ import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 
-const API_URL ="https://snap-dish.onrender.com";
+const API_URL = import.meta.env.VITE_API_URL || "https://snap-dish.onrender.com";
 
 
 const MenuManagement = () => {
@@ -188,11 +188,11 @@ const MenuManagement = () => {
           <div className="bg-white p-6 rounded-lg border border-gray-200">
             <h2 className="text-xl font-semibold mb-4 text-gray-800">Add New Item</h2>
             <form onSubmit={handleAddItem} className="space-y-4">
-              <input type="text" name="name" onChange={(e) => handleChange(e, setNewItem)} placeholder="Food Name*" required className="w-full p-3 bg-gray-50 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"/>
-              <textarea name="description" onChange={(e) => handleChange(e, setNewItem)} placeholder="Description" rows="3" className="w-full p-3 bg-gray-50 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"/>
+              <input type="text" name="name" onChange={(e) => handleChange(e, setNewItem)} placeholder="Food Name*" required className="w-full p-3 bg-gray-50 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" />
+              <textarea name="description" onChange={(e) => handleChange(e, setNewItem)} placeholder="Description" rows="3" className="w-full p-3 bg-gray-50 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" />
               <div className="grid grid-cols-2 gap-4">
-                <input type="number" name="price" onChange={(e) => handleChange(e, setNewItem)} placeholder="Price*" required className="w-full p-3 bg-gray-50 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"/>
-                <input type="text" name="category" onChange={(e) => handleChange(e, setNewItem)} placeholder="Category*" required className="w-full p-3 bg-gray-50 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"/>
+                <input type="number" name="price" onChange={(e) => handleChange(e, setNewItem)} placeholder="Price*" required className="w-full p-3 bg-gray-50 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" />
+                <input type="text" name="category" onChange={(e) => handleChange(e, setNewItem)} placeholder="Category*" required className="w-full p-3 bg-gray-50 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" />
               </div>
               <select name="is_veg" defaultValue="" onChange={(e) => handleChange(e, setNewItem)} required className="w-full p-3 bg-gray-50 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
                 <option value="" disabled>Select Type*</option>
@@ -201,7 +201,7 @@ const MenuManagement = () => {
               </select>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Image*</label>
-                <input type="file" accept="image/*" onChange={(e) => handleImageChange(e, setNewItem, setPreview)} required className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"/>
+                <input type="file" accept="image/*" onChange={(e) => handleImageChange(e, setNewItem, setPreview)} required className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" />
               </div>
               {preview && <img src={preview} alt="New item preview" className="mt-2 w-full h-40 object-cover rounded-lg" />}
               <button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition">Add Item to Menu</button>
@@ -248,7 +248,7 @@ const MenuManagement = () => {
                 <option value="true">🌱 Veg</option>
                 <option value="false">🍖 Non-Veg</option>
               </select>
-              <input type="file" accept="image/*" onChange={(e) => handleImageChange(e, setEditItem, setEditPreview)} className="w-full text-sm text-gray-500"/>
+              <input type="file" accept="image/*" onChange={(e) => handleImageChange(e, setEditItem, setEditPreview)} className="w-full text-sm text-gray-500" />
               {editPreview && <img src={editPreview} alt="Edit preview" className="mt-2 w-full h-40 object-cover rounded-lg" />}
             </div>
             <div className="flex justify-end mt-6 space-x-3">

@@ -84,9 +84,17 @@ const LoginPopup = ({ setShowLogin }) => {
     toast.success("Login successful!");
 
     if (userRole === 'restaurant_owner') {
-      navigate('/restaurant-dashboard');
+      // Redirect to external restaurant admin app
+      const restaurantAdminUrl = process.env.NODE_ENV === 'production'
+        ? 'https://snap-dish-d5y5.vercel.app'
+        : 'http://localhost:5174';
+      window.location.href = restaurantAdminUrl;
     } else if (userRole === 'delivery_agent') {
-      navigate('/delivery-dashboard');
+      // Redirect to external delivery agent app
+      const deliveryAgentUrl = process.env.NODE_ENV === 'production'
+        ? 'https://snap-dish-2p9s.vercel.app'
+        : 'http://localhost:5175';
+      window.location.href = deliveryAgentUrl;
     } else {
       setShowLogin(false);
     }

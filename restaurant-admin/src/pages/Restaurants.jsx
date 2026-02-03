@@ -2,11 +2,11 @@ import { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 
 // --- API Configuration ---
-const API_BASE_URL = "https://snap-dish.onrender.com";
+const API_BASE_URL = import.meta.env.VITE_API_URL || "https://snap-dish.onrender.com";
 
-const api = axios.create({ 
+const api = axios.create({
   baseURL: API_BASE_URL,
-  withCredentials: true 
+  withCredentials: true
 });
 
 api.interceptors.request.use(config => {
@@ -40,8 +40,8 @@ const ConfirmationModal = ({ isOpen, onCancel, onConfirm, title, message, isConf
         <p className="mt-2 text-gray-600">{message}</p>
         <div className="mt-6 flex justify-end space-x-3">
           <button onClick={onCancel} className="px-4 py-2 rounded-lg text-gray-700 bg-gray-200 hover:bg-gray-300 transition">Cancel</button>
-          <button 
-            onClick={onConfirm} 
+          <button
+            onClick={onConfirm}
             disabled={isConfirming}
             className="px-4 py-2 rounded-lg text-white bg-red-600 hover:bg-red-700 transition disabled:bg-red-400"
           >
@@ -150,7 +150,7 @@ const Restaurants = () => {
     setIsSaving(true);
     try {
       const formData = new FormData();
-      
+
       // Append all fields
       formData.append('name', restaurant.name);
       formData.append('address', restaurant.address);
@@ -158,7 +158,7 @@ const Restaurants = () => {
       formData.append('price_for_two', restaurant.price_for_two);
       formData.append('status', restaurant.status);
       if (restaurant.timing) formData.append('timing', restaurant.timing);
-      
+
       // Only append image if it's a new File object
       if (restaurant.image instanceof File) {
         formData.append('image', restaurant.image);
@@ -240,12 +240,12 @@ const Restaurants = () => {
 
   return (
     <>
-      <Notification 
-        message={notification.message} 
-        type={notification.type} 
-        onDismiss={() => setNotification({ message: '', type: '' })} 
+      <Notification
+        message={notification.message}
+        type={notification.type}
+        onDismiss={() => setNotification({ message: '', type: '' })}
       />
-      <ConfirmationModal 
+      <ConfirmationModal
         isOpen={isDeleteModalOpen}
         onCancel={() => setDeleteModalOpen(false)}
         onConfirm={handleDelete}
@@ -269,7 +269,7 @@ const Restaurants = () => {
             <h3 className="text-lg font-semibold text-gray-800 mb-4">Restaurant Image</h3>
             <div className="aspect-square bg-gray-100 rounded-lg border-2 border-dashed flex items-center justify-center overflow-hidden">
               {preview ? (
-                <img src={preview} alt="Restaurant" className="object-cover w-full h-full"/>
+                <img src={preview} alt="Restaurant" className="object-cover w-full h-full" />
               ) : (
                 <div className="text-center p-4 text-gray-500">
                   <svg className="mx-auto h-12 w-12" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true">
@@ -284,11 +284,11 @@ const Restaurants = () => {
                 <label htmlFor="image-upload" className="cursor-pointer w-full inline-block text-center bg-white hover:bg-gray-50 text-gray-800 font-semibold py-2 px-4 border border-gray-300 rounded-lg shadow-sm transition">
                   {preview ? 'Change Image' : 'Upload Image'}
                 </label>
-                <input 
-                  id="image-upload" 
-                  type="file" 
-                  accept="image/*" 
-                  onChange={handleImageChange} 
+                <input
+                  id="image-upload"
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageChange}
                   className="hidden"
                 />
                 <p className="mt-2 text-xs text-gray-500 text-center">Max size: 5MB</p>
@@ -301,58 +301,58 @@ const Restaurants = () => {
             {isEditing ? (
               <div className="p-8 bg-white border border-gray-200 rounded-lg shadow-sm space-y-6">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                  <input 
-                    type="text" 
-                    name="name" 
-                    value={restaurant.name} 
-                    onChange={handleChange} 
-                    placeholder="Restaurant Name *" 
-                    className="w-full p-3 bg-gray-50 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
+                  <input
+                    type="text"
+                    name="name"
+                    value={restaurant.name}
+                    onChange={handleChange}
+                    placeholder="Restaurant Name *"
+                    className="w-full p-3 bg-gray-50 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     required
                   />
-                  <input 
-                    type="text" 
-                    name="cuisine" 
-                    value={restaurant.cuisine} 
-                    onChange={handleChange} 
-                    placeholder="Cuisine (e.g., Italian) *" 
-                    className="w-full p-3 bg-gray-50 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
+                  <input
+                    type="text"
+                    name="cuisine"
+                    value={restaurant.cuisine}
+                    onChange={handleChange}
+                    placeholder="Cuisine (e.g., Italian) *"
+                    className="w-full p-3 bg-gray-50 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     required
                   />
                 </div>
-                <input 
-                  type="text" 
-                  name="address" 
-                  value={restaurant.address} 
-                  onChange={handleChange} 
-                  placeholder="Full Address *" 
-                  className="w-full p-3 bg-gray-50 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
+                <input
+                  type="text"
+                  name="address"
+                  value={restaurant.address}
+                  onChange={handleChange}
+                  placeholder="Full Address *"
+                  className="w-full p-3 bg-gray-50 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   required
                 />
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                  <input 
-                    type="number" 
-                    name="price_for_two" 
-                    value={restaurant.price_for_two} 
-                    onChange={handleChange} 
-                    placeholder="Avg. Price for Two (₹) *" 
-                    className="w-full p-3 bg-gray-50 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
+                  <input
+                    type="number"
+                    name="price_for_two"
+                    value={restaurant.price_for_two}
+                    onChange={handleChange}
+                    placeholder="Avg. Price for Two (₹) *"
+                    className="w-full p-3 bg-gray-50 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     required
                     min="0"
                   />
-                  <input 
-                    type="text" 
-                    name="timing" 
-                    value={restaurant.timing} 
-                    onChange={handleChange} 
-                    placeholder="Timings (e.g., 9 AM - 11 PM)" 
+                  <input
+                    type="text"
+                    name="timing"
+                    value={restaurant.timing}
+                    onChange={handleChange}
+                    placeholder="Timings (e.g., 9 AM - 11 PM)"
                     className="w-full p-3 bg-gray-50 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   />
                 </div>
-                <select 
-                  name="status" 
-                  value={restaurant.status} 
-                  onChange={handleChange} 
+                <select
+                  name="status"
+                  value={restaurant.status}
+                  onChange={handleChange}
                   className="w-full p-3 bg-gray-50 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 >
                   <option value="active">Active</option>
@@ -362,17 +362,17 @@ const Restaurants = () => {
 
                 <div className="flex justify-end space-x-4 pt-4 border-t border-gray-200">
                   {hasRestaurant && (
-                    <button 
-                      onClick={handleCancel} 
-                      disabled={isSaving} 
+                    <button
+                      onClick={handleCancel}
+                      disabled={isSaving}
                       className="px-6 py-2 rounded-lg text-gray-700 bg-gray-200 hover:bg-gray-300 transition disabled:opacity-50"
                     >
                       Cancel
                     </button>
                   )}
-                  <button 
-                    onClick={handleSave} 
-                    disabled={isSaving} 
+                  <button
+                    onClick={handleSave}
+                    disabled={isSaving}
                     className="px-6 py-2 rounded-lg text-white bg-blue-600 hover:bg-blue-700 transition disabled:bg-blue-400"
                   >
                     {isSaving ? 'Saving...' : (hasRestaurant ? 'Update Details' : 'Create Restaurant')}
@@ -388,24 +388,23 @@ const Restaurants = () => {
                   <DetailRow label="Price for Two" value={`₹${restaurant.price_for_two}`} />
                   <DetailRow label="Timings" value={restaurant.timing} />
                   <DetailRow label="Status">
-                    <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                      restaurant.status === 'active' ? 'bg-green-100 text-green-800' :
-                      restaurant.status === 'inactive' ? 'bg-red-100 text-red-800' :
-                      'bg-yellow-100 text-yellow-800'}`}>
+                    <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${restaurant.status === 'active' ? 'bg-green-100 text-green-800' :
+                        restaurant.status === 'inactive' ? 'bg-red-100 text-red-800' :
+                          'bg-yellow-100 text-yellow-800'}`}>
                       {restaurant.status.replace(/_/g, ' ').toUpperCase()}
                     </span>
                   </DetailRow>
                 </dl>
                 <div className="flex flex-col sm:flex-row gap-4 mt-8 pt-6 border-t border-gray-200">
-                  <button 
-                    onClick={() => setIsEditing(true)} 
+                  <button
+                    onClick={() => setIsEditing(true)}
                     className="w-full px-6 py-3 rounded-lg text-white bg-blue-600 hover:bg-blue-700 transition"
                   >
                     Edit Restaurant
                   </button>
-                  <button 
-                    onClick={() => setDeleteModalOpen(true)} 
-                    disabled={isSaving} 
+                  <button
+                    onClick={() => setDeleteModalOpen(true)}
+                    disabled={isSaving}
                     className="w-full px-6 py-3 rounded-lg text-red-700 bg-red-50 hover:bg-red-100 transition disabled:opacity-50"
                   >
                     Delete Restaurant

@@ -2,6 +2,12 @@ import React, { useState, useEffect } from 'react';
 import './ManageRestaurant.css';
 import { assets } from '../../assets/assets';
 import axios from 'axios';
+import { toast } from 'react-toastify';
+
+// Restaurant Admin Dashboard URL
+const RESTAURANT_ADMIN_URL = process.env.NODE_ENV === 'production'
+    ? 'https://snap-dish-d5y5.vercel.app'
+    : 'http://localhost:5174';
 
 const API_URL = "https://snap-dish.onrender.com";
 
@@ -158,16 +164,14 @@ const ManageRestaurant = ({ user, token }) => {
             });
 
             if (res.data.success) {
-                alert('Restaurant registered successfully! Your role has been updated to Restaurant Owner.');
+                toast.success('Restaurant registered successfully! Redirecting to your dashboard...');
                 localStorage.setItem('role', 'restaurant_owner');
                 setRole('restaurant_owner');
-                setStep(1);
-                setRestaurantData({
-                    name: '', address: '', cuisine: 'Italian',
-                    price_for_two: '', timing: '09:00-22:00'
-                });
-                setRestaurantImage(null);
-                setImagePreview(null);
+
+                // Redirect to restaurant admin dashboard after a short delay
+                setTimeout(() => {
+                    window.location.href = RESTAURANT_ADMIN_URL;
+                }, 1500);
             } else {
                 alert(res.data.message || 'An error occurred during registration.');
             }
@@ -189,7 +193,23 @@ const ManageRestaurant = ({ user, token }) => {
             <div className="manage-container">
                 <div className="manage-header">
                     <h1>Welcome, {user.firstName}</h1>
-                    <p>You are already a restaurant owner. Manage your restaurant in the dashboard.</p>
+                    <p>You are already a restaurant owner.</p>
+                    <button
+                        onClick={() => window.location.href = RESTAURANT_ADMIN_URL}
+                        style={{
+                            marginTop: '20px',
+                            padding: '12px 24px',
+                            backgroundColor: '#ff6b35',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '8px',
+                            cursor: 'pointer',
+                            fontSize: '16px',
+                            fontWeight: '600'
+                        }}
+                    >
+                        Go to Restaurant Dashboard
+                    </button>
                 </div>
             </div>
         );

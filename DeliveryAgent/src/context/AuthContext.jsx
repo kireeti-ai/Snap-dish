@@ -43,7 +43,7 @@
 //                 console.log("Verifying session with backend...");
 //                 const response = await axios.get(`${API_BASE_URL}/api/users/profile`);
 //                 console.log("Session verification response:", response.data);
-                
+
 //                 if (response.data.success) {
 //                     console.log("Session valid, setting user:", response.data.user);
 //                     setUser(response.data.user);
@@ -71,16 +71,16 @@
 //         console.log("=== LOGIN ATTEMPT STARTED ===");
 //         console.log("Email:", email);
 //         console.log("API URL:", `${API_BASE_URL}/api/users/login`);
-        
+
 //         try {
 //             console.log("Sending login request...");
-//             const response = await axios.post(`${API_BASE_URL}/api/users/login`, { 
-//                 email, 
-//                 password 
+//             const response = await axios.post(`${API_BASE_URL}/api/users/login`, {
+//                 email,
+//                 password
 //             });
-            
+
 //             console.log("Login response received:", response.data);
-            
+
 //             if (response.data.success) {
 //                 const { token: receivedToken, user: receivedUser } = response.data;
 //                 console.log("Login successful!");
@@ -95,7 +95,7 @@
 //                 }
 
 //                 console.log("Role check passed, storing credentials...");
-                
+
 //                 // Store data in localStorage
 //                 localStorage.setItem("token", receivedToken);
 //                 localStorage.setItem("user", JSON.stringify(receivedUser));
@@ -117,7 +117,7 @@
 //             console.error("Error object:", error);
 //             console.error("Error response:", error.response?.data);
 //             console.error("Error status:", error.response?.status);
-            
+
 //             if (error.response?.status === 404) {
 //                 toast.error("Backend server not found. Please ensure the server is running on http://localhost:4000");
 //             } else if (error.response?.data?.message) {
@@ -164,9 +164,8 @@ import { toast } from 'react-toastify';
 
 // Create the context
 export const AuthContext = createContext(null);
-//  import.meta.env.VITE_API_BASE_URL || 
 // Define the backend API URL from environment variable
-const API_BASE_URL ="http://localhost:4000";
+const API_BASE_URL = import.meta.env.VITE_API_URL || "https://snap-dish.onrender.com";
 
 // --- Axios Helper ---
 const setAuthHeader = (token) => {
@@ -197,7 +196,7 @@ export const AuthProvider = ({ children }) => {
 
             try {
                 const response = await axios.get(`${API_BASE_URL}/api/users/profile`);
-                
+
                 if (response.data.success) {
                     setUser(response.data.user);
                 }
@@ -219,11 +218,11 @@ export const AuthProvider = ({ children }) => {
     // --- Login Function ---
     const login = useCallback(async (email, password) => {
         try {
-            const response = await axios.post(`${API_BASE_URL}/api/users/login`, { 
-                email, 
-                password 
+            const response = await axios.post(`${API_BASE_URL}/api/users/login`, {
+                email,
+                password
             });
-            
+
             if (response.data.success) {
                 const { token: receivedToken, user: receivedUser } = response.data;
 
@@ -232,7 +231,7 @@ export const AuthProvider = ({ children }) => {
                     toast.error("Access denied. This portal is for delivery agents only.");
                     return;
                 }
-                
+
                 // Store data in localStorage
                 localStorage.setItem("token", receivedToken);
                 localStorage.setItem("user", JSON.stringify(receivedUser));
@@ -248,7 +247,7 @@ export const AuthProvider = ({ children }) => {
             }
         } catch (error) {
             console.error("Login error:", error);
-            
+
             if (error.response?.status === 404) {
                 toast.error("Backend server not found. Please ensure the server is running.");
             } else if (error.response?.data?.message) {
