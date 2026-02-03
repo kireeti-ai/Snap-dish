@@ -104,22 +104,14 @@ export const loginUser = async (req, res) => {
             </div>
         `;
 
-        try {
-            await sendEmail({
-                email: user.email,
-                subject: 'SnapDish: Your Login OTP',
-                message: message
-            });
+        const emailResult = await sendEmail({
+            email: user.email,
+            subject: 'SnapDish: Your Login OTP',
+            message: message
+        });
 
-            // Return success but NO TOKEN yet
-            res.json({
-                success: true,
-                message: `OTP sent to ${user.email}`,
-                mfaRequired: true,
-                userId: user._id
-            });
-        } catch (emailError) {
-            console.error("Email send failed:", emailError);
+        if (!emailResult.success) {
+            console.error("Email send failed:", emailResult.error);
             user.otp = undefined;
             user.otpExpires = undefined;
             await user.save();
@@ -128,6 +120,14 @@ export const loginUser = async (req, res) => {
                 message: "Could not send OTP email. Please try again later."
             });
         }
+
+        // Return success but NO TOKEN yet
+        res.json({
+            success: true,
+            message: `OTP sent to ${user.email}`,
+            mfaRequired: true,
+            userId: user._id
+        });
 
     } catch (error) {
         console.error("Login error:", error);
@@ -348,23 +348,14 @@ export const registerUser = async (req, res) => {
             </div>
         `;
 
-        try {
-            await sendEmail({
-                email: normalizedEmail,
-                subject: 'SnapDish: Verify Your Email',
-                message: message
-            });
+        const emailResult = await sendEmail({
+            email: normalizedEmail,
+            subject: 'SnapDish: Verify Your Email',
+            message: message
+        });
 
-            // Return success - user NOT created yet, just pending
-            res.json({
-                success: true,
-                message: `OTP sent to ${normalizedEmail}`,
-                mfaRequired: true,
-                registrationId, // Use registrationId instead of userId
-                isRegistration: true
-            });
-        } catch (emailError) {
-            console.error("Email send failed:", emailError);
+        if (!emailResult.success) {
+            console.error("Email send failed:", emailResult.error);
             // Remove from pending registrations
             pendingRegistrations.delete(registrationId);
             return res.status(500).json({
@@ -372,6 +363,15 @@ export const registerUser = async (req, res) => {
                 message: "Could not send verification email. Please check your email address and try again."
             });
         }
+
+        // Return success - user NOT created yet, just pending
+        res.json({
+            success: true,
+            message: `OTP sent to ${normalizedEmail}`,
+            mfaRequired: true,
+            registrationId, // Use registrationId instead of userId
+            isRegistration: true
+        });
     } catch (error) {
         console.error("Registration error:", error);
         res.json({ success: false, message: "Registration failed. Please try again." });
