@@ -79,14 +79,14 @@ const createUploadDirs = () => {
 };
 createUploadDirs();
 
-// Middleware
+// Middleware - CORS must be first to handle preflight requests
+app.use(corsMiddleware);
+
 app.use(express.json());
 app.use(cookieParser());
-app.use(corsMiddleware);
 app.use(socketMiddleware(io));
 app.use(securityHeadersMiddleware);
 app.use('/api/', rateLimiter);
-app.use(errorHandlerMiddleware);
 
 // Static files
 app.use('/images', express.static(path.join(__dirname, 'uploads')));
@@ -139,6 +139,9 @@ app.get("/", (req, res) => {
     version: process.env.npm_package_version || "1.0.0"
   });
 });
+
+// Error handler must be LAST middleware
+app.use(errorHandlerMiddleware);
 
 // Database connection and server startup
 const startServer = async () => {
