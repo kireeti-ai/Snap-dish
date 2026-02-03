@@ -33,7 +33,7 @@ const app = express();
 const server = http.createServer(app);
 const port = process.env.PORT || 4000;
 
-
+app.set("trust proxy", 1);
 const io = new Server(server, {
   cors: {
     origin: (origin, callback) => {
