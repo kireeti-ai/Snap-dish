@@ -50,7 +50,11 @@ export const securityHeadersMiddleware = (req, res, next) => {
 // Rate limiter
 export const rateLimiter = rateLimit({
     windowMs: 15 * 60 * 1000,
-    max: 100
+    max: 100,
+    standardHeaders: true,
+    legacyHeaders: false,
+    // Skip validation for X-Forwarded-For since we set trust proxy in the app
+    validate: { xForwardedForHeader: false }
 });
 
 // Error handling middleware
