@@ -7,8 +7,6 @@ import uploadToCloudinary from '../utils/cloudinary.js';
 import { encryptData, decryptData, generateQRCode } from "../utils/security.js"; // Security Utils
 import sendEmail from "../utils/sendEmail.js"; // Email Utils
 
-// Temporary storage for pending registrations (expires after 10 mins)
-// In production, use Redis for better scalability
 const pendingRegistrations = new Map();
 
 // Cleanup expired registrations every 5 minutes
@@ -41,7 +39,7 @@ export const validateToken = async (req, res) => {
     }
 };
 
-// --- LOGIN STEP 1: VERIFY CREDENTIALS & SEND OTP (MFA) ---
+// --- LOGIN VERIFY CREDENTIALS & SEND OTP (MFA) ---
 export const loginUser = async (req, res) => {
     try {
         const { email, password } = req.body;
@@ -84,7 +82,7 @@ export const loginUser = async (req, res) => {
             });
         }
 
-        // --- MFA IMPLEMENTATION ---
+
         // 1. Generate 6-digit OTP
         const otp = Math.floor(100000 + Math.random() * 900000).toString();
 
@@ -138,7 +136,7 @@ export const loginUser = async (req, res) => {
     }
 };
 
-// --- LOGIN/REGISTRATION STEP 2: VERIFY OTP & ISSUE TOKEN ---
+// --- LOGIN/REGISTRATION  VERIFY OTP & ISSUE TOKEN ---
 export const verifyLoginOTP = async (req, res) => {
     try {
         const { userId, otp, registrationId } = req.body;

@@ -17,7 +17,11 @@ import {
   FaChartLine
 } from 'react-icons/fa';
 
+<<<<<<< HEAD
 const API_BASE_URL = import.meta.env.VITE_API_URL || "https://snap-dish.onrender.com";
+=======
+const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:4000";
+>>>>>>> 0e518ca (dev local)
 
 const Dashboard = () => {
   const [stats, setStats] = useState(null);
@@ -145,7 +149,12 @@ const Dashboard = () => {
         <h1 className="text-3xl font-bold text-gray-800">{stats?.restaurantName} Dashboard</h1>
         <div className="flex items-center gap-3 mt-2">
           <p className="text-gray-600">Restaurant Overview</p>
+<<<<<<< HEAD
           <span className={`px-3 py-1 rounded-full text-xs font-semibold ${stats?.restaurantStatus === 'active'
+=======
+          <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
+            stats?.restaurantStatus === 'active'
+>>>>>>> 0e518ca (dev local)
               ? 'bg-green-100 text-green-800'
               : 'bg-yellow-100 text-yellow-800'
             }`}>

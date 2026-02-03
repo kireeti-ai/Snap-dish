@@ -60,10 +60,10 @@ const CreatorCommunity = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        
+
         console.log('Form submitted!'); // DEBUG
         console.log('Form data:', formData); // DEBUG
-        
+
         if (!formData.agreedToTerms) {
             toast.error('You must agree to the terms and conditions.');
             return;
@@ -71,7 +71,7 @@ const CreatorCommunity = () => {
 
         // Filter out empty best posts
         const filteredBestPosts = formData.bestPosts.filter(post => post.trim() !== '');
-        
+
         if (filteredBestPosts.length === 0) {
             toast.error('Please provide at least one link to your best post.');
             return;
@@ -94,14 +94,14 @@ const CreatorCommunity = () => {
         console.log('Submitting data:', submissionData); // DEBUG
 
         setLoading(true);
-        
+
         try {
             // Use environment variable or fallback to localhost
-            const API_URL = 'https://snap-dish.onrender.com';
+            const API_URL = 'http://localhost:4000';
             console.log('API URL:', `${API_URL}/api/creator-application/submit`); // DEBUG
-            
+
             const response = await axios.post(
-                `${API_URL}/api/creator-application/submit`, 
+                `${API_URL}/api/creator-application/submit`,
                 submissionData,
                 {
                     headers: {
@@ -110,10 +110,10 @@ const CreatorCommunity = () => {
                     timeout: 10000, // 10 second timeout
                 }
             );
-            
+
             console.log('Response:', response.data); // DEBUG
             toast.success(response.data.message || 'Application submitted successfully!');
-            
+
             // Reset form after successful submission
             setFormData({
                 name: '',
@@ -131,7 +131,7 @@ const CreatorCommunity = () => {
         } catch (error) {
             console.error('Full error object:', error); // DEBUG
             console.error('Error response:', error.response); // DEBUG
-            
+
             // Handle different types of errors
             if (error.response) {
                 // Server responded with error status
@@ -162,43 +162,43 @@ const CreatorCommunity = () => {
                 <form onSubmit={handleSubmit} className="creator-form">
                     <fieldset>
                         <legend>Your Information</legend>
-                        <input 
-                            type="text" 
-                            name="name" 
-                            placeholder="Full Name" 
-                            value={formData.name} 
-                            onChange={handleChange} 
-                            required 
+                        <input
+                            type="text"
+                            name="name"
+                            placeholder="Full Name"
+                            value={formData.name}
+                            onChange={handleChange}
+                            required
                         />
-                        <input 
-                            type="email" 
-                            name="email" 
-                            placeholder="Email Address" 
-                            value={formData.email} 
-                            onChange={handleChange} 
-                            required 
+                        <input
+                            type="email"
+                            name="email"
+                            placeholder="Email Address"
+                            value={formData.email}
+                            onChange={handleChange}
+                            required
                         />
-                        <input 
-                            type="tel" 
-                            name="phone" 
-                            placeholder="Phone Number" 
-                            value={formData.phone} 
-                            onChange={handleChange} 
-                            required 
+                        <input
+                            type="tel"
+                            name="phone"
+                            placeholder="Phone Number"
+                            value={formData.phone}
+                            onChange={handleChange}
+                            required
                         />
-                        <input 
-                            type="text" 
-                            name="city" 
-                            placeholder="City & Country" 
-                            value={formData.city} 
-                            onChange={handleChange} 
-                            required 
+                        <input
+                            type="text"
+                            name="city"
+                            placeholder="City & Country"
+                            value={formData.city}
+                            onChange={handleChange}
+                            required
                         />
-                        <textarea 
-                            name="bio" 
-                            placeholder="Tell us about yourself and your content" 
-                            value={formData.bio} 
-                            onChange={handleChange} 
+                        <textarea
+                            name="bio"
+                            placeholder="Tell us about yourself and your content"
+                            value={formData.bio}
+                            onChange={handleChange}
                             required
                         ></textarea>
                     </fieldset>
@@ -207,9 +207,9 @@ const CreatorCommunity = () => {
                         <legend>Your Platforms</legend>
                         {formData.platforms.map((platform, index) => (
                             <div key={index} className="platform-group">
-                                <select 
-                                    name="name" 
-                                    value={platform.name} 
+                                <select
+                                    name="name"
+                                    value={platform.name}
                                     onChange={(e) => handlePlatformChange(index, e)}
                                     required
                                 >
@@ -219,25 +219,25 @@ const CreatorCommunity = () => {
                                     <option value="Blog">Blog</option>
                                     <option value="Twitter/X">Twitter/X</option>
                                 </select>
-                                <input 
-                                    type="text" 
-                                    name="handle" 
-                                    placeholder="@handle or URL" 
-                                    value={platform.handle} 
-                                    onChange={(e) => handlePlatformChange(index, e)} 
-                                    required 
+                                <input
+                                    type="text"
+                                    name="handle"
+                                    placeholder="@handle or URL"
+                                    value={platform.handle}
+                                    onChange={(e) => handlePlatformChange(index, e)}
+                                    required
                                 />
-                                <input 
-                                    type="text" 
-                                    name="followers" 
-                                    placeholder="Followers (e.g., 50k, 1.2M)" 
-                                    value={platform.followers} 
-                                    onChange={(e) => handlePlatformChange(index, e)} 
-                                    required 
+                                <input
+                                    type="text"
+                                    name="followers"
+                                    placeholder="Followers (e.g., 50k, 1.2M)"
+                                    value={platform.followers}
+                                    onChange={(e) => handlePlatformChange(index, e)}
+                                    required
                                 />
                                 {formData.platforms.length > 1 && (
-                                    <button 
-                                        type="button" 
+                                    <button
+                                        type="button"
                                         onClick={() => removePlatform(index)}
                                         className="remove-platform-btn"
                                     >
@@ -256,84 +256,84 @@ const CreatorCommunity = () => {
                         <div className="checkbox-group">
                             <p>What is your content style? (Select all that apply)</p>
                             <label>
-                                <input 
-                                    type="checkbox" 
-                                    name="contentStyle" 
-                                    value="Restaurant Reviews" 
-                                    onChange={handleChange} 
+                                <input
+                                    type="checkbox"
+                                    name="contentStyle"
+                                    value="Restaurant Reviews"
+                                    onChange={handleChange}
                                 /> Restaurant Reviews
                             </label>
                             <label>
-                                <input 
-                                    type="checkbox" 
-                                    name="contentStyle" 
-                                    value="Home Cooking" 
-                                    onChange={handleChange} 
+                                <input
+                                    type="checkbox"
+                                    name="contentStyle"
+                                    value="Home Cooking"
+                                    onChange={handleChange}
                                 /> Home Cooking
                             </label>
                             <label>
-                                <input 
-                                    type="checkbox" 
-                                    name="contentStyle" 
-                                    value="Mukbang" 
-                                    onChange={handleChange} 
+                                <input
+                                    type="checkbox"
+                                    name="contentStyle"
+                                    value="Mukbang"
+                                    onChange={handleChange}
                                 /> Mukbang
                             </label>
                             <label>
-                                <input 
-                                    type="checkbox" 
-                                    name="contentStyle" 
-                                    value="Food Photography" 
-                                    onChange={handleChange} 
+                                <input
+                                    type="checkbox"
+                                    name="contentStyle"
+                                    value="Food Photography"
+                                    onChange={handleChange}
                                 /> Food Photography
                             </label>
                             <label>
-                                <input 
-                                    type="checkbox" 
-                                    name="contentStyle" 
-                                    value="Healthy Lifestyle" 
-                                    onChange={handleChange} 
+                                <input
+                                    type="checkbox"
+                                    name="contentStyle"
+                                    value="Healthy Lifestyle"
+                                    onChange={handleChange}
                                 /> Healthy Lifestyle
                             </label>
                         </div>
                         <p>Links to your best food-related posts (at least 1 required):</p>
                         {formData.bestPosts.map((post, index) => (
-                            <input 
-                                key={index} 
-                                type="url" 
-                                placeholder={`Post URL #${index + 1}`} 
-                                value={post} 
-                                onChange={(e) => handleBestPostsChange(index, e)} 
+                            <input
+                                key={index}
+                                type="url"
+                                placeholder={`Post URL #${index + 1}`}
+                                value={post}
+                                onChange={(e) => handleBestPostsChange(index, e)}
                             />
                         ))}
                     </fieldset>
 
                     <fieldset>
                         <legend>Partnership Details</legend>
-                        <textarea 
-                            name="proposal" 
-                            placeholder="How do you envision promoting SnapDish?" 
-                            value={formData.proposal} 
-                            onChange={handleChange} 
+                        <textarea
+                            name="proposal"
+                            placeholder="How do you envision promoting SnapDish?"
+                            value={formData.proposal}
+                            onChange={handleChange}
                             required
                         ></textarea>
-                        <input 
-                            type="text" 
-                            name="rates" 
-                            placeholder="Your standard rates for a sponsored post (Optional)" 
-                            value={formData.rates} 
-                            onChange={handleChange} 
+                        <input
+                            type="text"
+                            name="rates"
+                            placeholder="Your standard rates for a sponsored post (Optional)"
+                            value={formData.rates}
+                            onChange={handleChange}
                         />
                     </fieldset>
 
                     <fieldset>
                         <div className="terms-agreement">
-                            <input 
-                                type="checkbox" 
-                                id="agreedToTerms" 
-                                name="agreedToTerms" 
-                                checked={formData.agreedToTerms} 
-                                onChange={handleChange} 
+                            <input
+                                type="checkbox"
+                                id="agreedToTerms"
+                                name="agreedToTerms"
+                                checked={formData.agreedToTerms}
+                                onChange={handleChange}
                             />
                             <label htmlFor="agreedToTerms">
                                 I confirm that the information provided is accurate and I agree to the terms of the SnapDish Creator Program.
@@ -341,8 +341,8 @@ const CreatorCommunity = () => {
                         </div>
                     </fieldset>
 
-                    <button 
-                        type="submit" 
+                    <button
+                        type="submit"
                         className="submit-application-btn"
                         disabled={loading}
                     >

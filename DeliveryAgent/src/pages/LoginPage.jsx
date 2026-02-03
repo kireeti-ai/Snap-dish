@@ -5,7 +5,11 @@ import axios from 'axios';
 import { toast } from 'react-toastify';
 import './LoginPage.css';
 
+<<<<<<< HEAD
 const API_BASE_URL = import.meta.env.VITE_API_URL || "https://snap-dish.onrender.com";
+=======
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:4000";
+>>>>>>> 0e518ca (dev local)
 
 const LoginPage = () => {
     const { login, isLoggedIn } = useContext(AuthContext);
@@ -47,14 +51,19 @@ const LoginPage = () => {
 
     const handleVerifyOTP = async (e) => {
         e.preventDefault();
-        setIsSubmitting(true);
         setError('');
 
         if (!otp || otp.length !== 6) {
             setError('Please enter a valid 6-digit OTP');
-            setIsSubmitting(false);
             return;
         }
+
+        if (!/^\d{6}$/.test(otp)) {
+            setError('OTP must contain only numbers');
+            return;
+        }
+
+        setIsSubmitting(true);
 
         try {
             const response = await axios.post(`${API_BASE_URL}/api/users/verify-otp`, {
@@ -65,10 +74,12 @@ const LoginPage = () => {
             if (response.data.success) {
                 // Check role
                 if (response.data.role !== 'delivery_agent') {
-                    setError('Access denied. This portal is for delivery agents only.');
-                    toast.error('Access denied. This portal is for delivery agents only.');
+                    const roleMessage = `Access denied. This portal is for delivery agents only. Your account role is: ${response.data.role}`;
+                    setError(roleMessage);
+                    toast.error(roleMessage);
                     setShowOtpUI(false);
                     setOtp('');
+                    setTempUserId(null);
                     return;
                 }
 
@@ -104,14 +115,26 @@ const LoginPage = () => {
         setError('');
 
         // Validation
-        if (!formData.email || !formData.password) {
-            setError('Please enter both email and password');
+        if (!formData.email || !formData.email.trim()) {
+            setError('Email is required');
             setIsSubmitting(false);
             return;
         }
 
-        if (!validateEmail(formData.email)) {
+        if (!validateEmail(formData.email.trim())) {
             setError('Please enter a valid email address');
+            setIsSubmitting(false);
+            return;
+        }
+
+        if (!formData.password) {
+            setError('Password is required');
+            setIsSubmitting(false);
+            return;
+        }
+
+        if (formData.password.length < 8) {
+            setError('Password must be at least 8 characters');
             setIsSubmitting(false);
             return;
         }

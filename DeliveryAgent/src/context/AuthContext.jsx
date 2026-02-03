@@ -164,8 +164,14 @@ import { toast } from 'react-toastify';
 
 // Create the context
 export const AuthContext = createContext(null);
+<<<<<<< HEAD
 // Define the backend API URL from environment variable
 const API_BASE_URL = import.meta.env.VITE_API_URL || "https://snap-dish.onrender.com";
+=======
+
+// Define the backend API URL from environment variable
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:4000";
+>>>>>>> 0e518ca (dev local)
 
 // --- Axios Helper ---
 const setAuthHeader = (token) => {
@@ -228,8 +234,9 @@ export const AuthProvider = ({ children }) => {
 
                 // CRITICAL: Role check
                 if (receivedUser.role !== 'delivery_agent') {
-                    toast.error("Access denied. This portal is for delivery agents only.");
-                    return;
+                    const roleMessage = `Access denied. This portal is for delivery agents only. Your account role is: ${receivedUser.role}`;
+                    toast.error(roleMessage);
+                    return false;
                 }
 
                 // Store data in localStorage
@@ -242,34 +249,26 @@ export const AuthProvider = ({ children }) => {
                 setAuthHeader(receivedToken);
 
                 toast.success(`Welcome back, ${receivedUser.firstName}!`);
+                return true;
             } else {
                 toast.error(response.data.message || "An unknown error occurred.");
+                return false;
             }
         } catch (error) {
             console.error("Login error:", error);
 
             if (error.response?.status === 404) {
                 toast.error("Backend server not found. Please ensure the server is running.");
+            } else if (error.response?.status === 401) {
+                toast.error(error.response?.data?.message || "Invalid email or password.");
             } else if (error.response?.data?.message) {
                 toast.error(error.response.data.message);
             } else {
                 toast.error("Login failed. Please check your credentials and try again.");
             }
-        }
-    }, []);
-
-    const updateUser = useCallback((updatedUserData) => {
-        setUser(prev => ({ ...prev, ...updatedUserData }));
-        localStorage.setItem("user", JSON.stringify({ ...user, ...updatedUserData }));
-    }, [user]);
-    const logout = useCallback(() => {
-        localStorage.removeItem("token");
-        localStorage.removeItem("user");
-        setToken(null);
-        setUser(null);
-        setAuthHeader(null);
-        toast.info("You have been logged out.");
-    }, []);
+            return false;
+            toast.info("You have been logged out.");
+        }, []);
 
     // --- Memoized Context Value ---
     const contextValue = useMemo(() => ({

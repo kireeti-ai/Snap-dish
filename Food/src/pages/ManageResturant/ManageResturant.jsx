@@ -9,7 +9,7 @@ const RESTAURANT_ADMIN_URL = process.env.NODE_ENV === 'production'
     ? 'https://snap-dish-d5y5.vercel.app'
     : 'http://localhost:5174';
 
-const API_URL = "https://snap-dish.onrender.com";
+const API_URL = "http://localhost:4000";
 
 // --- Form Step Components (Moved Outside) ---
 

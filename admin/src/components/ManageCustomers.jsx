@@ -4,14 +4,14 @@ import axios from 'axios';
 function ManageCustomers() {
   const [customers, setCustomers] = useState([]);
   const [error, setError] = useState('');
-  
-  const API_URL = 'https://snap-dish.onrender.com/api/users'; 
+
+  const API_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:4000';
   const token = localStorage.getItem("token");
 
   useEffect(() => {
     const fetchCustomers = async () => {
       try {
-        const response = await axios.get(`${API_URL}/admin/users`, {
+        const response = await axios.get(`${API_URL}/api/users/admin/users`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         if (response.data.success) {
@@ -35,7 +35,7 @@ function ManageCustomers() {
   const handleToggleStatus = async (id, currentStatus) => {
     const newStatus = currentStatus === 'active' ? 'suspended' : 'active';
     try {
-      const response = await axios.put(`${API_URL}/admin/users/${id}/status`, 
+      const response = await axios.put(`${API_URL}/api/users/admin/users/${id}/status`,
         { status: newStatus },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -55,7 +55,7 @@ function ManageCustomers() {
   const handleDelete = async (id) => {
     if (window.confirm("Are you sure you want to permanently delete this user?")) {
       try {
-        const response = await axios.delete(`${API_URL}/admin/users/${id}`, {
+        const response = await axios.delete(`${API_URL}/api/users/admin/users/${id}`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         if (response.data.success) {
@@ -102,7 +102,7 @@ function ManageCustomers() {
                 >
                   {customer.status === 'active' ? 'Suspend' : 'Activate'}
                 </button>
-                <button 
+                <button
                   className="btn btn-delete"
                   onClick={() => handleDelete(customer._id)}
                 >

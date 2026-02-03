@@ -5,6 +5,7 @@ import { OrderProvider } from './context/OrderContext';
 
 import Layout from './components/Layout';
 import LoginPage from './pages/LoginPage';
+import SSOHandler from './pages/SSOHandler';
 import DashboardPage from './pages/DashboardPage';
 import EarningsPage from './pages/EarningsPage';
 import ProfilePage from './pages/ProfilePage';
@@ -19,6 +20,7 @@ function AppRoutes() {
     return (
         <Routes>
             <Route path="/login" element={<LoginPage />} />
+            <Route path="/sso" element={<SSOHandler />} />
             <Route
                 path="/*"
                 element={

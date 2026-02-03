@@ -23,14 +23,19 @@ function LoginPage({ onLoginSuccess }) {
 
   const handleVerifyOTP = async (e) => {
     e.preventDefault();
-    setLoading(true);
     setError('');
 
     if (!otp || otp.length !== 6) {
       setError('Please enter a valid 6-digit OTP');
-      setLoading(false);
       return;
     }
+
+    if (!/^\d{6}$/.test(otp)) {
+      setError('OTP must contain only numbers');
+      return;
+    }
+
+    setLoading(true);
 
     try {
       const response = await axios.post(`${API_BASE_URL}/api/users/verify-otp`, {
@@ -40,10 +45,11 @@ function LoginPage({ onLoginSuccess }) {
 
       if (response.data.success) {
         if (response.data.role !== 'admin') {
-          setError('Access denied. Admin privileges required.');
-          toast.error('Access denied. Admin privileges required.');
+          setError(`Access denied. Admin privileges required. Your role is: ${response.data.role}`);
+          toast.error(`Access denied. Admin privileges required. Your role is: ${response.data.role}`);
           setShowOtpUI(false);
           setOtp('');
+          setTempUserId(null);
           return;
         }
 
@@ -66,21 +72,30 @@ function LoginPage({ onLoginSuccess }) {
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    setLoading(true);
     setError('');
 
     // Validation
-    if (!email || !password) {
-      setError('Please enter both email and password');
-      setLoading(false);
+    if (!email || !email.trim()) {
+      setError('Email is required');
       return;
     }
 
-    if (!validateEmail(email)) {
+    if (!validateEmail(email.trim())) {
       setError('Please enter a valid email address');
-      setLoading(false);
       return;
     }
+
+    if (!password) {
+      setError('Password is required');
+      return;
+    }
+
+    if (password.length < 8) {
+      setError('Password must be at least 8 characters');
+      return;
+    }
+
+    setLoading(true);
 
     try {
       const response = await axios.post(`${API_BASE_URL}/api/users/login`,

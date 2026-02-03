@@ -1,9 +1,11 @@
 import { useState, useEffect } from "react";
 import { toast } from "react-toastify";
 import api from "../utils/api";
-import { Save, RefreshCw, AlertCircle, CheckCircle, Settings as SettingsIcon } from "lucide-react";
+import { Save, RefreshCw, AlertCircle, CheckCircle, Settings as SettingsIcon, User, QrCode } from "lucide-react";
+import { useAuth } from "../context/AuthContext";
 
 const Settings = () => {
+  const { user } = useAuth();
   const [settings, setSettings] = useState({
     commissionRate: 15,
     deliveryFee: 5,
@@ -16,7 +18,34 @@ const Settings = () => {
   const [saving, setSaving] = useState(false);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
+  // QR Code state
+  const [qrCode, setQrCode] = useState(null);
+  const [qrLoading, setQrLoading] = useState(false);
+  const [profileData, setProfileData] = useState(null);
+
+  // Fetch user profile with QR code
+  const fetchUserProfile = async () => {
+    setQrLoading(true);
+    try {
+      const response = await api.get("/api/users/profile");
+      if (response.data.success) {
+        setProfileData(response.data.user);
+        setQrCode(response.data.user.qrCode);
+      }
+    } catch (error) {
+      console.error("Error fetching profile:", error);
+    } finally {
+      setQrLoading(false);
+    }
+  };
+
   const fetchSettings = async () => {
+    // Only admins can access admin settings
+    if (user?.role !== 'admin') {
+      setLoading(false);
+      return;
+    }
+
     try {
       const response = await api.get("/api/admin/settings");
 
@@ -28,7 +57,7 @@ const Settings = () => {
       }
     } catch (error) {
       console.error("Error fetching settings:", error);
-      toast.error("Could not fetch settings.");
+      // Don't show error toast for restaurant owners
     } finally {
       setLoading(false);
     }
@@ -109,6 +138,7 @@ const Settings = () => {
 
   useEffect(() => {
     fetchSettings();
+    fetchUserProfile();
   }, []);
 
   // Warn user about unsaved changes when leaving the page
@@ -135,227 +165,315 @@ const Settings = () => {
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Platform Settings</h1>
-        <p className="text-gray-600">Configure your platform settings and preferences</p>
+        <h1 className="text-3xl font-bold text-gray-900 mb-2">
+          {user?.role === 'admin' ? 'Platform Settings' : 'Profile Settings'}
+        </h1>
+        <p className="text-gray-600">
+          {user?.role === 'admin'
+            ? 'Configure your platform settings and preferences'
+            : 'View your profile information and QR code'}
+        </p>
       </div>
 
-
-      {hasUnsavedChanges && (
-        <div className="mb-6 bg-yellow-50 border border-yellow-200 rounded-lg p-4 flex items-center">
-          <AlertCircle className="w-5 h-5 text-yellow-600 mr-3" />
-          <div className="flex-1">
-            <p className="text-sm font-medium text-yellow-800">You have unsaved changes</p>
-            <p className="text-sm text-yellow-700">Don't forget to save your changes before leaving this page.</p>
-          </div>
-        </div>
-      )}
-
-      <form onSubmit={handleSubmit} className="space-y-8">
-        {/* Platform Configuration */}
-        <div className="bg-white rounded-lg shadow border border-gray-200 p-6">
-          <div className="flex items-center mb-4">
-            <SettingsIcon className="w-5 h-5 text-gray-600 mr-2" />
-            <h2 className="text-lg font-semibold text-gray-900">Platform Configuration</h2>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <label htmlFor="platformName" className="block text-sm font-medium text-gray-700 mb-2">
-                Platform Name
-              </label>
-              <input
-                type="text"
-                id="platformName"
-                value={settings.platformName}
-                onChange={(e) => handleInputChange('platformName', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                placeholder="Enter platform name"
-                required
-                data-testid="platform-name-input"
-              />
-              <p className="text-xs text-gray-500 mt-1">This name will appear throughout the platform</p>
-            </div>
-
-            <div>
-              <label htmlFor="supportEmail" className="block text-sm font-medium text-gray-700 mb-2">
-                Support Email
-              </label>
-              <input
-                type="email"
-                id="supportEmail"
-                value={settings.supportEmail}
-                onChange={(e) => handleInputChange('supportEmail', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                placeholder="support@example.com"
-                required
-                data-testid="support-email-input"
-              />
-              <p className="text-xs text-gray-500 mt-1">Primary email for customer support</p>
-            </div>
-          </div>
+      {/* User Profile & QR Code Section */}
+      <div className="mb-8 bg-white rounded-lg shadow border border-gray-200 p-6">
+        <div className="flex items-center mb-4">
+          <User className="w-5 h-5 text-gray-600 mr-2" />
+          <h2 className="text-lg font-semibold text-gray-900">Your Profile & QR Code</h2>
         </div>
 
-    
-        <div className="bg-white rounded-lg shadow border border-gray-200 p-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">Financial Settings</h2>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Profile Info */}
+          <div className="space-y-3">
             <div>
-              <label htmlFor="commissionRate" className="block text-sm font-medium text-gray-700 mb-2">
-                Commission Rate (%)
-              </label>
-              <div className="relative">
-                <input
-                  type="number"
-                  id="commissionRate"
-                  value={settings.commissionRate}
-                  onChange={(e) => handleInputChange('commissionRate', parseFloat(e.target.value) || 0)}
-                  className="w-full px-3 py-2 pr-8 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  placeholder="15"
-                  min="0"
-                  max="100"
-                  step="0.1"
-                  required
-                  data-testid="commission-rate-input"
-                />
-                <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm">%</span>
-              </div>
-              <p className="text-xs text-gray-500 mt-1">Commission charged to restaurants per order</p>
-
-              {/* Commission Preview */}
-              <div className="mt-3 p-3 bg-blue-50 rounded-lg">
-                <p className="text-sm text-blue-700">
-                  <strong>Preview:</strong> For a ₹1000 order, commission will be ₹{(1000 * settings.commissionRate / 100).toFixed(2)}
-                </p>
-              </div>
+              <label className="text-sm font-medium text-gray-500">Name</label>
+              <p className="text-gray-900">{profileData?.firstName} {profileData?.lastName}</p>
             </div>
-
             <div>
-              <label htmlFor="deliveryFee" className="block text-sm font-medium text-gray-700 mb-2">
-                Base Delivery Fee (₹)
-              </label>
-              <div className="relative">
-                <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm">₹</span>
-                <input
-                  type="number"
-                  id="deliveryFee"
-                  value={settings.deliveryFee}
-                  onChange={(e) => handleInputChange('deliveryFee', parseFloat(e.target.value) || 0)}
-                  className="w-full pl-8 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  placeholder="5"
-                  min="0"
-                  step="0.1"
-                  required
-                  data-testid="delivery-fee-input"
-                />
-              </div>
-              <p className="text-xs text-gray-500 mt-1">Standard delivery fee for orders</p>
-
-
-              <div className="mt-3 p-3 bg-green-50 rounded-lg">
-                <p className="text-sm text-green-700">
-                  <strong>Current Fee:</strong> ₹{settings.deliveryFee} per delivery
-                </p>
-              </div>
+              <label className="text-sm font-medium text-gray-500">Email</label>
+              <p className="text-gray-900">{profileData?.email || user?.email}</p>
             </div>
-          </div>
-        </div>
-
-        <div className="bg-white rounded-lg shadow border border-gray-200 p-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">Revenue Calculator</h2>
-          <p className="text-sm text-gray-600 mb-4">Calculate potential platform revenue based on current settings</p>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="p-4 bg-blue-50 rounded-lg text-center">
-              <p className="text-sm text-blue-600 font-medium">Daily Orders</p>
-              <p className="text-2xl font-bold text-blue-900">100</p>
-              <p className="text-xs text-blue-600">Average order value: ₹500</p>
-            </div>
-
-            <div className="p-4 bg-green-50 rounded-lg text-center">
-              <p className="text-sm text-green-600 font-medium">Commission Revenue</p>
-              <p className="text-2xl font-bold text-green-900">
-                ₹{((100 * 500 * settings.commissionRate) / 100).toFixed(0)}
-              </p>
-              <p className="text-xs text-green-600">Per day from commissions</p>
-            </div>
-
-            <div className="p-4 bg-purple-50 rounded-lg text-center">
-              <p className="text-sm text-purple-600 font-medium">Delivery Revenue</p>
-              <p className="text-2xl font-bold text-purple-900">
-                ₹{(100 * settings.deliveryFee).toFixed(0)}
-              </p>
-              <p className="text-xs text-purple-600">Per day from delivery fees</p>
-            </div>
-          </div>
-
-          <div className="mt-4 p-4 bg-gray-50 rounded-lg">
-            <p className="text-sm font-medium text-gray-700">
-              Total Daily Revenue:
-              <span className="text-lg font-bold text-gray-900 ml-2">
-                ₹{(((100 * 500 * settings.commissionRate) / 100) + (100 * settings.deliveryFee)).toFixed(0)}
+            <div>
+              <label className="text-sm font-medium text-gray-500">Role</label>
+              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 capitalize">
+                {profileData?.role?.replace('_', ' ') || user?.role?.replace('_', ' ')}
               </span>
-            </p>
-            <p className="text-xs text-gray-500 mt-1">Based on 100 orders/day with ₹500 average order value</p>
+            </div>
+            <div>
+              <label className="text-sm font-medium text-gray-500">Phone</label>
+              <p className="text-gray-900">{profileData?.phone_number || 'Not set'}</p>
+            </div>
           </div>
-        </div>
 
-        {/* Action Buttons */}
-        <div className="flex flex-col sm:flex-row gap-4 justify-end">
-          <button
-            type="button"
-            onClick={handleReset}
-            disabled={!hasUnsavedChanges || saving}
-            className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 focus:ring-2 focus:ring-gray-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
-            data-testid="reset-settings-btn"
-          >
-            <RefreshCw className="w-4 h-4 inline mr-2" />
-            Reset Changes
-          </button>
+          {/* QR Code */}
+          <div className="flex flex-col items-center justify-center p-4 bg-gray-50 rounded-lg border-2 border-dashed border-gray-200">
+            <div className="flex items-center mb-3">
+              <QrCode className="w-5 h-5 text-gray-600 mr-2" />
+              <span className="text-sm font-medium text-gray-700">Your Unique QR Code</span>
+            </div>
 
-          <button
-            type="submit"
-            disabled={!hasUnsavedChanges || saving}
-            className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
-            data-testid="save-settings-btn"
-          >
-            {saving ? (
-              <>
-                <RefreshCw className="w-4 h-4 inline mr-2 animate-spin" />
-                Saving...
-              </>
+            {qrLoading ? (
+              <div className="w-32 h-32 flex items-center justify-center">
+                <RefreshCw className="w-8 h-8 text-gray-400 animate-spin" />
+              </div>
+            ) : qrCode ? (
+              <div className="bg-white p-3 rounded-lg shadow-sm">
+                <img
+                  src={qrCode}
+                  alt="User QR Code"
+                  className="w-32 h-32"
+                />
+              </div>
             ) : (
-              <>
-                <Save className="w-4 h-4 inline mr-2" />
-                Save Settings
-              </>
+              <div className="w-32 h-32 flex items-center justify-center bg-gray-100 rounded-lg">
+                <p className="text-sm text-gray-500 text-center">QR Code not available</p>
+              </div>
             )}
-          </button>
-        </div>
-      </form>
 
-      {/* Settings History (if you want to show when settings were last updated) */}
-      {originalSettings.updatedAt && (
-        <div className="mt-8 bg-gray-50 rounded-lg p-4 border border-gray-200">
-          <div className="flex items-center text-sm text-gray-600">
-            <CheckCircle className="w-4 h-4 text-green-500 mr-2" />
-            Last updated: {new Date(originalSettings.updatedAt).toLocaleString()}
-            {originalSettings.updatedBy && (
-              <span className="ml-2">by Admin</span>
+            <p className="text-xs text-gray-500 mt-3 text-center">
+              This QR code contains your encrypted user ID.<br />
+              Use it for quick identification and authentication.
+            </p>
+
+            {qrCode && (
+              <button
+                onClick={() => {
+                  const link = document.createElement('a');
+                  link.href = qrCode;
+                  link.download = `${profileData?.firstName || 'user'}-qrcode.png`;
+                  link.click();
+                }}
+                className="mt-3 px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              >
+                Download QR Code
+              </button>
             )}
           </div>
         </div>
-      )}
-
-      <div className="mt-8 bg-blue-50 rounded-lg p-4 border border-blue-200">
-        <h3 className="text-sm font-medium text-blue-900 mb-2">Configuration Tips</h3>
-        <ul className="text-sm text-blue-800 space-y-1">
-          <li>• Commission rates typically range from 10-25% in the food delivery industry</li>
-          <li>• Lower delivery fees can increase order volume but reduce per-order revenue</li>
-          <li>• Consider market competition when setting your rates</li>
-          <li>• Changes take effect immediately after saving</li>
-        </ul>
       </div>
+
+
+      {/* Admin-only sections */}
+      {user?.role === 'admin' && (
+        <>
+          {hasUnsavedChanges && (
+            <div className="mb-6 bg-yellow-50 border border-yellow-200 rounded-lg p-4 flex items-center">
+              <AlertCircle className="w-5 h-5 text-yellow-600 mr-3" />
+              <div className="flex-1">
+                <p className="text-sm font-medium text-yellow-800">You have unsaved changes</p>
+                <p className="text-sm text-yellow-700">Don't forget to save your changes before leaving this page.</p>
+              </div>
+            </div>
+          )}
+
+          <form onSubmit={handleSubmit} className="space-y-8">
+            {/* Platform Configuration */}
+            <div className="bg-white rounded-lg shadow border border-gray-200 p-6">
+              <div className="flex items-center mb-4">
+                <SettingsIcon className="w-5 h-5 text-gray-600 mr-2" />
+                <h2 className="text-lg font-semibold text-gray-900">Platform Configuration</h2>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label htmlFor="platformName" className="block text-sm font-medium text-gray-700 mb-2">
+                    Platform Name
+                  </label>
+                  <input
+                    type="text"
+                    id="platformName"
+                    value={settings.platformName}
+                    onChange={(e) => handleInputChange('platformName', e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    placeholder="Enter platform name"
+                    required
+                    data-testid="platform-name-input"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">This name will appear throughout the platform</p>
+                </div>
+
+                <div>
+                  <label htmlFor="supportEmail" className="block text-sm font-medium text-gray-700 mb-2">
+                    Support Email
+                  </label>
+                  <input
+                    type="email"
+                    id="supportEmail"
+                    value={settings.supportEmail}
+                    onChange={(e) => handleInputChange('supportEmail', e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    placeholder="support@example.com"
+                    required
+                    data-testid="support-email-input"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">Primary email for customer support</p>
+                </div>
+              </div>
+            </div>
+
+
+            <div className="bg-white rounded-lg shadow border border-gray-200 p-6">
+              <h2 className="text-lg font-semibold text-gray-900 mb-4">Financial Settings</h2>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label htmlFor="commissionRate" className="block text-sm font-medium text-gray-700 mb-2">
+                    Commission Rate (%)
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="number"
+                      id="commissionRate"
+                      value={settings.commissionRate}
+                      onChange={(e) => handleInputChange('commissionRate', parseFloat(e.target.value) || 0)}
+                      className="w-full px-3 py-2 pr-8 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      placeholder="15"
+                      min="0"
+                      max="100"
+                      step="0.1"
+                      required
+                      data-testid="commission-rate-input"
+                    />
+                    <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm">%</span>
+                  </div>
+                  <p className="text-xs text-gray-500 mt-1">Commission charged to restaurants per order</p>
+
+                  {/* Commission Preview */}
+                  <div className="mt-3 p-3 bg-blue-50 rounded-lg">
+                    <p className="text-sm text-blue-700">
+                      <strong>Preview:</strong> For a ₹1000 order, commission will be ₹{(1000 * settings.commissionRate / 100).toFixed(2)}
+                    </p>
+                  </div>
+                </div>
+
+                <div>
+                  <label htmlFor="deliveryFee" className="block text-sm font-medium text-gray-700 mb-2">
+                    Base Delivery Fee (₹)
+                  </label>
+                  <div className="relative">
+                    <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm">₹</span>
+                    <input
+                      type="number"
+                      id="deliveryFee"
+                      value={settings.deliveryFee}
+                      onChange={(e) => handleInputChange('deliveryFee', parseFloat(e.target.value) || 0)}
+                      className="w-full pl-8 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      placeholder="5"
+                      min="0"
+                      step="0.1"
+                      required
+                      data-testid="delivery-fee-input"
+                    />
+                  </div>
+                  <p className="text-xs text-gray-500 mt-1">Standard delivery fee for orders</p>
+
+
+                  <div className="mt-3 p-3 bg-green-50 rounded-lg">
+                    <p className="text-sm text-green-700">
+                      <strong>Current Fee:</strong> ₹{settings.deliveryFee} per delivery
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-lg shadow border border-gray-200 p-6">
+              <h2 className="text-lg font-semibold text-gray-900 mb-4">Revenue Calculator</h2>
+              <p className="text-sm text-gray-600 mb-4">Calculate potential platform revenue based on current settings</p>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="p-4 bg-blue-50 rounded-lg text-center">
+                  <p className="text-sm text-blue-600 font-medium">Daily Orders</p>
+                  <p className="text-2xl font-bold text-blue-900">100</p>
+                  <p className="text-xs text-blue-600">Average order value: ₹500</p>
+                </div>
+
+                <div className="p-4 bg-green-50 rounded-lg text-center">
+                  <p className="text-sm text-green-600 font-medium">Commission Revenue</p>
+                  <p className="text-2xl font-bold text-green-900">
+                    ₹{((100 * 500 * settings.commissionRate) / 100).toFixed(0)}
+                  </p>
+                  <p className="text-xs text-green-600">Per day from commissions</p>
+                </div>
+
+                <div className="p-4 bg-purple-50 rounded-lg text-center">
+                  <p className="text-sm text-purple-600 font-medium">Delivery Revenue</p>
+                  <p className="text-2xl font-bold text-purple-900">
+                    ₹{(100 * settings.deliveryFee).toFixed(0)}
+                  </p>
+                  <p className="text-xs text-purple-600">Per day from delivery fees</p>
+                </div>
+              </div>
+
+              <div className="mt-4 p-4 bg-gray-50 rounded-lg">
+                <p className="text-sm font-medium text-gray-700">
+                  Total Daily Revenue:
+                  <span className="text-lg font-bold text-gray-900 ml-2">
+                    ₹{(((100 * 500 * settings.commissionRate) / 100) + (100 * settings.deliveryFee)).toFixed(0)}
+                  </span>
+                </p>
+                <p className="text-xs text-gray-500 mt-1">Based on 100 orders/day with ₹500 average order value</p>
+              </div>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex flex-col sm:flex-row gap-4 justify-end">
+              <button
+                type="button"
+                onClick={handleReset}
+                disabled={!hasUnsavedChanges || saving}
+                className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 focus:ring-2 focus:ring-gray-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
+                data-testid="reset-settings-btn"
+              >
+                <RefreshCw className="w-4 h-4 inline mr-2" />
+                Reset Changes
+              </button>
+
+              <button
+                type="submit"
+                disabled={!hasUnsavedChanges || saving}
+                className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
+                data-testid="save-settings-btn"
+              >
+                {saving ? (
+                  <>
+                    <RefreshCw className="w-4 h-4 inline mr-2 animate-spin" />
+                    Saving...
+                  </>
+                ) : (
+                  <>
+                    <Save className="w-4 h-4 inline mr-2" />
+                    Save Settings
+                  </>
+                )}
+              </button>
+            </div>
+          </form>
+
+          {/* Settings History (if you want to show when settings were last updated) */}
+          {originalSettings.updatedAt && (
+            <div className="mt-8 bg-gray-50 rounded-lg p-4 border border-gray-200">
+              <div className="flex items-center text-sm text-gray-600">
+                <CheckCircle className="w-4 h-4 text-green-500 mr-2" />
+                Last updated: {new Date(originalSettings.updatedAt).toLocaleString()}
+                {originalSettings.updatedBy && (
+                  <span className="ml-2">by Admin</span>
+                )}
+              </div>
+            </div>
+          )}
+
+          <div className="mt-8 bg-blue-50 rounded-lg p-4 border border-blue-200">
+            <h3 className="text-sm font-medium text-blue-900 mb-2">Configuration Tips</h3>
+            <ul className="text-sm text-blue-800 space-y-1">
+              <li>• Commission rates typically range from 10-25% in the food delivery industry</li>
+              <li>• Lower delivery fees can increase order volume but reduce per-order revenue</li>
+              <li>• Consider market competition when setting your rates</li>
+              <li>• Changes take effect immediately after saving</li>
+            </ul>
+          </div>
+        </>
+      )}
     </div>
   );
 };

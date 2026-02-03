@@ -1,6 +1,6 @@
 // App.jsx
 import { useState, useEffect } from "react";
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import Sidebar from "./components/Sidebar";
 import Navbar from "./components/Navbar";
 import Dashboard from "./pages/Dashboard";
@@ -11,6 +11,7 @@ import Users from "./pages/Users";
 import Reports from "./pages/Reports";
 import Settings from "./pages/Settings";
 import Login from "./pages/Login";
+import SSOHandler from "./pages/SSOHandler";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -23,14 +24,36 @@ const ProtectedRoute = ({ children }) => {
 
 function AppContent() {
   const { user, logout } = useAuth();
+  const location = useLocation();
+
+  // Allow SSO route without authentication
+  if (location.pathname === '/sso') {
+    return (
+      <>
+        <ToastContainer position="top-right" autoClose={3000} theme="colored" />
+        <Routes>
+          <Route path="/sso" element={<SSOHandler />} />
+        </Routes>
+      </>
+    );
+  }
 
   if (!user) {
-    return <Login />;
+    return (
+      <>
+        <ToastContainer position="top-right" autoClose={3000} theme="colored" />
+        <Routes>
+          <Route path="/login" element={<Login />} />
+          <Route path="/sso" element={<SSOHandler />} />
+          <Route path="*" element={<Login />} />
+        </Routes>
+      </>
+    );
   }
 
   return (
     <div className="flex h-screen bg-gray-100">
-            <ToastContainer
+      <ToastContainer
         position="top-right"
         autoClose={3000}
         hideProgressBar={false}

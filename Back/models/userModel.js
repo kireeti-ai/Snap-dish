@@ -32,10 +32,10 @@ const userSchema = new mongoose.Schema(
       type: String,
       enum: ["customer", "restaurant_owner", "delivery_agent", "admin"],
       default: "customer",
-    },// --- ADD THESE NEW FIELDS ---
+    },
     otp: {
         type: String,
-        select: false // Hides this field from normal queries for security
+        select: false 
     },
     otpExpires: {
         type: Date,

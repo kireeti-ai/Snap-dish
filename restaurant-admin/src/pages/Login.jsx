@@ -3,7 +3,11 @@ import { useState } from "react";
 import axios from "axios";
 import { useAuth } from "../context/AuthContext";
 
+<<<<<<< HEAD
 const API_BASE_URL = import.meta.env.VITE_API_URL || "https://snap-dish.onrender.com";
+=======
+const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:4000";
+>>>>>>> 0e518ca (dev local)
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -25,14 +29,19 @@ const Login = () => {
 
   const handleVerifyOTP = async (e) => {
     e.preventDefault();
-    setLoading(true);
     setError("");
 
     if (!otp || otp.length !== 6) {
       setError("Please enter a valid 6-digit OTP");
-      setLoading(false);
       return;
     }
+
+    if (!/^\d{6}$/.test(otp)) {
+      setError("OTP must contain only numbers");
+      return;
+    }
+
+    setLoading(true);
 
     try {
       const response = await axios.post(`${API_BASE_URL}/api/users/verify-otp`, {
@@ -43,9 +52,10 @@ const Login = () => {
       if (response.data.success) {
         // Check role - allow restaurant_owner or admin
         if (response.data.role !== 'restaurant_owner' && response.data.role !== 'admin') {
-          setError("Access denied. This portal is for restaurant owners only.");
+          setError(`Access denied. This portal is for restaurant owners only. Your role is: ${response.data.role}`);
           setShowOtpUI(false);
           setOtp("");
+          setTempUserId(null);
           return;
         }
 
@@ -62,21 +72,30 @@ const Login = () => {
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    setLoading(true);
     setError("");
 
     // Validation
-    if (!email || !password) {
-      setError("Please enter both email and password");
-      setLoading(false);
+    if (!email || !email.trim()) {
+      setError("Email is required");
       return;
     }
 
-    if (!validateEmail(email)) {
+    if (!validateEmail(email.trim())) {
       setError("Please enter a valid email address");
-      setLoading(false);
       return;
     }
+
+    if (!password) {
+      setError("Password is required");
+      return;
+    }
+
+    if (password.length < 8) {
+      setError("Password must be at least 8 characters");
+      return;
+    }
+
+    setLoading(true);
 
     try {
       const response = await axios.post(`${API_BASE_URL}/api/users/login`, {
@@ -95,7 +114,8 @@ const Login = () => {
 
         // Direct login (no MFA) - shouldn't happen with current backend
         if (response.data.role !== 'restaurant_owner' && response.data.role !== 'admin') {
-          setError("Access denied. This portal is for restaurant owners only.");
+          setError(`Access denied. This portal is for restaurant owners only. Your role is: ${response.data.role}`);
+          setLoading(false);
           return;
         }
 
@@ -139,6 +159,7 @@ const Login = () => {
               onChange={(e) => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
               maxLength={6}
               required
+              disabled={loading}
             />
             <button
               className="w-full bg-blue-600 text-white py-2 rounded disabled:bg-blue-400"
@@ -162,14 +183,17 @@ const Login = () => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
+              disabled={loading}
             />
             <input
               type="password"
-              placeholder="Password"
+              placeholder="Password (min 8 characters)"
               className="w-full border px-3 py-2 mb-4 rounded"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
+              disabled={loading}
+              minLength={8}
             />
             <button
               className="w-full bg-blue-600 text-white py-2 rounded disabled:bg-blue-400"

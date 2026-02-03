@@ -40,6 +40,18 @@ const LoginPopup = ({ setShowLogin }) => {
   const onVerifyOTP = async (event) => {
     event.preventDefault();
     setError("");
+
+    // OTP Validation
+    if (!otp || otp.length !== 6) {
+      setError("Please enter a valid 6-digit OTP");
+      return;
+    }
+
+    if (!/^\d{6}$/.test(otp)) {
+      setError("OTP must contain only numbers");
+      return;
+    }
+
     setIsLoading(true);
 
     try {
@@ -68,6 +80,22 @@ const LoginPopup = ({ setShowLogin }) => {
 
   const handleLoginSuccess = (resData) => {
     const token = resData.token || resData.user?.token;
+    const userRole = resData.role || resData.user?.role || "customer";
+
+    // Block restaurant owners and delivery agents - they must use their own portals
+    if (userRole === 'restaurant_owner') {
+      toast.error("Restaurant owners must login at the Restaurant Admin portal (localhost:5174)");
+      setError("This portal is for customers only. Please use the Restaurant Admin portal to login.");
+      return;
+    }
+
+    if (userRole === 'delivery_agent') {
+      toast.error("Delivery agents must login at the Delivery Partner portal (localhost:5175)");
+      setError("This portal is for customers only. Please use the Delivery Partner portal to login.");
+      return;
+    }
+
+    // Only customers can login through Food app
     if (token) {
       setToken(token);
       localStorage.setItem("token", token);
@@ -77,12 +105,14 @@ const LoginPopup = ({ setShowLogin }) => {
     setUserName(name);
     localStorage.setItem("userName", name);
 
-    const userRole = resData.role || resData.user?.role || "customer";
     setUserRole(userRole);
     localStorage.setItem("role", userRole);
 
     toast.success("Login successful!");
+    setShowLogin(false);
+  };
 
+<<<<<<< HEAD
     if (userRole === 'restaurant_owner') {
       // Redirect to external restaurant admin app
       const restaurantAdminUrl = process.env.NODE_ENV === 'production'
@@ -98,51 +128,97 @@ const LoginPopup = ({ setShowLogin }) => {
     } else {
       setShowLogin(false);
     }
+=======
+  // Validation helpers
+  const validateEmail = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
+  const validatePassword = (password) => {
+    // At least 8 chars, 1 uppercase, 1 lowercase, 1 number
+    const hasMinLength = password.length >= 8;
+    const hasUpperCase = /[A-Z]/.test(password);
+    const hasLowerCase = /[a-z]/.test(password);
+    const hasNumber = /\d/.test(password);
+    return { hasMinLength, hasUpperCase, hasLowerCase, hasNumber, isValid: hasMinLength && hasUpperCase && hasLowerCase && hasNumber };
+  };
+
+  const validatePhone = (phone) => {
+    if (!phone) return true; // Phone is optional
+    const phoneRegex = /^[\d\s\-+()]{10,15}$/;
+    return phoneRegex.test(phone);
+>>>>>>> 0e518ca (dev local)
   };
 
   const onLogin = async (event) => {
     event.preventDefault();
     setError("");
-    setIsLoading(true);
-
-    // Email validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(data.email)) {
-      setError("Please enter a valid email address");
-      setIsLoading(false);
-      return;
-    }
 
     if (currState === "Login") {
       // Login Validation
-      if (!data.email || !data.password) {
-        setError("Please enter both email and password");
-        setIsLoading(false);
+      if (!data.email || !data.email.trim()) {
+        setError("Email is required");
+        return;
+      }
+      if (!validateEmail(data.email.trim())) {
+        setError("Please enter a valid email address");
+        return;
+      }
+      if (!data.password) {
+        setError("Password is required");
+        return;
+      }
+      if (data.password.length < 8) {
+        setError("Password must be at least 8 characters");
         return;
       }
     } else {
       // Registration Validation
       if (!data.firstName || !data.firstName.trim()) {
         setError("First name is required");
-        setIsLoading(false);
         return;
       }
-      if (!data.email) {
+      if (data.firstName.trim().length < 2) {
+        setError("First name must be at least 2 characters");
+        return;
+      }
+      if (!data.email || !data.email.trim()) {
         setError("Email is required");
-        setIsLoading(false);
+        return;
+      }
+      if (!validateEmail(data.email.trim())) {
+        setError("Please enter a valid email address");
         return;
       }
       if (!data.password) {
         setError("Password is required");
-        setIsLoading(false);
         return;
       }
-      if (data.password.length < 8) {
+      const passwordCheck = validatePassword(data.password);
+      if (!passwordCheck.hasMinLength) {
         setError("Password must be at least 8 characters");
-        setIsLoading(false);
+        return;
+      }
+      if (!passwordCheck.hasUpperCase) {
+        setError("Password must contain at least one uppercase letter");
+        return;
+      }
+      if (!passwordCheck.hasLowerCase) {
+        setError("Password must contain at least one lowercase letter");
+        return;
+      }
+      if (!passwordCheck.hasNumber) {
+        setError("Password must contain at least one number");
+        return;
+      }
+      if (data.phone_number && !validatePhone(data.phone_number)) {
+        setError("Please enter a valid phone number");
         return;
       }
     }
+
+    setIsLoading(true);
 
     const endpoint = currState === 'Login' ? '/api/users/login' : '/api/users/register';
 
@@ -222,11 +298,12 @@ const LoginPopup = ({ setShowLogin }) => {
                 <input
                   type="text"
                   value={otp}
-                  onChange={(e) => setOtp(e.target.value)}
-
+                  onChange={(e) => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                  placeholder="000000"
                   maxLength={6}
                   style={{ textAlign: 'center', letterSpacing: '5px', fontSize: '1.2rem' }}
                   required
+                  disabled={isLoading}
                 />
               </div>
             ) : (

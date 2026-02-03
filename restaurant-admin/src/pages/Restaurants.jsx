@@ -2,7 +2,11 @@ import { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 
 // --- API Configuration ---
+<<<<<<< HEAD
 const API_BASE_URL = import.meta.env.VITE_API_URL || "https://snap-dish.onrender.com";
+=======
+const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:4000";
+>>>>>>> 0e518ca (dev local)
 
 const api = axios.create({
   baseURL: API_BASE_URL,
