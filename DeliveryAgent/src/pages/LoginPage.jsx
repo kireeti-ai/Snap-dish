@@ -5,11 +5,7 @@ import axios from 'axios';
 import { toast } from 'react-toastify';
 import './LoginPage.css';
 
-<<<<<<< HEAD
-const API_BASE_URL = import.meta.env.VITE_API_URL || "https://snap-dish.onrender.com";
-=======
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:4000";
->>>>>>> 0e518ca (dev local)
 
 const LoginPage = () => {
     const { login, isLoggedIn } = useContext(AuthContext);

@@ -2,11 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 
 // --- API Configuration ---
-<<<<<<< HEAD
-const API_BASE_URL = import.meta.env.VITE_API_URL || "https://snap-dish.onrender.com";
-=======
 const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:4000";
->>>>>>> 0e518ca (dev local)
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -393,8 +389,8 @@ const Restaurants = () => {
                   <DetailRow label="Timings" value={restaurant.timing} />
                   <DetailRow label="Status">
                     <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${restaurant.status === 'active' ? 'bg-green-100 text-green-800' :
-                        restaurant.status === 'inactive' ? 'bg-red-100 text-red-800' :
-                          'bg-yellow-100 text-yellow-800'}`}>
+                      restaurant.status === 'inactive' ? 'bg-red-100 text-red-800' :
+                        'bg-yellow-100 text-yellow-800'}`}>
                       {restaurant.status.replace(/_/g, ' ').toUpperCase()}
                     </span>
                   </DetailRow>

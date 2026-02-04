@@ -3,11 +3,7 @@ import { useState } from "react";
 import axios from "axios";
 import { useAuth } from "../context/AuthContext";
 
-<<<<<<< HEAD
-const API_BASE_URL = import.meta.env.VITE_API_URL || "https://snap-dish.onrender.com";
-=======
 const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:4000";
->>>>>>> 0e518ca (dev local)
 
 const Login = () => {
   const [email, setEmail] = useState("");
