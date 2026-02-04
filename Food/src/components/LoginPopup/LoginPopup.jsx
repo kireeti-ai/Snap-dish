@@ -111,24 +111,7 @@ const LoginPopup = ({ setShowLogin }) => {
     toast.success("Login successful!");
     setShowLogin(false);
   };
-
-<<<<<<< HEAD
-    if (userRole === 'restaurant_owner') {
-      // Redirect to external restaurant admin app
-      const restaurantAdminUrl = process.env.NODE_ENV === 'production'
-        ? 'https://snap-dish-d5y5.vercel.app'
-        : 'http://localhost:5174';
-      window.location.href = restaurantAdminUrl;
-    } else if (userRole === 'delivery_agent') {
-      // Redirect to external delivery agent app
-      const deliveryAgentUrl = process.env.NODE_ENV === 'production'
-        ? 'https://snap-dish-2p9s.vercel.app'
-        : 'http://localhost:5175';
-      window.location.href = deliveryAgentUrl;
-    } else {
-      setShowLogin(false);
-    }
-=======
+  // Validation helpers
   // Validation helpers
   const validateEmail = (email) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -148,7 +131,6 @@ const LoginPopup = ({ setShowLogin }) => {
     if (!phone) return true; // Phone is optional
     const phoneRegex = /^[\d\s\-+()]{10,15}$/;
     return phoneRegex.test(phone);
->>>>>>> 0e518ca (dev local)
   };
 
   const onLogin = async (event) => {
