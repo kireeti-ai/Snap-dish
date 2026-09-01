@@ -5,19 +5,6 @@ import fs from "fs";
 import path from "path";
 import uploadToCloudinary from '../utils/cloudinary.js';
 import { encryptData, decryptData, generateQRCode } from "../utils/security.js"; // Security Utils
-import sendEmail from "../utils/sendEmail.js"; // Email Utils
-
-const pendingRegistrations = new Map();
-
-// Cleanup expired registrations every 5 minutes
-setInterval(() => {
-    const now = Date.now();
-    for (const [key, data] of pendingRegistrations.entries()) {
-        if (data.expiresAt < now) {
-            pendingRegistrations.delete(key);
-        }
-    }
-}, 5 * 60 * 1000);
 
 // Helper function to create a token
 const createToken = (id) => {
@@ -39,7 +26,7 @@ export const validateToken = async (req, res) => {
     }
 };
 
-// --- LOGIN VERIFY CREDENTIALS & SEND OTP (MFA) ---
+// --- LOGIN ---
 export const loginUser = async (req, res) => {
     try {
         const { email, password } = req.body;
@@ -67,175 +54,12 @@ export const loginUser = async (req, res) => {
             });
         }
 
-        // Check if user is active
-        if (user.status === 'inactive') {
-            return res.status(401).json({
-                success: false,
-                message: "Please verify your email first. Check your inbox for the verification code."
-            });
-        }
-
         if (user.status === 'suspended') {
             return res.status(401).json({
                 success: false,
                 message: "Your account has been suspended. Contact support for help."
             });
         }
-
-
-        // 1. Generate 6-digit OTP
-        const otp = Math.floor(100000 + Math.random() * 900000).toString();
-
-        // 2. Save OTP to DB (Valid for 10 mins)
-        user.otp = otp;
-        user.otpExpires = Date.now() + 10 * 60 * 1000;
-        await user.save();
-
-        // 3. Send Email
-        const message = `
-            <div style="font-family: Arial, sans-serif; padding: 20px;">
-                <h2>SnapDish Login Verification</h2>
-                <p>Your One-Time Password (OTP) is:</p>
-                <h1 style="color: #4CAF50; letter-spacing: 5px;">${otp}</h1>
-                <p>This code expires in 10 minutes.</p>
-                <p>If you did not request this, please ignore this email.</p>
-            </div>
-        `;
-
-        const emailResult = await sendEmail({
-            email: user.email,
-            subject: 'SnapDish: Your Login OTP',
-            message: message
-        });
-
-        if (!emailResult.success) {
-            console.error("Email send failed:", emailResult.error);
-            user.otp = undefined;
-            user.otpExpires = undefined;
-            await user.save();
-            return res.status(500).json({
-                success: false,
-                message: "Could not send OTP email. Please try again later."
-            });
-        }
-
-        // Return success but NO TOKEN yet
-        res.json({
-            success: true,
-            message: `OTP sent to ${user.email}`,
-            mfaRequired: true,
-            userId: user._id
-        });
-
-    } catch (error) {
-        console.error("Login error:", error);
-        res.status(500).json({
-            success: false,
-            message: "Login failed. Please check your connection and try again."
-        });
-    }
-};
-
-// --- LOGIN/REGISTRATION  VERIFY OTP & ISSUE TOKEN ---
-export const verifyLoginOTP = async (req, res) => {
-    try {
-        const { userId, otp, registrationId } = req.body;
-
-        if (!otp) {
-            return res.status(400).json({ success: false, message: "Please enter the OTP code" });
-        }
-
-        // --- REGISTRATION OTP VERIFICATION ---
-        if (registrationId) {
-            const pendingData = pendingRegistrations.get(registrationId);
-
-            if (!pendingData) {
-                return res.status(400).json({
-                    success: false,
-                    message: "Registration session expired. Please register again."
-                });
-            }
-
-            if (pendingData.expiresAt < Date.now()) {
-                pendingRegistrations.delete(registrationId);
-                return res.status(400).json({
-                    success: false,
-                    message: "OTP has expired. Please register again."
-                });
-            }
-
-            if (pendingData.otp !== otp) {
-                return res.status(400).json({
-                    success: false,
-                    message: "Incorrect OTP. Please check and try again."
-                });
-            }
-
-            // OTP verified! Now create the user in database
-            const encryptedAddress = pendingData.address ? encryptData(pendingData.address) : "";
-
-            const newUser = new userModel({
-                firstName: pendingData.firstName,
-                lastName: pendingData.lastName,
-                email: pendingData.email,
-                phone_number: pendingData.phone_number,
-                password: pendingData.password,
-                role: pendingData.role,
-                address: encryptedAddress,
-                status: 'active' // User is verified, so active immediately
-            });
-
-            const user = await newUser.save();
-
-            // Remove from pending registrations
-            pendingRegistrations.delete(registrationId);
-
-            const token = createToken(user._id);
-
-            return res.json({
-                success: true,
-                token,
-                role: user.role,
-                firstName: user.firstName,
-                user: {
-                    firstName: user.firstName,
-                    lastName: user.lastName,
-                    email: user.email,
-                    phone_number: user.phone_number,
-                    role: user.role,
-                    avatar: user.avatar
-                }
-            });
-        }
-
-        // --- LOGIN OTP VERIFICATION ---
-        if (!userId) {
-            return res.status(400).json({ success: false, message: "Session expired. Please try logging in again." });
-        }
-
-        // We must select the hidden fields +otp and +otpExpires
-        const user = await userModel.findById(userId).select('+otp +otpExpires');
-
-        if (!user) {
-            return res.status(404).json({ success: false, message: "Session expired. Please try logging in again." });
-        }
-
-        if (!user.otp) {
-            return res.status(400).json({ success: false, message: "No OTP found. Please request a new one." });
-        }
-
-        if (user.otpExpires < Date.now()) {
-            return res.status(400).json({ success: false, message: "OTP has expired. Please request a new one." });
-        }
-
-        if (user.otp !== otp) {
-            return res.status(400).json({ success: false, message: "Incorrect OTP. Please check and try again." });
-        }
-
-        // Clear OTP
-        user.otp = undefined;
-        user.otpExpires = undefined;
-        await user.save();
 
         const token = createToken(user._id);
 
@@ -253,15 +77,17 @@ export const verifyLoginOTP = async (req, res) => {
                 avatar: user.avatar
             }
         });
+
     } catch (error) {
-        console.error("OTP Verify Error:", error);
-        // Handle duplicate email error during registration
-        if (error.code === 11000) {
-            return res.status(400).json({ success: false, message: "Email already registered. Please login instead." });
-        }
-        res.status(500).json({ success: false, message: "Verification failed. Please try again." });
+        console.error("Login error:", error);
+        res.status(500).json({
+            success: false,
+            message: "Login failed. Please check your connection and try again."
+        });
     }
 };
+
+
 
 export const getWishlist = async (req, res) => {
     try {
@@ -285,13 +111,11 @@ export const updateWishlist = async (req, res) => {
     }
 };
 
-// Register user (With Encryption & OTP Verification)
-// Step 1: Validate and send OTP - user is NOT created yet
+// --- REGISTER ---
 export const registerUser = async (req, res) => {
     const { firstName, lastName, email, password, phone_number, role, address } = req.body;
 
     try {
-        // Validation checks with specific messages
         if (!firstName || !firstName.trim()) {
             return res.json({ success: false, message: "First name is required" });
         }
@@ -316,62 +140,41 @@ export const registerUser = async (req, res) => {
             return res.json({ success: false, message: "Password must be at least 8 characters" });
         }
 
-        // Generate 6-digit OTP
-        const otp = Math.floor(100000 + Math.random() * 900000).toString();
+        const encryptedAddress = address ? encryptData(address) : "";
 
-        // Generate a unique registration ID
-        const registrationId = `reg_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-
-        // Store registration data temporarily (NOT in database)
-        pendingRegistrations.set(registrationId, {
+        const newUser = new userModel({
             firstName: firstName.trim(),
             lastName: lastName ? lastName.trim() : "",
             email: normalizedEmail,
             phone_number: phone_number || "",
-            password, // Will be hashed when user is actually created
+            password,
             role: role || "customer",
-            address: address || "",
-            otp,
-            expiresAt: Date.now() + 10 * 60 * 1000 // 10 minutes
+            address: encryptedAddress,
+            status: 'active'
         });
 
-        // Send OTP Email
-        const message = `
-            <div style="font-family: Arial, sans-serif; padding: 20px;">
-                <h2>Welcome to SnapDish!</h2>
-                <p>Thank you for registering. Please verify your email with this OTP:</p>
-                <h1 style="color: #4CAF50; letter-spacing: 5px;">${otp}</h1>
-                <p>This code expires in 10 minutes.</p>
-                <p>If you did not create this account, please ignore this email.</p>
-            </div>
-        `;
+        const user = await newUser.save();
+        const token = createToken(user._id);
 
-        const emailResult = await sendEmail({
-            email: normalizedEmail,
-            subject: 'SnapDish: Verify Your Email',
-            message: message
-        });
-
-        if (!emailResult.success) {
-            console.error("Email send failed:", emailResult.error);
-            // Remove from pending registrations
-            pendingRegistrations.delete(registrationId);
-            return res.status(500).json({
-                success: false,
-                message: "Could not send verification email. Please check your email address and try again."
-            });
-        }
-
-        // Return success - user NOT created yet, just pending
         res.json({
             success: true,
-            message: `OTP sent to ${normalizedEmail}`,
-            mfaRequired: true,
-            registrationId, // Use registrationId instead of userId
-            isRegistration: true
+            token,
+            role: user.role,
+            firstName: user.firstName,
+            user: {
+                firstName: user.firstName,
+                lastName: user.lastName,
+                email: user.email,
+                phone_number: user.phone_number,
+                role: user.role,
+                avatar: user.avatar
+            }
         });
     } catch (error) {
         console.error("Registration error:", error);
+        if (error.code === 11000) {
+            return res.json({ success: false, message: "Email already registered. Please login instead." });
+        }
         res.json({ success: false, message: "Registration failed. Please try again." });
     }
 };

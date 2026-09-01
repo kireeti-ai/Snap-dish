@@ -92,10 +92,7 @@ userSchema.methods.comparePassword = async function (enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
 };
 
-// Helper to verify OTP
-userSchema.methods.verifyOTP = function(enteredOTP) {
-    return this.otp === enteredOTP && this.otpExpires > Date.now();
-};
+
 userSchema.methods.toJSON = function() {
   const userObject = this.toObject();
   delete userObject.password;

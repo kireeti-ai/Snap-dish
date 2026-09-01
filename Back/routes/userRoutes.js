@@ -10,10 +10,11 @@ import {
   updateUserStatusByAdmin,
   deleteUserByAdmin,
   updateUserByAdmin,
-    getCart,
+  getCart,
   updateCart,
-    getWishlist,
-  updateWishlist,validateToken,verifyLoginOTP
+  getWishlist,
+  updateWishlist,
+  validateToken
 } from '../controllers/userController.js';
 import {
     getAllRestaurantsForAdmin,
@@ -31,7 +32,6 @@ userRouter.post('/register', registerUser);
 userRouter.post('/login', loginUser);
 userRouter.get('/cart', protect, getCart);
 userRouter.post('/cart', protect, updateCart);
-userRouter.post('/verify-otp', verifyLoginOTP);
 
 // Protected routes - Profile management
 userRouter.get('/profile', protect, getUserProfile);
