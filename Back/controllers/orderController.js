@@ -84,13 +84,33 @@ export const updateOrderByRestaurant = async (req, res) => {
 
 /**
  * @route   GET /api/order/myorders
- * @desc    Get logged in user's orders
+ * @desc    Get logged in user's orders with signature verification
  * @access  Private
  */
 const getUserOrders = async (req, res) => {
     try {
         const orders = await orderModel.find({ userId: req.user.id }).sort({ date: -1 });
-        res.json({ success: true, data: orders });
+
+        // Verify digital signatures for all orders (Data Integrity Check)
+        const verifiedOrders = orders.map(order => {
+            const orderData = {
+                userId: order.userId.toString(),
+                restaurantId: order.restaurantId.toString(),
+                items: order.items,
+                amount: order.amount,
+                timestamp: order.timestamp
+            };
+
+            const isSignatureValid = verifyDigitalSignature(orderData, order.orderSignature);
+
+            return {
+                ...order.toObject(),
+                signatureStatus: isSignatureValid ? 'verified' : 'invalid',
+                integrityCheck: isSignatureValid ? 'Order data integrity confirmed' : 'Warning: Order data may have been tampered'
+            };
+        });
+
+        res.json({ success: true, data: verifiedOrders });
     } catch (error) {
         console.error("Error fetching user orders:", error);
         res.status(500).json({ success: false, message: "Error fetching orders." });
@@ -135,10 +155,81 @@ export const getRestaurantOrders = async (req, res) => {
             return res.status(404).json({ success: false, message: "Restaurant not found for this user." });
         }
         const orders = await orderModel.find({ restaurantId: restaurant._id }).sort({ date: -1 });
-        res.json({ success: true, data: orders });
+
+        // Verify digital signatures for all orders (Data Integrity Verification)
+        const verifiedOrders = orders.map(order => {
+            const orderData = {
+                userId: order.userId.toString(),
+                restaurantId: order.restaurantId.toString(),
+                items: order.items,
+                amount: order.amount,
+                timestamp: order.timestamp
+            };
+
+            const isSignatureValid = verifyDigitalSignature(orderData, order.orderSignature);
+
+            return {
+                ...order.toObject(),
+                signatureStatus: isSignatureValid ? 'verified' : 'invalid',
+                dataIntegrity: isSignatureValid ? 'confirmed' : 'compromised'
+            };
+        });
+
+        res.json({ success: true, data: verifiedOrders });
     } catch (error) {
         console.error("Error fetching restaurant orders:", error);
         res.status(500).json({ success: false, message: "Error fetching orders" });
+    }
+};
+
+/**
+ * @route   GET /api/order/verify/:orderId
+ * @desc    Verify the digital signature of a specific order
+ * @access  Private
+ * @demonstration Shows digital signature verification in action
+ */
+export const verifyOrderSignature = async (req, res) => {
+    try {
+        const { orderId } = req.params;
+        const order = await orderModel.findById(orderId);
+
+        if (!order) {
+            return res.status(404).json({ success: false, message: "Order not found" });
+        }
+
+        // Reconstruct original order data
+        const orderData = {
+            userId: order.userId.toString(),
+            restaurantId: order.restaurantId.toString(),
+            items: order.items,
+            amount: order.amount,
+            timestamp: order.timestamp
+        };
+
+        // Verify the signature
+        const isSignatureValid = verifyDigitalSignature(orderData, order.orderSignature);
+        const expectedSignature = createDigitalSignature(orderData);
+
+        res.json({
+            success: true,
+            orderId: orderId,
+            signatureVerification: {
+                isValid: isSignatureValid,
+                storedSignature: order.orderSignature,
+                expectedSignature: expectedSignature,
+                match: order.orderSignature === expectedSignature,
+                message: isSignatureValid ? '✓ Order data is authentic and unmodified' : '✗ Order data has been tampered with'
+            },
+            orderData: {
+                userId: order.userId,
+                restaurantId: order.restaurantId,
+                amount: order.amount,
+                itemCount: order.items.length
+            }
+        });
+    } catch (error) {
+        console.error("Error verifying order signature:", error);
+        res.status(500).json({ success: false, message: "Error verifying signature" });
     }
 };
 

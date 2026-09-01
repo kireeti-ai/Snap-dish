@@ -35,7 +35,7 @@ const userSchema = new mongoose.Schema(
     },
     otp: {
         type: String,
-        select: false 
+        select: false
     },
     otpExpires: {
         type: Date,
@@ -75,7 +75,6 @@ const userSchema = new mongoose.Schema(
     timestamps: true
   }
 );
-
 userSchema.pre("save", async function (next) {
   if (!this.isModified("password")) return next();
 

@@ -384,7 +384,7 @@ export const getUserProfile = async (req, res) => {
             return res.status(404).json({ success: false, message: "User not found" });
         }
 
-        // --- DECRYPTION IMPLEMENTATION ---
+        //  DECRYPTION 
         const decryptedAddress = decryptData(user.address);
 
         // --- ENCODING IMPLEMENTATION ---

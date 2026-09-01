@@ -25,7 +25,7 @@ const StoreContextProvider = (props) => {
     longitude: 76.9038,
   });
 
-  const url = "http://localhost:4000";
+  const url = import.meta.env.VITE_API_URL || "http://localhost:4000";
 
 
   const fetchFoodList = async () => {
